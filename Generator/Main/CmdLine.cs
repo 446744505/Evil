@@ -5,7 +5,10 @@ namespace Generator;
 public class CmdLine
 {
     public static CmdLine I;
-    
+
+    [ConfigurationKeyName("interface")] 
+    public string InterfacePath { get; set; }
+
     public static void Init(string[] args)
     {
         var builder = new ConfigurationBuilder().AddCommandLine(args);

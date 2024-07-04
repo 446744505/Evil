@@ -7,4 +7,9 @@
         <RootNamespace>Evil</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Attributes\Config" />
+      <Folder Include="Attributes\DB" />
+    </ItemGroup>
+
 </Project>

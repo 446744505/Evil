@@ -1,6 +1,6 @@
-using Protocol.Attributes;
+using Attributes;
 
-namespace Protocol.Hero;
+namespace Hero;
 
 
 [Protocol]

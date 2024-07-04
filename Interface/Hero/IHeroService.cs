@@ -1,10 +1,10 @@
 
-using Protocol.Attributes;
+using Attributes;
 
-namespace Protocol.Hero;
+namespace Hero;
     
-[Rpc]
+[ClientToServer]
 public interface IHeroService
 {
-     Task<Hero> GetHero(long id);
+     void DoStar(long id);
 }
