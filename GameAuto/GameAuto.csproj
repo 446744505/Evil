@@ -4,13 +4,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Evil</RootNamespace>
         <LangVersion>11</LangVersion>
     </PropertyGroup>
-
+    
     <ItemGroup>
-      <Folder Include="Attributes\Config" />
-      <Folder Include="Attributes\DB" />
+        <Folder Include="*" />
     </ItemGroup>
-
 </Project>

@@ -1,18 +1,21 @@
 using Microsoft.Extensions.Configuration;
 
-namespace Generator;
-
-public class CmdLine
+namespace Generator
 {
-    public static CmdLine I;
-
-    [ConfigurationKeyName("interface")] 
-    public string InterfacePath { get; set; }
-
-    public static void Init(string[] args)
+    internal class CmdLine
     {
-        var builder = new ConfigurationBuilder().AddCommandLine(args);
-        var configuration = builder.Build();
-        I = configuration.Get<CmdLine>() ?? throw new Exception("cmdLineArgs parse failed");
+        public static CmdLine I = null!;
+
+        [ConfigurationKeyName("interface")] 
+        public string InterfacePath { get; set; } = null!;
+        [ConfigurationKeyName("codeOut")] 
+        public string CodeOutputPath { get; set; } = null!;
+
+        public static void Init(string[] args)
+        {
+            var builder = new ConfigurationBuilder().AddCommandLine(args);
+            var configuration = builder.Build();
+            I = configuration.Get<CmdLine>() ?? throw new Exception("cmdLineArgs parse failed");
+        }
     }
 }

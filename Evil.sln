@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interface", "Interface\Inte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "Generator\Generator.csproj", "{357B60E0-BC75-4465-A0FF-4640A1DD4E86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameAuto", "GameAuto\GameAuto.csproj", "{69E80389-91FD-4D3A-9CB7-D432BC8D1804}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{357B60E0-BC75-4465-A0FF-4640A1DD4E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{357B60E0-BC75-4465-A0FF-4640A1DD4E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{357B60E0-BC75-4465-A0FF-4640A1DD4E86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69E80389-91FD-4D3A-9CB7-D432BC8D1804}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69E80389-91FD-4D3A-9CB7-D432BC8D1804}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69E80389-91FD-4D3A-9CB7-D432BC8D1804}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69E80389-91FD-4D3A-9CB7-D432BC8D1804}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

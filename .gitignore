@@ -3,3 +3,6 @@
 /Generator/obj/
 /Interface/bin/
 /Interface/obj/
+/GameAuto/bin/
+/GameAuto/obj/
+**/*.g.cs
