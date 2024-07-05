@@ -8,7 +8,7 @@ namespace Generator
     /// </summary>
     public class ProtocolAttrHandler : BaseTypeAttrHandler, ICreateKindAttrHandler
     {
-        private ICreateKindAttrHandler m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler();
+        private readonly ICreateKindAttrHandler m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler();
         protected override void Parse0(TypeContext tc, AttributeSyntax attr)
         {
             var fields = tc.TypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();

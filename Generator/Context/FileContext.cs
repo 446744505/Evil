@@ -11,24 +11,43 @@ namespace Generator
         private readonly GloableContext m_Gc;
         private readonly string m_Path;
 
-        private readonly List<NamespaceDeclarationSyntax> m_Namespaces = new();
-        
+        private readonly List<TypeContext> m_TypeContexts = new();
+        private readonly List<NamespaceDeclarationSyntax> m_NamespaceSyntaxes = new();
+        private readonly Dictionary<string, NamespaceKind> m_NamespaceKinds = new();
+
         #endregion
 
         public FileContext(GloableContext gc, string path)
         {
             m_Gc = gc;
             m_Path = path;
+            gc.AddFileContext(this);
         }
         
-        public void AddNamespace(NamespaceDeclarationSyntax ns)
+        public void AddNamespaceSyntax(NamespaceDeclarationSyntax ns)
         {
-            m_Namespaces.Add(ns);
+            m_NamespaceSyntaxes.Add(ns);
+        }
+        
+        public void AddTypeContext(TypeContext tc)
+        {
+            m_TypeContexts.Add(tc);
+        }
+        
+        public NamespaceKind GetOrCreateNamespaceKind(string name)
+        {
+            if (m_NamespaceKinds.TryGetValue(name, out var ns))
+            {
+                return ns;
+            }
+            ns = new NamespaceKind(name);
+            m_NamespaceKinds.Add(name, ns);
+            return ns;
         }
 
         public void CreateFile()
         {
-            if (m_Namespaces.Count == 0)
+            if (m_NamespaceSyntaxes.Count == 0)
             {
                 return;
             }
@@ -41,7 +60,7 @@ namespace Generator
             }
             
             var cu = SyntaxFactory.CompilationUnit();
-            foreach (var ns in m_Namespaces)
+            foreach (var ns in m_NamespaceSyntaxes)
             {
                 cu = cu.AddUsings(ns.Usings.ToArray())
                     .AddMembers(ns);

@@ -29,12 +29,15 @@ namespace Generator
 
                 try
                 {
-                    HandleFile(sourceFile, gc);   
+                    HandleFile(sourceFile, gc);
                 } catch (Exception e)
                 {
                     throw new Exception($"解析文件{sourceFile}失败", e);
                 }
             }
+            // 生成.proto文件
+            var pg = new ProtoGenerator(gc);
+            pg.GenerateMeta(gc);
         }
 
         /// <summary>

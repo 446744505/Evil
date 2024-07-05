@@ -1,6 +1,6 @@
 namespace Generator
 {
-    public class ClassKind
+    public class ClassKind : BaseKind
     {
         #region 字段
 
@@ -15,7 +15,7 @@ namespace Generator
         
         #endregion
         
-        public ClassKind(ClassType type)
+        public ClassKind(ClassType type, IKind parent) : base(parent)
         {
             m_Type = type;
         }

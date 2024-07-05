@@ -50,6 +50,7 @@ namespace Generator
             m_TypeSyntax = typeSyntax;
             m_NameSpaceName = AnalysisUtil.GetNameSpaceName(typeSyntax);
             m_ClassName = AnalysisUtil.GetClassName(typeSyntax);
+            fc.AddTypeContext(this);
         }
     }
 }

@@ -18,12 +18,13 @@ namespace Generator
             m_TypeContext = tc;
             m_Attr = attr;
             var classType = TypeBuilder.I.ParseType(tc.TypeSyntax);
-            tc.ClassKind = new ClassKind(classType);
+            var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(tc.NameSpaceName);
+            tc.ClassKind = new ClassKind(classType, namespaceKind);
         }
 
         public void AddField(string name, IType type)
         {
-            var field = new FieldKind(name, type);
+            var field = new FieldKind(name, type, m_TypeContext.ClassKind!);
             m_TypeContext.ClassKind!.AddField(field);
         }
     }

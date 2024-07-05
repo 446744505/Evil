@@ -1,6 +1,6 @@
 namespace Generator
 {
-    public class FieldKind
+    public class FieldKind : BaseKind
     {
         #region 字段
 
@@ -15,7 +15,7 @@ namespace Generator
         
         #endregion
         
-        public FieldKind(string name, IType type)
+        public FieldKind(string name, IType type, IKind parent) : base(parent)
         {
             m_Name = name;
             m_Type = type;

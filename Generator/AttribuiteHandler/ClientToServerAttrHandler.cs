@@ -7,7 +7,7 @@ namespace Generator
 {
     public class ClientToServerAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
     {
-        private ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler = new DefaultCreateSyntaxAttrHandler();
+        private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler = new DefaultCreateSyntaxAttrHandler();
         /// <summary>
         /// 解析类型里的所有方法，并生成对应的方法
         /// 会为每个方法生成一个协议

@@ -28,7 +28,7 @@ namespace Generator
         {
             var tc = m_TypeContext;
             tc.NamespaceSyntax = tc.NamespaceSyntax!.AddMembers(tc.ClassSyntax!);
-            tc.FileContext.AddNamespace(tc.NamespaceSyntax);
+            tc.FileContext.AddNamespaceSyntax(tc.NamespaceSyntax);
         }
     }
 }
