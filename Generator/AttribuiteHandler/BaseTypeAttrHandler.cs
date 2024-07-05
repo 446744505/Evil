@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis.CSharp;
+
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Generator
@@ -7,18 +7,14 @@ namespace Generator
     {
         public void Parse(TypeContext tc, AttributeSyntax attr)
         {
-            tc.Namespace = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(tc.NameSpaceName));
-            tc.Class = SyntaxFactory.ClassDeclaration(tc.ClassName)
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword)) // 设置为public
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword)); // 设置为partial
+            var createKindAttrHandler = this as ICreateKindAttrHandler;
+            createKindAttrHandler?.InitKind(tc, attr);
+            var createSyntaxAttrHandler = this as ICreateSyntaxAttrHandler;
+            createSyntaxAttrHandler?.InitSyntax(tc, attr);
+            
             Parse0(tc, attr);
-            ParseFinish(tc);
-        }
-
-        protected void ParseFinish(TypeContext tc)
-        {
-            tc.Namespace = tc.Namespace.AddMembers(tc.Class);
-            tc.FileContext.AddNamespace(tc.Namespace);
+            
+            createSyntaxAttrHandler?.FinishSyntax();
         }
 
         protected abstract void Parse0(TypeContext tc, AttributeSyntax attr);

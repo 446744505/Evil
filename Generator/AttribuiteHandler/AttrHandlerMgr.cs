@@ -6,21 +6,17 @@ namespace Generator
 
         private AttrHandlerMgr()
         {
-            RegisterAttrHandler(new ClientToServerAttrHandler());
-            RegisterAttrHandler(new ProtocolAttrHandler());
-            RegisterAttrHandler(new ProtocolFieldAttrHandler());
         }
 
-        private readonly Dictionary<string, IAttributeHandler> _handlers = new();
-
-        private void RegisterAttrHandler(IAttributeHandler handler)
+        public IAttributeHandler CreateHandler(string attrName)
         {
-            _handlers[handler.GetAttrName()] = handler;
-        }
-        
-        public IAttributeHandler? GetHandler(string attrName)
-        {
-            return _handlers[attrName];
+            return attrName switch
+            {
+                Attributes.ClientToServer => new ClientToServerAttrHandler(),
+                Attributes.Protocol => new ProtocolAttrHandler(),
+                Attributes.ProtocolField => new ProtocolFieldAttrHandler(),
+                _ => throw new NullReferenceException($"特性 {attrName} 没有对应的处理器")
+            };
         }
     }
 }

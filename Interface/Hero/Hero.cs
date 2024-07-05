@@ -6,8 +6,10 @@ namespace Hero
     public class Hero
     {
         [ProtocolField(1)]
-        private long id;
+        private long heroId;
         [ProtocolField(2)]
-        private int level;
+        private int star;
+        [ProtocolField(3)]
+        private List<HeroSkill> skills;
     }
 }

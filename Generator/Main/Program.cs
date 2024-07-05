@@ -26,7 +26,14 @@ namespace Generator
                 {
                     continue;
                 }
-                HandleFile(sourceFile, gc);
+
+                try
+                {
+                    HandleFile(sourceFile, gc);   
+                } catch (Exception e)
+                {
+                    throw new Exception($"解析文件{sourceFile}失败", e);
+                }
             }
         }
 
@@ -65,12 +72,7 @@ namespace Generator
                 foreach (var attribute in attributes)
                 {
                     var attributeName = attribute.Name.ToString();
-                    var handler = AttrHandlerMgr.I.GetHandler(attributeName);
-                    if (handler == null)
-                    {
-                        throw new NullReferenceException($"特性 {attributeName} 没有对应的处理器");
-                    }
-
+                    var handler = AttrHandlerMgr.I.CreateHandler(attributeName);
                     // 找到特效处理器，解析特性
                     handler.Parse(tc, attribute);
                 }

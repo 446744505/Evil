@@ -8,9 +8,15 @@ namespace Hero
     [Protocol]
     public class HeroStarNtf
     {
+        /// <summary>
+        /// 英雄id
+        /// </summary>
         [ProtocolField(1)]
-        private long heroId; // 英雄id
+        private long heroId;
+        /// <summary>
+        /// 升级后星级
+        /// </summary>
         [ProtocolField(2)]
-        private int star; // 升级后星级
+        private int star;
     }
 }

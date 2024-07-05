@@ -28,6 +28,10 @@ namespace Generator
 
         public void CreateFile()
         {
+            if (m_Namespaces.Count == 0)
+            {
+                return;
+            }
             var genFilePath = m_Path.Replace(".cs", Files.GeneratorFileSuffix);
             var outputPath = Path.Combine(m_Gc.OutPath, genFilePath);
             var dir = Path.GetDirectoryName(outputPath);

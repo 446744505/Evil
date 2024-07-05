@@ -21,6 +21,11 @@ namespace Generator.Util
         {
             return type.Identifier.Text;
         }
+        
+        public static string GetFieldName(FieldDeclarationSyntax field)
+        {
+            return field.Declaration.Variables.First().Identifier.Text;
+        }
 
         public static bool HadAttribute(MemberDeclarationSyntax type, string attrName, out AttributeSyntax? syntax)
         {
