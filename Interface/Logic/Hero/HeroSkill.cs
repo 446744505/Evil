@@ -1,6 +1,6 @@
 using Attributes;
 
-namespace Hero
+namespace Logic.Hero
 {
     [Protocol]
     public class HeroSkill

@@ -1,3 +1,4 @@
+using Generator.Exception;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -9,12 +10,13 @@ namespace Generator
         
         private TypeBuilder() { }
 
-        public ClassType ParseType(TypeDeclarationSyntax typeSyntax)
+        public BaseIdentiferType ParseType(TypeDeclarationSyntax typeSyntax)
         {
             var kind = typeSyntax.Kind();
             return kind switch
             {
                 SyntaxKind.ClassDeclaration => new ClassType().Parse(typeSyntax),
+                SyntaxKind.StructDeclaration => new StructType().Parse(typeSyntax),
                 _ => throw new TypeException($"不支持的类型:{kind.ToString()}")
             };
         }
@@ -57,7 +59,8 @@ namespace Generator
         }
         private IType ParseIdentiferType(IdentifierNameSyntax typeSyntax)
         {
-            return new ClassType().Parse(typeSyntax);
+            var name = typeSyntax.Identifier.Text;
+            return new WaitCompileIdentiferType(name);
         }
     }
 }

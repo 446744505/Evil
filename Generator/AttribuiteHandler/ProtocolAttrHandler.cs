@@ -1,3 +1,6 @@
+using Generator.Exception;
+using Generator.Factory;
+using Generator.Kind;
 using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -8,7 +11,11 @@ namespace Generator
     /// </summary>
     public class ProtocolAttrHandler : BaseTypeAttrHandler, ICreateKindAttrHandler
     {
-        private readonly ICreateKindAttrHandler m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler();
+        private readonly ICreateKindAttrHandler m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler()
+        {
+            CreateFieldFactory = new ProtoCreateFieldFactory()
+        };
+        
         protected override void Parse0(TypeContext tc, AttributeSyntax attr)
         {
             var fields = tc.TypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
@@ -37,9 +44,11 @@ namespace Generator
                 try
                 {
                     var type = TypeBuilder.I.ParseType(f.Declaration.Type);
-                    AddField(fieldName, type);
+                    var field = NewField(fieldName, type);
+                    var protoField = field as ProtoFieldKind;
+                    protoField!.Index = int.Parse(index);
                 }
-                catch (Exception e)
+                catch (System.Exception e)
                 {
                     throw new TypeException($"{tc.ClassName}的字段{fieldName}的类型解析失败", e);
                 }
@@ -56,9 +65,9 @@ namespace Generator
             m_CreateKindAttrHandler.InitKind(tc, attr);
         }
 
-        public void AddField(string name, IType type)
+        public FieldKind NewField(string name, IType type)
         {
-            m_CreateKindAttrHandler.AddField(name, type);
+            return m_CreateKindAttrHandler.NewField(name, type);
         }
     }
 }

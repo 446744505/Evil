@@ -1,7 +1,10 @@
-namespace Generator;
-
-public interface IKind
+namespace Generator.Kind
 {
-    public IKind Parent();
-    public void AddChild(IKind child);
+    public interface IKind
+    {
+        public IKind Parent();
+        public void AddChild(IKind child);
+        public List<IKind> Children();
+        void Compile(CompileContext ctx);
+    }
 }

@@ -11,6 +11,7 @@
     <ItemGroup>
       <Folder Include="Attributes\Config" />
       <Folder Include="Attributes\DB" />
+      <Folder Include="Logic\" />
     </ItemGroup>
 
 </Project>

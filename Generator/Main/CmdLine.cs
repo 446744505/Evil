@@ -7,7 +7,7 @@ namespace Generator
         public static CmdLine I = null!;
 
         [ConfigurationKeyName("interface")] 
-        public string InterfacePath { get; set; } = null!;
+        public string InterfaceProject { get; set; } = null!;
         [ConfigurationKeyName("codeOut")] 
         public string CodeOutputPath { get; set; } = null!;
 
@@ -15,7 +15,7 @@ namespace Generator
         {
             var builder = new ConfigurationBuilder().AddCommandLine(args);
             var configuration = builder.Build();
-            I = configuration.Get<CmdLine>() ?? throw new Exception("cmdLineArgs parse failed");
+            I = configuration.Get<CmdLine>() ?? throw new System.Exception("cmdLineArgs parse failed");
         }
     }
 }

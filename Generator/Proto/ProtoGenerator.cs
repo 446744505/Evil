@@ -1,3 +1,6 @@
+using Generator.Kind;
+using Generator.Util;
+
 namespace Generator
 {
     public class ProtoGenerator
@@ -11,7 +14,64 @@ namespace Generator
 
         public void GenerateMeta(GloableContext gc)
         {
-            
+            // 从context中获取所有的namespace和class
+            Dictionary<string, List<BaseIdentiferKind>> namespaceClassKinds = new();
+            foreach (var fc in gc.FileContexts)
+            {
+                foreach (var namespaceKind in fc.NamespaceKinds)
+                {
+                    if (namespaceClassKinds.TryGetValue(namespaceKind.Name, out var classKinds))
+                    {
+                        classKinds.AddRange(namespaceKind.Children());
+                    }
+                    else
+                    {
+                        namespaceClassKinds.Add(namespaceKind.Name, namespaceKind.Children());
+                    }
+                }
+            }
+            // 遍历所有namespace，每个namespace生成一个proto文件
+            foreach (var namespaceClassKind in namespaceClassKinds)
+            {
+                var namespaceName = namespaceClassKind.Key;
+                var identiferKinds = namespaceClassKind.Value;
+                var writer = new Writer();
+                MakeHead(writer, namespaceName);
+                foreach (var identiferKind in identiferKinds)
+                {
+                    MakeMessage(writer, identiferKind);
+                }
+                CreateFile(writer, namespaceName);
+            }
+        }
+
+        private void MakeMessage(Writer writer, BaseIdentiferKind identiferKind)
+        {
+            writer.WriteLine("message " + identiferKind.Name + " {");
+            foreach (var field in identiferKind.Children())
+            {
+                field.Type.Accept(new ProtoTypeVisitor());
+            }
+            writer.WriteLine("}");
+        }
+
+        private void MakeHead(Writer writer, string namespaceName)
+        {
+            writer.WriteLine(@"syntax = ""proto3;");
+            writer.WriteLine();
+            writer.WriteLine("package " + namespaceName + ";");
+        }
+        
+        private void CreateFile(Writer writer, string namespaceName)
+        {
+            var fileName = CalProtoFileNameByNamespace(namespaceName);
+            File.WriteAllText(fileName, writer.ToString());
+        }
+       
+        private string CalProtoFileNameByNamespace(string name)
+        {
+            // 将.换成_，且转换为小写
+            return name.Replace(".", "_").ToLower() + ".proto";
         }
     }
 }

@@ -1,28 +1,14 @@
-namespace Generator
+﻿namespace Generator.Kind
 {
-    public class ClassKind : BaseKind
+    public class ClassKind : BaseIdentiferKind
     {
-        #region 字段
-
-        private readonly ClassType m_Type;
-        private readonly List<FieldKind> m_Fields = new();
-
-        #endregion
-        
-        #region 属性
-        
-        public string Name => m_Type.ClassName;
-        
-        #endregion
-        
-        public ClassKind(ClassType type, IKind parent) : base(parent)
+        public ClassKind(BaseIdentiferType type, IKind parent) : base(type, parent)
         {
-            m_Type = type;
         }
-        
-        public void AddField(FieldKind field)
+
+        public override BaseIdentiferType CreateIdentiferType()
         {
-            m_Fields.Add(field);
+            return new ClassType(Name);
         }
     }
 }

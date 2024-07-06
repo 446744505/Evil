@@ -12,8 +12,10 @@ public abstract class BaseBaseType : IType
         return this;
     }
 
-    public void Compile()
+    public IType Compile(CompileContext ctx)
     {
-        
+        return this;
     }
+    
+    public abstract void Accept<T>(ITypeVisitor<T> visitor) where T : ITypeVisitorContext;
 }

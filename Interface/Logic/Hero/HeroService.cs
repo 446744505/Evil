@@ -1,7 +1,7 @@
 
 using Attributes;
 
-namespace Hero
+namespace Logic.Hero
 {
      [ClientToServer]
      public interface HeroService

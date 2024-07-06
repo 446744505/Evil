@@ -2,24 +2,23 @@ using Generator.Kind;
 
 namespace Generator
 {
-    public class ClassType : BaseIdentiferType
+    public class StructType : BaseIdentiferType
     {
-        public ClassType()
+        public StructType()
         {
         }
-        public ClassType(string name)
+        public StructType(string name)
         {
             m_Name = name;
         }
-        
-        public override ClassType Compile(CompileContext ctx)
+        public override StructType Compile(CompileContext ctx)
         {
             return this;
         }
 
         public override BaseIdentiferKind CreateKind(IKind parent)
         {
-            return new ClassKind(this, parent);
+            return new StructKind(this, parent);
         }
         
         public override void Accept<T>(ITypeVisitor<T> visitor)

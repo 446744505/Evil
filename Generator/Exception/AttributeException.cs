@@ -1,6 +1,6 @@
-namespace Generator
+namespace Generator.Exception
 {
-    public class AttributeException : Exception
+    public class AttributeException : System.Exception
     {
         public AttributeException(string msg) : base(msg)
         {

@@ -2,6 +2,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using NamespaceKind = Generator.Kind.NamespaceKind;
+
 namespace Generator
 {
     public class FileContext
@@ -10,16 +12,26 @@ namespace Generator
 
         private readonly GloableContext m_Gc;
         private readonly string m_Path;
+        private readonly Document m_Document;
 
         private readonly List<TypeContext> m_TypeContexts = new();
         private readonly List<NamespaceDeclarationSyntax> m_NamespaceSyntaxes = new();
-        private readonly Dictionary<string, NamespaceKind> m_NamespaceKinds = new();
+        private readonly Dictionary<string, Kind.NamespaceKind> m_NamespaceKinds = new();
 
         #endregion
 
-        public FileContext(GloableContext gc, string path)
+        #region 属性
+
+        public Document Document => m_Document;
+        public List<TypeContext> TypeContexts => m_TypeContexts;
+        public List<Kind.NamespaceKind> NamespaceKinds => m_NamespaceKinds.Values.ToList();
+
+        #endregion
+
+        public FileContext(GloableContext gc, Document document, string path)
         {
             m_Gc = gc;
+            m_Document = document;
             m_Path = path;
             gc.AddFileContext(this);
         }
@@ -34,13 +46,13 @@ namespace Generator
             m_TypeContexts.Add(tc);
         }
         
-        public NamespaceKind GetOrCreateNamespaceKind(string name)
+        public Kind.NamespaceKind GetOrCreateNamespaceKind(string name)
         {
             if (m_NamespaceKinds.TryGetValue(name, out var ns))
             {
                 return ns;
             }
-            ns = new NamespaceKind(name);
+            ns = new Kind.NamespaceKind(name);
             m_NamespaceKinds.Add(name, ns);
             return ns;
         }
@@ -67,6 +79,7 @@ namespace Generator
             }
             var code = cu.NormalizeWhitespace().ToFullString();
             File.WriteAllText(outputPath, code);
+            m_Gc.Log($"生成文件:{outputPath}");
         }
     }
 }

@@ -1,13 +1,13 @@
-namespace Generator
+namespace Generator.Exception
 {
-    public class TypeException : Exception
+    public class TypeException : System.Exception
     {
         public TypeException(string msg) : base(msg)
         {
             
         }
         
-        public TypeException(string msg, Exception e) : base(msg, e)
+        public TypeException(string msg, System.Exception e) : base(msg, e)
         {
             
         }

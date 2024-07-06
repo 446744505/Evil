@@ -1,11 +1,24 @@
-namespace Generator;
-
-public class NamespaceKind : BaseKind
+namespace Generator.Kind
 {
-    private readonly string m_Name;
-    
-    public NamespaceKind(string name) : base(null!)
+    public class NamespaceKind : BaseKind
     {
-        m_Name = name;
+        private readonly string m_Name;
+    
+        public string Name => m_Name;
+    
+        public NamespaceKind(string name) : base(null!)
+        {
+            m_Name = name;
+        }
+    
+        public new List<BaseIdentiferKind> Children()
+        {
+            return base.Children().Cast<BaseIdentiferKind>().ToList();
+        }
+
+        protected override void Compile0(CompileContext ctx)
+        {
+        
+        }
     }
 }

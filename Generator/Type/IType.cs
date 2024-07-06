@@ -6,6 +6,7 @@ namespace Generator
     public interface IType
     {
         public IType Parse(TypeSyntax typeSyntax);
-        public void Compile();
+        public IType Compile(CompileContext ctx);
+        public void Accept<T>(ITypeVisitor<T> visitor) where T : ITypeVisitorContext;
     }
 }

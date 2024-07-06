@@ -1,4 +1,4 @@
-namespace Generator
+namespace Generator.Kind
 {
     public class FieldKind : BaseKind
     {
@@ -12,6 +12,7 @@ namespace Generator
         #region 属性
         
         public string Name => m_Name;
+        public IType Type => m_Type;
         
         #endregion
         
@@ -19,6 +20,11 @@ namespace Generator
         {
             m_Name = name;
             m_Type = type;
+        }
+
+        protected override void Compile0(CompileContext ctx)
+        {
+            m_Type.Compile(ctx);
         }
     }
 }

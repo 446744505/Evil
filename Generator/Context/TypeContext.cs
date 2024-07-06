@@ -1,3 +1,4 @@
+using Generator.Kind;
 using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -14,7 +15,7 @@ namespace Generator
 
         private NamespaceDeclarationSyntax? m_NamespaceSyntax;
         private ClassDeclarationSyntax? m_ClazzSyntax;
-        private ClassKind? m_ClassKind;
+        private BaseIdentiferKind? m_ClassKind;
 
         #endregion
 
@@ -36,7 +37,7 @@ namespace Generator
             set => m_ClazzSyntax = value;
         }
         
-        public ClassKind? ClassKind
+        public BaseIdentiferKind? ClassKind
         {
             get => m_ClassKind;
             set => m_ClassKind = value;

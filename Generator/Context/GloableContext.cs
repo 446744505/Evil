@@ -1,6 +1,6 @@
 namespace Generator
 {
-    public class GloableContext
+    public partial class GloableContext
     {
         #region 字段
 
@@ -9,7 +9,8 @@ namespace Generator
         #endregion
         #region 属性
 
-        public string OutPath { get; init; }
+        public string OutPath { get; }
+        public List<FileContext> FileContexts => m_FileContexts;
 
         #endregion
         public GloableContext(string outPath)
@@ -28,6 +29,16 @@ namespace Generator
             {
                 File.Delete(file);
             }
+        }
+        
+        public void Log(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+        public void Exception(System.Exception e)
+        {
+            Console.WriteLine(e);
         }
     }
 }

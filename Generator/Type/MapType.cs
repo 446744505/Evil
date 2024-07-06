@@ -26,9 +26,16 @@ namespace Generator
             return this;
         }
 
-        public void Compile()
+        public IType Compile(CompileContext ctx)
         {
-            throw new NotImplementedException();
+            m_Key = m_Key.Compile(ctx);
+            m_Value = m_Value.Compile(ctx);
+            return this;
+        }
+
+        public void Accept<T>(ITypeVisitor<T> visitor) where T : ITypeVisitorContext
+        {
+            visitor.Visit(this);
         }
     }
 }
