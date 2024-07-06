@@ -2,9 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using NamespaceKind = Generator.Kind.NamespaceKind;
-
-namespace Generator
+namespace Generator.Context
 {
     public class FileContext
     {

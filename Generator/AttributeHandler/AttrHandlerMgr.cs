@@ -1,4 +1,4 @@
-namespace Generator
+namespace Generator.AttributeHandler
 {
     public class AttrHandlerMgr
     {

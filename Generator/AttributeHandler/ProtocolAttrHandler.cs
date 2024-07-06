@@ -1,10 +1,12 @@
+using Generator.Context;
 using Generator.Exception;
 using Generator.Factory;
 using Generator.Kind;
+using Generator.Type;
 using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Generator
+namespace Generator.AttributeHandler
 {
     /// <summary>
     /// 解析所有协议字段构造类型信息，用于后面生成.proto文件

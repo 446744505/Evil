@@ -1,8 +1,10 @@
+using Generator.Context;
 using Generator.Factory;
 using Generator.Kind;
+using Generator.Type;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Generator
+namespace Generator.AttributeHandler
 {
     public interface ICreateKindAttrHandler
     {

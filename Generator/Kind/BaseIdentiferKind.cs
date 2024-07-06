@@ -1,3 +1,6 @@
+using Generator.Context;
+using Generator.Type;
+
 namespace Generator.Kind
 {
     public abstract class BaseIdentiferKind : BaseKind

@@ -1,6 +1,8 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Generator.Context;
+using Generator.Visitor;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Generator
+namespace Generator.Type
 {
     public class WaitCompileIdentiferType : IType
     {

@@ -1,5 +1,7 @@
 
-namespace Generator
+using Generator.Visitor;
+
+namespace Generator.Type
 {
     public class FloatType : BaseBaseType
     {

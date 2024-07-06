@@ -1,4 +1,4 @@
-namespace Generator
+namespace Generator.Type
 {
     public interface IHaveValue
     {

@@ -1,10 +1,11 @@
+using Generator.Context;
 using Generator.Exception;
 using Generator.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Generator
+namespace Generator.AttributeHandler
 {
     public class ClientToServerAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
     {

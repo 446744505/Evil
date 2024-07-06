@@ -1,4 +1,4 @@
-namespace Generator
+namespace Generator.Context
 {
     public partial class GloableContext
     {

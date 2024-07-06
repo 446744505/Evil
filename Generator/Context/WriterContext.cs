@@ -1,6 +1,6 @@
 ﻿using Generator.Util;
 
-namespace Generator
+namespace Generator.Context
 {
     public class WriterContext
     {

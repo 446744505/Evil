@@ -1,4 +1,6 @@
-﻿namespace Generator.Kind
+﻿using Generator.Type;
+
+namespace Generator.Kind
 {
     public class StructKind : BaseIdentiferKind
     {

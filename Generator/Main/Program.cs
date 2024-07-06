@@ -1,4 +1,5 @@
 ﻿
+using Generator.Context;
 using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Generator

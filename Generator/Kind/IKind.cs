@@ -1,3 +1,5 @@
+using Generator.Context;
+
 namespace Generator.Kind
 {
     public interface IKind

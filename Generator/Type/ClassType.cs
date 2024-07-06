@@ -1,6 +1,8 @@
+using Generator.Context;
 using Generator.Kind;
+using Generator.Visitor;
 
-namespace Generator
+namespace Generator.Type
 {
     public class ClassType : BaseIdentiferType
     {

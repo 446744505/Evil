@@ -2,7 +2,7 @@ using Generator.Exception;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Generator
+namespace Generator.Type
 {
     public class TypeBuilder
     {

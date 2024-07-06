@@ -2,7 +2,7 @@ using Generator.Kind;
 using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Generator
+namespace Generator.Context
 {
     public class TypeContext
     {

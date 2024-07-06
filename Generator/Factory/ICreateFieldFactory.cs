@@ -1,4 +1,5 @@
 ﻿using Generator.Kind;
+using Generator.Type;
 
 namespace Generator.Factory
 {

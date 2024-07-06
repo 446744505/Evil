@@ -1,4 +1,6 @@
-﻿namespace Generator
+﻿using Generator.Type;
+
+namespace Generator.Visitor
 {
     public interface ITypeVisitorContext
     {

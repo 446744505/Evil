@@ -1,4 +1,6 @@
-﻿namespace Generator
+﻿using Generator.Context;
+
+namespace Generator
 {
     public partial class Progress
     {

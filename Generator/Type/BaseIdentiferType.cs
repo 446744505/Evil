@@ -1,7 +1,9 @@
-﻿using Generator.Kind;
+﻿using Generator.Context;
+using Generator.Kind;
+using Generator.Visitor;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Generator
+namespace Generator.Type
 {
     public abstract class BaseIdentiferType  : IType
     {

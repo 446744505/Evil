@@ -1,6 +1,6 @@
 ﻿using Generator.Kind;
 
-namespace Generator
+namespace Generator.Context
 {
     public class CompileContext
     {
