@@ -9,7 +9,7 @@ namespace Generator.AttributeHandler
     public interface ICreateKindAttrHandler
     {
         void InitKind(TypeContext tc, AttributeSyntax attr);
-        FieldKind NewField(string name, IType type);
+        FieldKind NewField(NewFieldContext ctx);
     }
     
     public class DefaultCreateKindAttrHandler : ICreateKindAttrHandler
@@ -33,9 +33,9 @@ namespace Generator.AttributeHandler
             tc.ClassKind = identiferType.CreateKind(namespaceKind);
         }
 
-        public FieldKind NewField(string name, IType type)
+        public FieldKind NewField(NewFieldContext ctx)
         {
-            var field = m_CreateFieldFactory.CreateField(name, type, m_TypeContext.ClassKind!);
+            var field = m_CreateFieldFactory.CreateField(ctx, m_TypeContext.ClassKind!);
             m_TypeContext.ClassKind!.AddField(field);
             return field;
         }

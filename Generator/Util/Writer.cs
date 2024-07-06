@@ -27,5 +27,10 @@ namespace Generator.Util
             m_Sb.Append(content);
             m_Sb.Append(Files.NewLine);
         }
+
+        public override string ToString()
+        {
+            return m_Sb.ToString();
+        }
     }
 }

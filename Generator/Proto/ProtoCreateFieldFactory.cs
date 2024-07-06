@@ -1,13 +1,16 @@
-﻿using Generator.Kind;
-using Generator.Type;
+﻿using Generator.Context;
+using Generator.Kind;
 
 namespace Generator.Factory
 {
     public class ProtoCreateFieldFactory : ICreateFieldFactory<ProtoFieldKind>
     {
-        public ProtoFieldKind CreateField(string name, IType type, IKind parent)
+        public ProtoFieldKind CreateField(NewFieldContext ctx, IKind parent)
         {
-            return new ProtoFieldKind(name, type, parent);
+            return new ProtoFieldKind(ctx.Name, ctx.Type, parent)
+            {
+                Comment = ctx.Comment
+            };
         }
     }
 }

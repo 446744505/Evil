@@ -16,6 +16,14 @@ namespace Generator
 
         public void GenerateMeta(GloableContext gc)
         {
+            // 清空并创建临时文件夹
+            var tmpPath = Path.Combine(m_Gc.OutPath, Files.ProtoFileTmpPath);
+            if (Directory.Exists(tmpPath))
+            {
+                Directory.Delete(tmpPath, true);
+            }
+            Directory.CreateDirectory(tmpPath);
+            
             // 从context中获取所有的namespace和class
             Dictionary<string, List<BaseIdentiferKind>> namespaceClassKinds = new();
             foreach (var fc in gc.FileContexts)
@@ -52,22 +60,27 @@ namespace Generator
             writer.WriteLine("message " + identiferKind.Name + " {");
             foreach (var field in identiferKind.Children())
             {
-                field.Type.Accept(new ProtoTypeVisitor());
+                var fieldVisitor = new ProtoFieldTypeVisitor(field);
+                field.Type.Accept(fieldVisitor);
+                writer.WriteLine(4, fieldVisitor.Context.Line);
             }
             writer.WriteLine("}");
         }
 
         private void MakeHead(Writer writer, string namespaceName)
         {
-            writer.WriteLine(@"syntax = ""proto3;");
+            writer.WriteLine(@"syntax = ""proto3"";");
             writer.WriteLine();
             writer.WriteLine("package " + namespaceName + ";");
+            writer.WriteLine();
         }
         
         private void CreateFile(Writer writer, string namespaceName)
         {
             var fileName = CalProtoFileNameByNamespace(namespaceName);
-            File.WriteAllText(fileName, writer.ToString());
+            var outPath = Path.Combine(m_Gc.OutPath, Files.ProtoFileTmpPath, fileName);
+            File.WriteAllText(outPath, writer.ToString());
+            m_Gc.Log($"生成文件:{outPath}");
         }
        
         private string CalProtoFileNameByNamespace(string name)

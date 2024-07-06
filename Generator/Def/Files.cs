@@ -12,4 +12,8 @@ public class Files
     /// 生成的文件名后缀
     /// </summary>
     public const string GeneratorFileSuffix = $".g{CodeFileSuffix}";
+    /// <summary>
+    /// 生成的.proto文件的临时路径
+    /// </summary>
+    public const string ProtoFileTmpPath = "ProtoTmp";
 }

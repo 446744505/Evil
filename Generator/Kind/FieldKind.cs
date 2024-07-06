@@ -16,6 +16,7 @@ namespace Generator.Kind
         
         public string Name => m_Name;
         public IType Type => m_Type;
+        public string Comment { get; set; }
         
         #endregion
         

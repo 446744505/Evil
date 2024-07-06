@@ -45,8 +45,8 @@ namespace Generator.AttributeHandler
                 // 获取字段类型
                 try
                 {
-                    var type = TypeBuilder.I.ParseType(f.Declaration.Type);
-                    var field = NewField(fieldName, type);
+                    var ctx = NewFieldContext.Parse(f);
+                    var field = NewField(ctx);
                     var protoField = field as ProtoFieldKind;
                     protoField!.Index = int.Parse(index);
                 }
@@ -67,9 +67,9 @@ namespace Generator.AttributeHandler
             m_CreateKindAttrHandler.InitKind(tc, attr);
         }
 
-        public FieldKind NewField(string name, IType type)
+        public FieldKind NewField(NewFieldContext ctx)
         {
-            return m_CreateKindAttrHandler.NewField(name, type);
+            return m_CreateKindAttrHandler.NewField(ctx);
         }
     }
 }

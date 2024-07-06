@@ -8,8 +8,8 @@ namespace Logic.Hero
         [ProtocolField(1)]
         private long heroId;
         [ProtocolField(2)]
-        private int star;
+        private int star; // 星级
         [ProtocolField(3)]
-        private List<HeroSkill> skills;
+        private List<HeroSkill> skills; // 技能
     }
 }
