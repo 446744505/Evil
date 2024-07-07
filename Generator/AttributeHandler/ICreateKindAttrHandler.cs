@@ -28,8 +28,8 @@ namespace Generator.AttributeHandler
         {
             m_TypeContext = tc;
             m_Attr = attr;
-            var identiferType = TypeBuilder.I.ParseType(tc.TypeSyntax);
-            var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(tc.NameSpaceName);
+            var identiferType = TypeBuilder.I.ParseType(tc.OldTypeSyntax);
+            var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName);
             tc.ClassKind = identiferType.CreateKind(namespaceKind);
         }
 

@@ -1,3 +1,5 @@
+using System;
+
 namespace Generator.AttributeHandler
 {
     public class AttrHandlerMgr

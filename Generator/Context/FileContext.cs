@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Generator.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,6 +14,7 @@ namespace Generator.Context
 
         private readonly GloableContext m_Gc;
         private readonly string m_Path;
+        private readonly CompilationUnitSyntax m_Root;
         private readonly Document m_Document;
 
         private readonly List<TypeContext> m_TypeContexts = new();
@@ -26,9 +31,10 @@ namespace Generator.Context
 
         #endregion
 
-        public FileContext(GloableContext gc, Document document, string path)
+        public FileContext(GloableContext gc, CompilationUnitSyntax root, Document document, string path)
         {
             m_Gc = gc;
+            m_Root = root;
             m_Document = document;
             m_Path = path;
             gc.AddFileContext(this);
@@ -72,7 +78,7 @@ namespace Generator.Context
             var cu = SyntaxFactory.CompilationUnit();
             foreach (var ns in m_NamespaceSyntaxes)
             {
-                cu = cu.AddUsings(ns.Usings.ToArray())
+                cu = cu.AddUsings(AnalysisUtil.SkipAttributes(m_Root.Usings).ToArray())
                     .AddMembers(ns);
             }
             var code = cu.NormalizeWhitespace().ToFullString();

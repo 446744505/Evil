@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+using System.IO;
 using Generator.Context;
 using Generator.Kind;
 using Generator.Util;
 using Generator.Visitor;
 
-namespace Generator
+namespace Generator.Proto
 {
     public class ProtoGenerator
     {
@@ -16,8 +18,13 @@ namespace Generator
 
         public void GenerateMeta(GloableContext gc)
         {
+            var context = new ProtoContext();
+            context.IdentiferFind = name =>
+            {
+                return m_Gc.FindIdentiferKind(name);
+            };
             // 清空并创建临时文件夹
-            var tmpPath = Path.Combine(m_Gc.OutPath, Files.ProtoFileTmpPath);
+            var tmpPath = Path.Combine(m_Gc.OutPath, Files.ProtoPath);
             if (Directory.Exists(tmpPath))
             {
                 Directory.Delete(tmpPath, true);
@@ -49,18 +56,18 @@ namespace Generator
                 MakeHead(writer, namespaceName);
                 foreach (var identiferKind in identiferKinds)
                 {
-                    MakeMessage(writer, identiferKind);
+                    MakeMessage(writer, identiferKind, context);
                 }
                 CreateFile(writer, namespaceName);
             }
         }
 
-        private void MakeMessage(Writer writer, BaseIdentiferKind identiferKind)
+        private void MakeMessage(Writer writer, BaseIdentiferKind identiferKind, ProtoContext ctx)
         {
             writer.WriteLine("message " + identiferKind.Name + " {");
             foreach (var field in identiferKind.Children())
             {
-                var fieldVisitor = new ProtoFieldTypeVisitor(field);
+                var fieldVisitor = new ProtoFieldTypeVisitor(field, ctx);
                 field.Type.Accept(fieldVisitor);
                 writer.WriteLine(4, fieldVisitor.Context.Line);
             }
@@ -78,7 +85,7 @@ namespace Generator
         private void CreateFile(Writer writer, string namespaceName)
         {
             var fileName = CalProtoFileNameByNamespace(namespaceName);
-            var outPath = Path.Combine(m_Gc.OutPath, Files.ProtoFileTmpPath, fileName);
+            var outPath = Path.Combine(m_Gc.OutPath, Files.ProtoPath, fileName);
             File.WriteAllText(outPath, writer.ToString());
             m_Gc.Log($"生成文件:{outPath}");
         }

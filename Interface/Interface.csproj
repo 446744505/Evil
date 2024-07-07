@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Evil</RootNamespace>
         <LangVersion>11</LangVersion>
@@ -11,7 +10,10 @@
     <ItemGroup>
       <Folder Include="Attributes\Config" />
       <Folder Include="Attributes\DB" />
-      <Folder Include="Logic\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Protobuf" Version="3.27.2" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿
+using Generator.Proto;
 using Generator.Type;
 
 namespace Generator.Visitor
@@ -9,18 +10,22 @@ namespace Generator.Visitor
     }
     public class ProtoTypeNameTypeVisitor : BaseTypeVisitor<ProtoTypeNameTypeVisitorContext>
     {
-        public ProtoTypeNameTypeVisitor() : base(new ProtoTypeNameTypeVisitorContext())
+        private readonly ProtoContext m_Context;
+        public ProtoTypeNameTypeVisitor(ProtoContext ctx) : base(new ProtoTypeNameTypeVisitorContext())
         {
+            m_Context = ctx;
         }
 
         public override void Visit(StructType type)
         {
-            Context.Name = type.Name;
+            var identiferKind = m_Context.IdentiferFind.Invoke(type.Name);
+            Context.Name = identiferKind!.FullName();
         }
 
         public override void Visit(ClassType type)
         {
-            Context.Name = type.Name;
+            var identiferKind = m_Context.IdentiferFind.Invoke(type.Name);
+            Context.Name = identiferKind!.FullName();
         }
 
         public override void Visit(IntType type)
@@ -55,16 +60,16 @@ namespace Generator.Visitor
 
         public override void Visit(ListType type)
         {
-            var valVisitor = new ProtoTypeNameTypeVisitor();
+            var valVisitor = new ProtoTypeNameTypeVisitor(m_Context);
             type.Value().Accept(valVisitor);
             Context.Name = $"repeated {valVisitor.Context.Name}";
         }
 
         public override void Visit(MapType type)
         {
-            var keyVisitor = new ProtoTypeNameTypeVisitor();
+            var keyVisitor = new ProtoTypeNameTypeVisitor(m_Context);
             type.Key().Accept(keyVisitor);
-            var valVisitor = new ProtoTypeNameTypeVisitor();
+            var valVisitor = new ProtoTypeNameTypeVisitor(m_Context);
             type.Value().Accept(valVisitor);
             Context.Name = $"map<{keyVisitor.Context.Name}, {valVisitor.Context.Name}>";
         }

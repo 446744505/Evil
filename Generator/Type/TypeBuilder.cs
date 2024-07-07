@@ -29,8 +29,14 @@ namespace Generator.Type
                 SyntaxKind.PredefinedType => ParsePredefinedType((typeSyntax as PredefinedTypeSyntax)!),
                 SyntaxKind.GenericName => ParseGenericType((typeSyntax as GenericNameSyntax)!),
                 SyntaxKind.IdentifierName => ParseIdentiferType((typeSyntax as IdentifierNameSyntax)!),
+                SyntaxKind.QualifiedName => ParseQualifiedType((typeSyntax as QualifiedNameSyntax)!),
                 _ => throw new TypeException($"不支持的类型:{kind.ToString()}")
             };
+        }
+
+        private IType ParseQualifiedType(QualifiedNameSyntax typeSyntax)
+        {
+            return ParseType(typeSyntax.Right);
         }
 
         private IType ParseGenericType(GenericNameSyntax typeSyntax)

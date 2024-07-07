@@ -1,8 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using Generator.Context;
 using Generator.Exception;
 using Generator.Factory;
 using Generator.Kind;
-using Generator.Type;
 using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -20,7 +21,7 @@ namespace Generator.AttributeHandler
         
         protected override void Parse0(TypeContext tc, AttributeSyntax attr)
         {
-            var fields = tc.TypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
+            var fields = tc.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
             // 用来检查协议字段的索引是否重复
             HashSet<string> fieldIndex = new();
             foreach (var f in fields)
@@ -35,12 +36,12 @@ namespace Generator.AttributeHandler
                 if (!AnalysisUtil.HadAttrArgument(attr, AttributeFields.ProtocolFieldIndex, out var index))
                 {
                     throw new AttributeException(
-                        $"{tc.ClassName}的字段{fieldName}的{Attributes.ProtocolField}注解取不到index={AttributeFields.ProtocolFieldIndex}的字段");
+                        $"{tc.OldClassName}的字段{fieldName}的{Attributes.ProtocolField}注解取不到index={AttributeFields.ProtocolFieldIndex}的字段");
                 }
                 // 检查索引是否重复
                 if (!fieldIndex.Add(index))
                 {
-                    throw new AttributeException($"{tc.ClassName}的字段{fieldName}的索引{index}重复");
+                    throw new AttributeException($"{tc.OldClassName}的字段{fieldName}的索引{index}重复");
                 }
                 // 获取字段类型
                 try
@@ -52,7 +53,7 @@ namespace Generator.AttributeHandler
                 }
                 catch (System.Exception e)
                 {
-                    throw new TypeException($"{tc.ClassName}的字段{fieldName}的类型解析失败", e);
+                    throw new TypeException($"{tc.OldClassName}的字段{fieldName}的类型解析失败", e);
                 }
             }
         }

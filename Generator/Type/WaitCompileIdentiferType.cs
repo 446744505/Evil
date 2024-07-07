@@ -1,4 +1,5 @@
-﻿using Generator.Context;
+﻿using System;
+using Generator.Context;
 using Generator.Visitor;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 

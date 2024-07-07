@@ -13,7 +13,11 @@ public class Files
     /// </summary>
     public const string GeneratorFileSuffix = $".g{CodeFileSuffix}";
     /// <summary>
-    /// 生成的.proto文件的临时路径
+    /// 生成的.proto文件和.cs文件的目录
     /// </summary>
-    public const string ProtoFileTmpPath = "ProtoTmp";
+    public const string ProtoPath = "Proto";
+    /// <summary>
+    /// Interface项目里存在所有Attribute的目录
+    /// </summary>
+    public const string AttributesDir = "Attributes";
 }

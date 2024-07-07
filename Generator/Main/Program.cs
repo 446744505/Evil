@@ -1,5 +1,6 @@
 ﻿
 using Generator.Context;
+using Generator.Proto;
 using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Generator

@@ -1,4 +1,6 @@
+using System.Linq;
 using Generator.Context;
+using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -19,17 +21,20 @@ namespace Generator.AttributeHandler
         {
             m_TypeContext = tc;
             m_Attr = attr;
-            tc.NamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(tc.NameSpaceName));
-            tc.ClassSyntax = SyntaxFactory.ClassDeclaration(tc.ClassName)
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword)) // 设置为public
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword)); // 设置为partial
+            var modifiers = SyntaxFactory.TokenList();
+            modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.PublicKeyword)); // 设置为public
+            modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.PartialKeyword)); // 设置为partial
+            tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(tc.OldNameSpaceName))
+                .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
+            tc.NewClassSyntax = SyntaxFactory.ClassDeclaration(tc.OldClassName)
+                .AddModifiers(modifiers.ToArray());
         }
 
         public void FinishSyntax()
         {
             var tc = m_TypeContext;
-            tc.NamespaceSyntax = tc.NamespaceSyntax!.AddMembers(tc.ClassSyntax!);
-            tc.FileContext.AddNamespaceSyntax(tc.NamespaceSyntax);
+            tc.NewNamespaceSyntax = tc.NewNamespaceSyntax!.AddMembers(tc.NewClassSyntax!);
+            tc.FileContext.AddNamespaceSyntax(tc.NewNamespaceSyntax);
         }
     }
 }

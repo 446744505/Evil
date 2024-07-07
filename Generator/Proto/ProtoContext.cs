@@ -1,9 +1,9 @@
 ﻿using System;
 using Generator.Kind;
 
-namespace Generator.Context
+namespace Generator.Proto
 {
-    public class CompileContext
+    public class ProtoContext
     {
         public Func<string, BaseIdentiferKind?> IdentiferFind { get; set; } = null!;
     }

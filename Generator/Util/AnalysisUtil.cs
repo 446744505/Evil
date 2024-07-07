@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
+using Generator.Exception;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,17 +10,17 @@ namespace Generator.Util
 {
     public class AnalysisUtil
     {
-        public static string GetNameSpaceName(TypeDeclarationSyntax type)
+        public static NamespaceDeclarationSyntax GetNameSpaceName(TypeDeclarationSyntax type)
         {
             foreach (var syntaxNode in type.AncestorsAndSelf())
             {
                 if (syntaxNode is NamespaceDeclarationSyntax namespaceDeclaration)
                 {
-                    return namespaceDeclaration.Name.ToString();
+                    return namespaceDeclaration;
                 }
             }
 
-            return string.Empty;
+            throw new AnalysException($"{type.Identifier}没有找到命名空间");
         }
 
         public static string GetClassName(TypeDeclarationSyntax type)
@@ -124,6 +127,21 @@ namespace Generator.Util
             }
             val = argList.Arguments[index].Expression.ToString();
             return true;
+        }
+        
+        public static SyntaxList<UsingDirectiveSyntax> SkipAttributes(SyntaxList<UsingDirectiveSyntax> usings)
+        {
+            var list = new SyntaxList<UsingDirectiveSyntax>();
+            foreach (var syntax in usings)
+            {
+                if (syntax.Name?.ToString() == Namespaces.AttributesNamespace)
+                {
+                    continue;
+                }
+                list = list.Add(syntax);
+            }
+
+            return list;
         }
     }
 }

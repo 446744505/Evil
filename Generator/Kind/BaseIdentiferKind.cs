@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Generator.Context;
 using Generator.Type;
 
@@ -26,6 +27,16 @@ namespace Generator.Kind
         public void AddField(FieldKind field)
         {
             m_Fields.Add(field);
+        }
+        
+        public string FullName()
+        {
+            var parent = Parent();
+            if (parent is NamespaceKind namespaceKind)
+            {
+                return $"{namespaceKind.Name}.{m_Type.Name}";
+            }
+            return m_Type.Name;
         }
 
         protected override void Compile0(CompileContext ctx)
