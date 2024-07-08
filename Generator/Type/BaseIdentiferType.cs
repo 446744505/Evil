@@ -7,7 +7,7 @@ namespace Generator.Type
 {
     public abstract class BaseIdentiferType  : IType
     {
-        protected string m_Name;
+        protected string m_Name = null!;
 
         public string Name => m_Name;
         

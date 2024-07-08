@@ -23,7 +23,7 @@ namespace Generator.Type
         public IType Compile(CompileContext ctx)
         {
             var kind = ctx.IdentiferFind.Invoke(m_Name);
-            return kind!.CreateIdentiferType();
+            return kind.CreateIdentiferType();
         }
 
         public void Accept<T>(ITypeVisitor<T> visitor) where T : ITypeVisitorContext

@@ -16,6 +16,7 @@ namespace Generator.Kind
         #region 属性
         
         public string Name => m_Type.Name;
+        public BaseIdentiferType Type => m_Type;
         
         #endregion
         

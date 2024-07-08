@@ -10,22 +10,22 @@ namespace Generator.Visitor
     }
     public class ProtoTypeNameTypeVisitor : BaseTypeVisitor<ProtoTypeNameTypeVisitorContext>
     {
-        private readonly ProtoContext m_Context;
-        public ProtoTypeNameTypeVisitor(ProtoContext ctx) : base(new ProtoTypeNameTypeVisitorContext())
+        private readonly ProtoContext m_Pc;
+        public ProtoTypeNameTypeVisitor(ProtoContext pc) : base(new ProtoTypeNameTypeVisitorContext())
         {
-            m_Context = ctx;
+            m_Pc = pc;
         }
 
         public override void Visit(StructType type)
         {
-            var identiferKind = m_Context.IdentiferFind.Invoke(type.Name);
-            Context.Name = identiferKind!.FullName();
+            var identiferKind = m_Pc.IdentiferFind.Invoke(type.Name);
+            Context.Name = identiferKind.FullName();
         }
 
         public override void Visit(ClassType type)
         {
-            var identiferKind = m_Context.IdentiferFind.Invoke(type.Name);
-            Context.Name = identiferKind!.FullName();
+            var identiferKind = m_Pc.IdentiferFind.Invoke(type.Name);
+            Context.Name = identiferKind.FullName();
         }
 
         public override void Visit(IntType type)
@@ -60,16 +60,16 @@ namespace Generator.Visitor
 
         public override void Visit(ListType type)
         {
-            var valVisitor = new ProtoTypeNameTypeVisitor(m_Context);
+            var valVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Value().Accept(valVisitor);
             Context.Name = $"repeated {valVisitor.Context.Name}";
         }
 
         public override void Visit(MapType type)
         {
-            var keyVisitor = new ProtoTypeNameTypeVisitor(m_Context);
+            var keyVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Key().Accept(keyVisitor);
-            var valVisitor = new ProtoTypeNameTypeVisitor(m_Context);
+            var valVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Value().Accept(valVisitor);
             Context.Name = $"map<{keyVisitor.Context.Name}, {valVisitor.Context.Name}>";
         }

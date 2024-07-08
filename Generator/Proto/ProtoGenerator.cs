@@ -4,6 +4,8 @@ using Generator.Context;
 using Generator.Kind;
 using Generator.Util;
 using Generator.Visitor;
+using Google.Protobuf.Reflection;
+using ProtoBuf.Reflection;
 
 namespace Generator.Proto
 {
@@ -48,17 +50,64 @@ namespace Generator.Proto
                 }
             }
             // 遍历所有namespace，每个namespace生成一个proto文件
+            var fileSet = new FileDescriptorSet();
+            fileSet.AddImportPath(Path.Combine(m_Gc.OutPath, Files.ProtoPath));
             foreach (var namespaceClassKind in namespaceClassKinds)
             {
                 var namespaceName = namespaceClassKind.Key;
                 var identiferKinds = namespaceClassKind.Value;
                 var writer = new Writer();
                 MakeHead(writer, namespaceName);
+                MakeImport(writer, identiferKinds, namespaceName, context);
                 foreach (var identiferKind in identiferKinds)
                 {
                     MakeMessage(writer, identiferKind, context);
                 }
-                CreateFile(writer, namespaceName);
+                var fileName = CreateFile(writer, namespaceName);
+                fileSet.Add(fileName);
+            }
+
+            CreateCodeFile(fileSet);
+        }
+
+        private void CreateCodeFile(FileDescriptorSet fileSet)
+        {
+            fileSet.Process();
+            var generator = new ProtoCodeGenerator();
+            foreach (var codeFile in generator.Generate(fileSet))
+            {
+                File.WriteAllText(Path.Combine(m_Gc.OutPath, Files.ProtoPath, codeFile.Name), codeFile.Text);
+                m_Gc.Log("生成文件:" + codeFile);
+            }
+        }
+
+        private void MakeImport(Writer writer, List<BaseIdentiferKind> identiferKinds, string namespaceName, ProtoContext context)
+        {
+            List<string> importList = new();
+            var self = ProtoUtil.CalProtoFileNameByNamespace(namespaceName);
+            foreach (var identiferKind in identiferKinds)
+            {
+                foreach (var fieldKind in identiferKind.Children())
+                {
+                    var importVisitor = new ProtoImportTypeVisitor(context);
+                    fieldKind.Type.Accept(importVisitor);
+                    foreach (var import in importVisitor.Context.Imports)
+                    {
+                        if (import != self && !importList.Contains(import))
+                        {
+                            importList.Add($"import \"{import}\";");   
+                        }
+                    }
+                }
+            }
+           
+            foreach (var import in importList)
+            {
+                writer.WriteLine(import);
+            }
+            if (importList.Count > 0)
+            {
+                writer.WriteLine();
             }
         }
 
@@ -82,18 +131,13 @@ namespace Generator.Proto
             writer.WriteLine();
         }
         
-        private void CreateFile(Writer writer, string namespaceName)
+        private string CreateFile(Writer writer, string namespaceName)
         {
-            var fileName = CalProtoFileNameByNamespace(namespaceName);
+            var fileName = ProtoUtil.CalProtoFileNameByNamespace(namespaceName);
             var outPath = Path.Combine(m_Gc.OutPath, Files.ProtoPath, fileName);
             File.WriteAllText(outPath, writer.ToString());
             m_Gc.Log($"生成文件:{outPath}");
-        }
-       
-        private string CalProtoFileNameByNamespace(string name)
-        {
-            // 将.换成_，且转换为小写
-            return name.Replace(".", "_").ToLower() + ".proto";
+            return fileName;
         }
     }
 }

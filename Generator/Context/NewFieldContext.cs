@@ -10,7 +10,7 @@ namespace Generator.Context
 
         private readonly string m_Name;
         private readonly IType m_Type;
-        private string m_Comment;
+        private string? m_Comment;
 
         #endregion
 
@@ -18,7 +18,7 @@ namespace Generator.Context
 
         public string Name => m_Name;
         public IType Type => m_Type;
-        public string Comment => m_Comment;
+        public string? Comment => m_Comment;
 
         #endregion
         

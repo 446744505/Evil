@@ -11,18 +11,18 @@ namespace Generator.Visitor
     public class ProtoFieldTypeVisitor : BaseTypeVisitor<ProtoTypeVisitorContext>
     {
         private readonly ProtoFieldKind m_Field;
-        private readonly ProtoContext m_Context;
+        private readonly ProtoContext m_Pc;
         public string FieldName => m_Field.Name;
         public int FieldIndex => m_Field.Index;
-        public ProtoFieldTypeVisitor(FieldKind field, ProtoContext ctx) : base(new ProtoTypeVisitorContext())
+        public ProtoFieldTypeVisitor(FieldKind field, ProtoContext pc) : base(new ProtoTypeVisitorContext())
         {
-            m_Context = ctx;
+            m_Pc = pc;
             m_Field = (ProtoFieldKind) field;
         }
 
         private void Visit0(IType type)
         {
-            var typeNameVisitor = new ProtoTypeNameTypeVisitor(m_Context);
+            var typeNameVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Accept(typeNameVisitor);
             if (string.IsNullOrEmpty(m_Field.Comment))
                 Context.Line = $"{typeNameVisitor.Context.Name} {FieldName} = {FieldIndex};";

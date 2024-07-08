@@ -1,10 +1,11 @@
-﻿using Generator.Kind;
+﻿using System;
+using Generator.Kind;
 
 namespace Generator.Context
 {
     public partial class GloableContext
     {
-        public BaseIdentiferKind? FindIdentiferKind(string name)
+        public BaseIdentiferKind FindIdentiferKind(string name)
         {
             foreach (var fc in FileContexts)
             {
@@ -20,7 +21,7 @@ namespace Generator.Context
                 }
             }
 
-            return null;
+            throw new NullReferenceException($"不存在的类型{name}");
         }
     }
 }
