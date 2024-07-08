@@ -6,15 +6,10 @@ namespace Generator.Context
 {
     public partial class GloableContext
     {
-        #region 字段
-
-        private readonly List<FileContext> m_FileContexts = new();
-
-        #endregion
         #region 属性
 
         public string OutPath { get; }
-        public List<FileContext> FileContexts => m_FileContexts;
+        public List<FileContext> FileContexts { get; } = new();
 
         #endregion
         public GloableContext(string outPath)
@@ -24,7 +19,7 @@ namespace Generator.Context
         
         public void AddFileContext(FileContext fc)
         {
-            m_FileContexts.Add(fc);
+            FileContexts.Add(fc);
         }
         
         public void CleanGeneratedFiles()

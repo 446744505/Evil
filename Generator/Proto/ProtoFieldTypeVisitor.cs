@@ -4,17 +4,16 @@ using Generator.Type;
 
 namespace Generator.Visitor
 {
-    public class ProtoTypeVisitorContext : ITypeVisitorContext
-    {
-        public string Line { get; set; }
-    }
-    public class ProtoFieldTypeVisitor : BaseTypeVisitor<ProtoTypeVisitorContext>
+    public class ProtoFieldTypeVisitor : ITypeVisitor
     {
         private readonly ProtoFieldKind m_Field;
         private readonly ProtoContext m_Pc;
         public string FieldName => m_Field.Name;
         public int FieldIndex => m_Field.Index;
-        public ProtoFieldTypeVisitor(FieldKind field, ProtoContext pc) : base(new ProtoTypeVisitorContext())
+        
+        public string Result { get; set; }
+        
+        public ProtoFieldTypeVisitor(FieldKind field, ProtoContext pc)
         {
             m_Pc = pc;
             m_Field = (ProtoFieldKind) field;
@@ -25,57 +24,57 @@ namespace Generator.Visitor
             var typeNameVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Accept(typeNameVisitor);
             if (string.IsNullOrEmpty(m_Field.Comment))
-                Context.Line = $"{typeNameVisitor.Context.Name} {FieldName} = {FieldIndex};";
+                Result = $"{typeNameVisitor.Result} {FieldName} = {FieldIndex};";
             else
-                Context.Line = $"{typeNameVisitor.Context.Name} {FieldName} = {FieldIndex}; // {m_Field.Comment}";
+                Result = $"{typeNameVisitor.Result} {FieldName} = {FieldIndex}; // {m_Field.Comment}";
         }
         
-        public override void Visit(StructType type)
+        public void Visit(StructType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(ClassType type)
+        public void Visit(ClassType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(IntType type)
+        public void Visit(IntType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(LongType type)
+        public void Visit(LongType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(BoolType type)
+        public void Visit(BoolType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(StringType type)
+        public void Visit(StringType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(FloatType type)
+        public void Visit(FloatType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(DoubleType type)
+        public void Visit(DoubleType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(ListType type)
+        public void Visit(ListType type)
         {
             Visit0(type);
         }
 
-        public override void Visit(MapType type)
+        public void Visit(MapType type)
         {
             Visit0(type);
         }

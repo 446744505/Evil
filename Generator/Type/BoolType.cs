@@ -5,7 +5,7 @@ namespace Generator.Type
 {
     public class BoolType : BaseBaseType
     {
-        public override void Accept<T>(ITypeVisitor<T> visitor)
+        public override void Accept(ITypeVisitor visitor)
         {
             visitor.Visit(this);
         }

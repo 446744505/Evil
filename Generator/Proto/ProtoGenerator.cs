@@ -5,7 +5,6 @@ using Generator.Kind;
 using Generator.Util;
 using Generator.Visitor;
 using Google.Protobuf.Reflection;
-using ProtoBuf.Reflection;
 
 namespace Generator.Proto
 {
@@ -91,7 +90,7 @@ namespace Generator.Proto
                 {
                     var importVisitor = new ProtoImportTypeVisitor(context);
                     fieldKind.Type.Accept(importVisitor);
-                    foreach (var import in importVisitor.Context.Imports)
+                    foreach (var import in importVisitor.Imports)
                     {
                         if (import != self && !importList.Contains(import))
                         {
@@ -118,7 +117,7 @@ namespace Generator.Proto
             {
                 var fieldVisitor = new ProtoFieldTypeVisitor(field, ctx);
                 field.Type.Accept(fieldVisitor);
-                writer.WriteLine(4, fieldVisitor.Context.Line);
+                writer.WriteLine(4, fieldVisitor.Result);
             }
             writer.WriteLine("}");
         }

@@ -19,6 +19,6 @@ namespace Generator.Type
             return this;
         }
     
-        public abstract void Accept<T>(ITypeVisitor<T> visitor) where T : ITypeVisitorContext;
+        public abstract void Accept(ITypeVisitor visitor);
     }
 }

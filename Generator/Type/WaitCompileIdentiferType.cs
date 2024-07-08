@@ -7,12 +7,11 @@ namespace Generator.Type
 {
     public class WaitCompileIdentiferType : IType
     {
-        private readonly string m_Name;
-        public string Name => m_Name;
+        public string Name { get; }
     
         public WaitCompileIdentiferType(string name)
         {
-            m_Name = name;
+            Name = name;
         }
     
         public IType Parse(TypeSyntax typeSyntax)
@@ -22,11 +21,11 @@ namespace Generator.Type
 
         public IType Compile(CompileContext ctx)
         {
-            var kind = ctx.IdentiferFind.Invoke(m_Name);
+            var kind = ctx.IdentiferFind.Invoke(Name);
             return kind.CreateIdentiferType();
         }
 
-        public void Accept<T>(ITypeVisitor<T> visitor) where T : ITypeVisitorContext
+        public void Accept(ITypeVisitor visitor)
         {
             throw new NotImplementedException();
         }

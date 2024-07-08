@@ -11,7 +11,7 @@ namespace Generator.Type
         }
         public StructType(string name)
         {
-            m_Name = name;
+            Name = name;
         }
         public override StructType Compile(CompileContext ctx)
         {
@@ -23,7 +23,7 @@ namespace Generator.Type
             return new StructKind(this, parent);
         }
         
-        public override void Accept<T>(ITypeVisitor<T> visitor)
+        public override void Accept(ITypeVisitor visitor)
         {
             visitor.Visit(this);
         }

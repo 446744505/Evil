@@ -9,6 +9,6 @@ namespace Generator.Type
     {
         public IType Parse(TypeSyntax typeSyntax);
         public IType Compile(CompileContext ctx);
-        public void Accept<T>(ITypeVisitor<T> visitor) where T : ITypeVisitorContext;
+        public void Accept(ITypeVisitor visitor);
     }
 }

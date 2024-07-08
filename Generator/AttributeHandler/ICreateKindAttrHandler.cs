@@ -16,13 +16,8 @@ namespace Generator.AttributeHandler
     {
         private TypeContext m_TypeContext = null!;
         private AttributeSyntax m_Attr = null!;
-        private ICreateFieldFactory<FieldKind> m_CreateFieldFactory = new DefaultCreateFieldFactory();
-        
-        public ICreateFieldFactory<FieldKind> CreateFieldFactory
-        {
-            get => m_CreateFieldFactory;
-            set => m_CreateFieldFactory = value;
-        }
+
+        public ICreateFieldFactory<FieldKind> CreateFieldFactory { get; set; }
 
         public void InitKind(TypeContext tc, AttributeSyntax attr)
         {
@@ -35,7 +30,7 @@ namespace Generator.AttributeHandler
 
         public FieldKind NewField(NewFieldContext ctx)
         {
-            var field = m_CreateFieldFactory.CreateField(ctx, m_TypeContext.ClassKind!);
+            var field = CreateFieldFactory.CreateField(ctx, m_TypeContext.ClassKind!);
             m_TypeContext.ClassKind!.AddField(field);
             return field;
         }

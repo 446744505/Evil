@@ -15,9 +15,7 @@ namespace Generator.Context
         private readonly GloableContext m_Gc;
         private readonly string m_Path;
         private readonly CompilationUnitSyntax m_Root;
-        private readonly Document m_Document;
-
-        private readonly List<TypeContext> m_TypeContexts = new();
+        
         private readonly List<NamespaceDeclarationSyntax> m_NamespaceSyntaxes = new();
         private readonly Dictionary<string, Kind.NamespaceKind> m_NamespaceKinds = new();
 
@@ -25,8 +23,8 @@ namespace Generator.Context
 
         #region 属性
 
-        public Document Document => m_Document;
-        public List<TypeContext> TypeContexts => m_TypeContexts;
+        public Document Document { get; }
+        public List<TypeContext> TypeContexts { get; } = new();
         public List<Kind.NamespaceKind> NamespaceKinds => m_NamespaceKinds.Values.ToList();
 
         #endregion
@@ -35,7 +33,7 @@ namespace Generator.Context
         {
             m_Gc = gc;
             m_Root = root;
-            m_Document = document;
+            Document = document;
             m_Path = path;
             gc.AddFileContext(this);
         }
@@ -47,7 +45,7 @@ namespace Generator.Context
         
         public void AddTypeContext(TypeContext tc)
         {
-            m_TypeContexts.Add(tc);
+            TypeContexts.Add(tc);
         }
         
         public Kind.NamespaceKind GetOrCreateNamespaceKind(string name)

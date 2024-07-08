@@ -12,16 +12,16 @@ namespace NetWork.Transport
 {
     public class ConnectorTransport : BaseTransport
     {
-        private readonly ConnectorTransportConfig m_Config;
+        private ConnectorTransportConfig Config { get; }
 
         public ConnectorTransport(ConnectorTransportConfig config)
         {
-            m_Config = config;
+            Config = config;
         }
 
         public override async void Start()
         {
-            var group = new MultithreadEventLoopGroup(m_Config.WorkerCount);
+            var group = new MultithreadEventLoopGroup(Config.WorkerCount);
             try
             {
                 var bootstrap = new Bootstrap();
@@ -39,13 +39,13 @@ namespace NetWork.Transport
                         pipeline.AddLast(new MessageEncode());
                         pipeline.AddLast(new LogicHandler());
                     }));
-                var channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(m_Config.Host), m_Config.Port));
-                Log.I.Info($"connector connect to {m_Config.Host}:{m_Config.Port}");
+                var channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Config.Host), Config.Port));
+                Log.I.Info($"connector connect to {Config.Host}:{Config.Port}");
                 // 等待关闭
                 WaitStop();
                 // 关闭连接
                 await channel.CloseAsync();
-                Log.I.Info($"connector stop at {m_Config.Host}:{m_Config.Port}");
+                Log.I.Info($"connector stop at {Config.Host}:{Config.Port}");
             }
             finally
             {

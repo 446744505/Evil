@@ -10,11 +10,11 @@ namespace NetWork.Transport
 {
     public class AcceptorTransport : BaseTransport
     {
-        private readonly AcceptorTransportConfig m_Config;
+        private AcceptorTransportConfig Config { get; }
 
         public AcceptorTransport(AcceptorTransportConfig config)
         {
-            m_Config = config;
+            Config = config;
         }
 
         public override async void Start()
@@ -26,7 +26,7 @@ namespace NetWork.Transport
                 var bootstrap = new ServerBootstrap();
                 bootstrap.Group(bossGroup, workerGroup)
                     .Channel<TcpServerChannel>()
-                    .Option(ChannelOption.SoBacklog, m_Config.Backlog)
+                    .Option(ChannelOption.SoBacklog, Config.Backlog)
                     .ChildHandler(new ActionChannelInitializer<IChannel>(channel =>
                     {
                         var pipeline = channel.Pipeline;
@@ -39,13 +39,13 @@ namespace NetWork.Transport
                         pipeline.AddLast(new LogicHandler());
                     }));
                 
-                var channel = await bootstrap.BindAsync(m_Config.Port);
-                Log.I.Info($"acceptor start at {m_Config.Port}");
+                var channel = await bootstrap.BindAsync(Config.Port);
+                Log.I.Info($"acceptor start at {Config.Port}");
                 // 等待关闭
                 WaitStop();
                 // 关闭连接
                 await channel.CloseAsync();
-                Log.I.Info($"acceptor stop at {m_Config.Port}");
+                Log.I.Info($"acceptor stop at {Config.Port}");
             }
             finally
             {

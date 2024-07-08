@@ -11,9 +11,9 @@ namespace NetWork
             m_Context = context;
         }
 
-        public override string ToString()
+        public override string? ToString()
         {
-            return m_Context.ToString();
+            return m_Context.Channel.RemoteAddress.ToString();
         }
     }
 }

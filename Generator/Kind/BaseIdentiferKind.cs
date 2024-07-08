@@ -7,22 +7,21 @@ namespace Generator.Kind
     public abstract class BaseIdentiferKind : BaseKind
     {
         #region 字段
-
-        private readonly BaseIdentiferType m_Type;
+        
         private readonly List<FieldKind> m_Fields = new();
 
         #endregion
         
         #region 属性
         
-        public string Name => m_Type.Name;
-        public BaseIdentiferType Type => m_Type;
-        
+        public string Name => Type.Name;
+        public BaseIdentiferType Type { get; }
+
         #endregion
         
         public BaseIdentiferKind(BaseIdentiferType type, IKind parent) : base(parent)
         {
-            m_Type = type;
+            Type = type;
         }
         
         public void AddField(FieldKind field)
@@ -35,14 +34,14 @@ namespace Generator.Kind
             var parent = Parent();
             if (parent is NamespaceKind namespaceKind)
             {
-                return $"{namespaceKind.Name}.{m_Type.Name}";
+                return $"{namespaceKind.Name}.{Type.Name}";
             }
-            return m_Type.Name;
+            return Type.Name;
         }
 
         protected override void Compile0(CompileContext ctx)
         {
-            m_Type.Compile(ctx);
+            Type.Compile(ctx);
             foreach (var field in m_Fields)
             {
                 field.Compile(ctx);

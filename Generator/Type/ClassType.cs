@@ -11,7 +11,7 @@ namespace Generator.Type
         }
         public ClassType(string name)
         {
-            m_Name = name;
+            Name = name;
         }
         
         public override ClassType Compile(CompileContext ctx)
@@ -24,7 +24,7 @@ namespace Generator.Type
             return new ClassKind(this, parent);
         }
         
-        public override void Accept<T>(ITypeVisitor<T> visitor)
+        public override void Accept(ITypeVisitor visitor)
         {
             visitor.Visit(this);
         }

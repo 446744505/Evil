@@ -4,74 +4,71 @@ using Generator.Type;
 
 namespace Generator.Visitor
 {
-    public class ProtoTypeNameTypeVisitorContext : ITypeVisitorContext
-    {
-        public string Name { get; set; }
-    }
-    public class ProtoTypeNameTypeVisitor : BaseTypeVisitor<ProtoTypeNameTypeVisitorContext>
+    public class ProtoTypeNameTypeVisitor : ITypeVisitor
     {
         private readonly ProtoContext m_Pc;
-        public ProtoTypeNameTypeVisitor(ProtoContext pc) : base(new ProtoTypeNameTypeVisitorContext())
+        public string Result { get; set; }
+        public ProtoTypeNameTypeVisitor(ProtoContext pc)
         {
             m_Pc = pc;
         }
 
-        public override void Visit(StructType type)
+        public void Visit(StructType type)
         {
             var identiferKind = m_Pc.IdentiferFind.Invoke(type.Name);
-            Context.Name = identiferKind.FullName();
+            Result = identiferKind.FullName();
         }
 
-        public override void Visit(ClassType type)
+        public void Visit(ClassType type)
         {
             var identiferKind = m_Pc.IdentiferFind.Invoke(type.Name);
-            Context.Name = identiferKind.FullName();
+            Result = identiferKind.FullName();
         }
 
-        public override void Visit(IntType type)
+        public void Visit(IntType type)
         {
-            Context.Name = "int32";
+            Result = "int32";
         }
 
-        public override void Visit(LongType type)
+        public void Visit(LongType type)
         {
-            Context.Name = "int64";
+            Result = "int64";
         }
 
-        public override void Visit(BoolType type)
+        public void Visit(BoolType type)
         {
-            Context.Name = "bool";
+            Result = "bool";
         }
 
-        public override void Visit(StringType type)
+        public void Visit(StringType type)
         {
-            Context.Name = "string";
+            Result = "string";
         }
 
-        public override void Visit(FloatType type)
+        public void Visit(FloatType type)
         {
-            Context.Name = "float32";
+            Result = "float32";
         }
 
-        public override void Visit(DoubleType type)
+        public void Visit(DoubleType type)
         {
-            Context.Name = "float64";
+            Result = "float64";
         }
 
-        public override void Visit(ListType type)
+        public void Visit(ListType type)
         {
             var valVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Value().Accept(valVisitor);
-            Context.Name = $"repeated {valVisitor.Context.Name}";
+            Result = $"repeated {valVisitor.Result}";
         }
 
-        public override void Visit(MapType type)
+        public void Visit(MapType type)
         {
             var keyVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Key().Accept(keyVisitor);
             var valVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Value().Accept(valVisitor);
-            Context.Name = $"map<{keyVisitor.Context.Name}, {valVisitor.Context.Name}>";
+            Result = $"map<{keyVisitor.Result}, {valVisitor.Result}>";
         }
     }
 }

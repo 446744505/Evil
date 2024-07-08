@@ -7,13 +7,12 @@ namespace Generator.Context
         #region 字段
 
         private readonly string m_FilePath;
-        private readonly Writer m_Writer = new();
 
         #endregion
 
         #region 属性
 
-        public Writer Writer => m_Writer;
+        public Writer Writer { get; } = new();
 
         #endregion
 

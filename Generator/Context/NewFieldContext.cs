@@ -6,26 +6,18 @@ namespace Generator.Context
 {
     public class NewFieldContext
     {
-        #region 字段
-
-        private readonly string m_Name;
-        private readonly IType m_Type;
-        private string? m_Comment;
-
-        #endregion
-
         #region MyRegion
 
-        public string Name => m_Name;
-        public IType Type => m_Type;
-        public string? Comment => m_Comment;
+        public string Name { get; }
+        public IType Type { get; }
+        public string? Comment { get; set; }
 
         #endregion
         
         public NewFieldContext(string name, IType type)
         {
-            m_Type = type;
-            m_Name = name;
+            Type = type;
+            Name = name;
         }
 
         public static NewFieldContext Parse(FieldDeclarationSyntax syntax)
@@ -34,7 +26,7 @@ namespace Generator.Context
             var name = AnalysisUtil.GetFieldName(syntax);
             return new NewFieldContext(name, type)
             {
-                m_Comment = AnalysisUtil.GetFieldComment(syntax)
+                Comment = AnalysisUtil.GetFieldComment(syntax)
             };
         }
     }

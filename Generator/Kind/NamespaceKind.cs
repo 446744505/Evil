@@ -6,13 +6,11 @@ namespace Generator.Kind
 {
     public class NamespaceKind : BaseKind
     {
-        private readonly string m_Name;
-    
-        public string Name => m_Name;
+        public string Name { get; }
     
         public NamespaceKind(string name) : base(null!)
         {
-            m_Name = name;
+            Name = name;
         }
     
         public new List<BaseIdentiferKind> Children()
