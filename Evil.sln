@@ -6,6 +6,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "Generator\Gene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameAuto", "GameAuto\GameAuto.csproj", "{69E80389-91FD-4D3A-9CB7-D432BC8D1804}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientAuto", "ClientAuto\ClientAuto.csproj", "{798DA45E-79A0-4029-8881-4B201DD165EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetWork", "NetWork\NetWork.csproj", "{EB8757A9-4FCC-491F-ACCD-2AA2C544771C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{AABE076E-C653-4755-9529-F7B88F9F15D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game", "Game\Game.csproj", "{05115A86-4C6E-40A5-8443-870BA997E0C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +32,21 @@ Global
 		{69E80389-91FD-4D3A-9CB7-D432BC8D1804}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69E80389-91FD-4D3A-9CB7-D432BC8D1804}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69E80389-91FD-4D3A-9CB7-D432BC8D1804}.Release|Any CPU.Build.0 = Release|Any CPU
+		{798DA45E-79A0-4029-8881-4B201DD165EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{798DA45E-79A0-4029-8881-4B201DD165EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{798DA45E-79A0-4029-8881-4B201DD165EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{798DA45E-79A0-4029-8881-4B201DD165EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB8757A9-4FCC-491F-ACCD-2AA2C544771C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB8757A9-4FCC-491F-ACCD-2AA2C544771C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB8757A9-4FCC-491F-ACCD-2AA2C544771C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB8757A9-4FCC-491F-ACCD-2AA2C544771C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AABE076E-C653-4755-9529-F7B88F9F15D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AABE076E-C653-4755-9529-F7B88F9F15D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AABE076E-C653-4755-9529-F7B88F9F15D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AABE076E-C653-4755-9529-F7B88F9F15D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05115A86-4C6E-40A5-8443-870BA997E0C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05115A86-4C6E-40A5-8443-870BA997E0C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05115A86-4C6E-40A5-8443-870BA997E0C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05115A86-4C6E-40A5-8443-870BA997E0C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

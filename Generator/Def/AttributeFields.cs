@@ -1,7 +1,8 @@
-namespace Generator;
-
-public class AttributeFields
+namespace Generator
 {
-    // ProtocolField
-    public const int ProtocolFieldIndex = 0;
+    public class AttributeFields
+    {
+        // ProtocolField
+        public const int ProtocolFieldIndex = 0;
+    }
 }

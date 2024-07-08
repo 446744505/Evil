@@ -3,5 +3,12 @@
 /Generator/obj/
 /Interface/bin/
 /Interface/obj/
+/Game/obj/
+/Game/bin/
+/Client/obj/
+/Client/bin/
+/NetWork/obj/
+/NetWork/bin/
 /GameAuto/**
+/ClientAuto/**
 **/*.g.cs
