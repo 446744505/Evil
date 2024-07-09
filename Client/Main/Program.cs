@@ -1,4 +1,7 @@
-﻿using NetWork.Transport;
+﻿using System;
+using Client.NetWork;
+using NetWork;
+using NetWork.Transport;
 using NetWork.Util;
 
 namespace Client
@@ -10,7 +13,9 @@ namespace Client
             Stopper? stopper = null;
             try
             {
-                var connector = new ConnectorTransport(new ConnectorTransportConfig());
+                var config = new ConnectorTransportConfig();
+                config.SessionFactory = new ClientSessionFactory();
+                var connector = new ConnectorTransport(config);
                 connector.Start();
                 Console.WriteLine("client started");
                 stopper = new Stopper()

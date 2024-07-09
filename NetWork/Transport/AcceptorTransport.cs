@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using DotNetty.Codecs;
 using DotNetty.Handlers.Logging;
 using DotNetty.Transport.Bootstrapping;
@@ -8,13 +9,10 @@ using NetWork.Handler;
 
 namespace NetWork.Transport
 {
-    public class AcceptorTransport : BaseTransport
+    public class AcceptorTransport : BaseTransport<AcceptorTransportConfig>
     {
-        private AcceptorTransportConfig Config { get; }
-
-        public AcceptorTransport(AcceptorTransportConfig config)
+        public AcceptorTransport(AcceptorTransportConfig config) : base(config)
         {
-            Config = config;
         }
 
         public override async void Start()
@@ -30,13 +28,12 @@ namespace NetWork.Transport
                     .ChildHandler(new ActionChannelInitializer<IChannel>(channel =>
                     {
                         var pipeline = channel.Pipeline;
-                        pipeline.AddLast(new LoggingHandler());
                         pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
                             Messages.HeaderSize, 0, Messages.HeaderSize));
                         pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
                         pipeline.AddLast(new MessageDecode());
                         pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler());
+                        pipeline.AddLast(new LogicHandler(Config.SessionFactory, m_SessionMgr));
                     }));
                 
                 var channel = await bootstrap.BindAsync(Config.Port);

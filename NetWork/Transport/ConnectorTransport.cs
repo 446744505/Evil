@@ -1,6 +1,5 @@
 using System.Net;
 using DotNetty.Codecs;
-using DotNetty.Codecs.Protobuf;
 using DotNetty.Handlers.Logging;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
@@ -10,13 +9,10 @@ using NetWork.Handler;
 
 namespace NetWork.Transport
 {
-    public class ConnectorTransport : BaseTransport
+    public class ConnectorTransport : BaseTransport<ConnectorTransportConfig>
     {
-        private ConnectorTransportConfig Config { get; }
-
-        public ConnectorTransport(ConnectorTransportConfig config)
+        public ConnectorTransport(ConnectorTransportConfig config) : base(config)
         {
-            Config = config;
         }
 
         public override async void Start()
@@ -31,13 +27,12 @@ namespace NetWork.Transport
                     .Handler(new ActionChannelInitializer<IChannel>(channel =>
                     {
                         var pipeline = channel.Pipeline;
-                        pipeline.AddLast(new LoggingHandler());
                         pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
                             Messages.HeaderSize, 0, Messages.HeaderSize));
                         pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
                         pipeline.AddLast(new MessageDecode());
                         pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler());
+                        pipeline.AddLast(new LogicHandler(Config.SessionFactory, m_SessionMgr));
                     }));
                 var channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Config.Host), Config.Port));
                 Log.I.Info($"connector connect to {Config.Host}:{Config.Port}");

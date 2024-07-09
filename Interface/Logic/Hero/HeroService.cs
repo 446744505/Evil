@@ -24,6 +24,6 @@ namespace Logic.Hero
           /// </summary>
           /// <param name="heroId"></param>
           /// <returns></returns>
-          public Task<HeroStarNtf> HeroStarReq([ProtocolField(1)]long heroId);
+          public Task<HeroStarAck> HeroStarReq([ProtocolField(1)]long heroId);
      }
 }

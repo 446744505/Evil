@@ -1,4 +1,6 @@
-﻿using NetWork.Transport;
+﻿using System;
+using NetWork;
+using NetWork.Transport;
 using NetWork.Util;
 
 namespace Game
@@ -10,9 +12,11 @@ namespace Game
             Stopper? stopper = null;
             try
             {
-                var acceptor = new AcceptorTransport(new AcceptorTransportConfig());
+                var config = new AcceptorTransportConfig();
+                config.SessionFactory = new DefaultAcceptorSessionFactory();
+                var acceptor = new AcceptorTransport(config);
                 acceptor.Start();
-                Console.WriteLine("server started");
+                Log.I.Info("server started");
                 stopper = new Stopper()
                     .BindSignal()
                     .BindCancelKey()

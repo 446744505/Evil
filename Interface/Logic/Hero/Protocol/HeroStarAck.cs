@@ -6,7 +6,7 @@ namespace Logic.Hero
     /// 升星返回
     /// </summary>
     [Protocol]
-    public class HeroStarNtf
+    public class HeroStarAck
     {
         /// <summary>
         /// 英雄id

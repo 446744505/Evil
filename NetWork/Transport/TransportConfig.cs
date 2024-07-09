@@ -3,6 +3,7 @@ namespace NetWork.Transport
     public abstract class TransportConfig
     {
         public int Port { get; set; } = 27519;
+        public ISessionFactory SessionFactory { get; set; }
     }
     
     public class AcceptorTransportConfig : TransportConfig

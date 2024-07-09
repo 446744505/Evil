@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
 
@@ -7,7 +9,7 @@ namespace NetWork.Codec
     {
         protected override void Decode(IChannelHandlerContext context, Message message, List<object> output)
         {
-            
+            Console.WriteLine();
         }
     }
 }
