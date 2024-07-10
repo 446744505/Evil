@@ -12,17 +12,21 @@ namespace Generator.Visitor
         {
             m_Pc = pc;
         }
+        
+        private void VisitIdentiferType(BaseIdentiferType identiferType)
+        {
+            var identiferKind = m_Pc.IdentiferFind.Invoke(identiferType.Name);
+            Result = $"{identiferKind.NamespaceName()}.{Namespaces.ProtoNamespace}.{identiferKind.Name}";
+        }
 
         public void Visit(StructType type)
         {
-            var identiferKind = m_Pc.IdentiferFind.Invoke(type.Name);
-            Result = identiferKind.FullName();
+            VisitIdentiferType(type);
         }
 
         public void Visit(ClassType type)
         {
-            var identiferKind = m_Pc.IdentiferFind.Invoke(type.Name);
-            Result = identiferKind.FullName();
+            VisitIdentiferType(type);
         }
 
         public void Visit(IntType type)

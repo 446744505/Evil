@@ -1,8 +1,8 @@
 using ProtoBuf.Reflection;
 
-namespace Generator.Proto;
-
-public class ProtoCodeGenerator : CSharpCodeGenerator
+namespace Generator.Proto
 {
-    
+    public class ProtoCodeGenerator : CSharpCodeGenerator
+    {
+    }
 }

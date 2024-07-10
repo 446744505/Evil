@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Generator.Context;
 using Generator.Exception;
+using Generator.Kind;
+using Generator.Type;
 using Generator.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -9,9 +11,19 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Generator.AttributeHandler
 {
+    class ClientToServerCreateSyntaxAttrHandler : DefaultCreateSyntaxAttrHandler
+    {
+        protected override void NewNamespaceSyntax()
+        {
+            var tc = m_TypeContext;
+            // namespace添加Proto
+            tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName($"{tc.OldNameSpaceName}.{Namespaces.ProtoNamespace}"))
+                .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
+        }
+    }
     public class ClientToServerAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
     {
-        private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler = new DefaultCreateSyntaxAttrHandler();
+        private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler = new ClientToServerCreateSyntaxAttrHandler();
         /// <summary>
         /// 解析类型里的所有方法，并生成对应的方法
         /// 会为每个方法生成一个协议
@@ -24,7 +36,7 @@ namespace Generator.AttributeHandler
             var methodList = tc.OldTypeSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>();
             foreach (var m in methodList)
             {
-                var body = SyntaxFactory.ParseStatement("");
+                var body = SyntaxFactory.ParseStatement("return null;");
                 var method = SyntaxFactory.MethodDeclaration(m.ReturnType, m.Identifier)
                     .WithBody(SyntaxFactory.Block(body));
                 var modifiers = m.Modifiers;
@@ -39,6 +51,9 @@ namespace Generator.AttributeHandler
                 method = method.WithLeadingTrivia(m.GetLeadingTrivia());
                 // 用来检查协议字段的索引是否重复
                 HashSet<string> fieldIndex = new();
+                // 每个方法创建一个协议
+                var classKind = new ClassType().Parse(method).CreateKind(tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName));
+                classKind.Comment = AnalysisUtil.GetComment(m);
                 // 拷贝参数,去掉参数注解
                 foreach (var p in m.ParameterList.Parameters)
                 {
@@ -62,15 +77,14 @@ namespace Generator.AttributeHandler
                     var param = SyntaxFactory.Parameter(p.Identifier)
                         .WithType(p.Type);
                     method = method.AddParameterListParameters(param);
+                    // 添加协议字段
+                    var field = new ProtoFieldKind(p.Identifier.Text, TypeBuilder.I.ParseType(p.Type!), classKind);
+                    field.Index = int.Parse(index);
+                    classKind.AddField(field);
                 }
 
                 tc.NewClassSyntax = tc.NewClassSyntax!.AddMembers(method);
             }
-        }
-
-        public override string GetAttrName()
-        {
-            return Attributes.ClientToServer;
         }
 
         public void InitSyntax(TypeContext tc, AttributeSyntax attr)

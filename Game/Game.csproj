@@ -8,7 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GameAuto\GameAuto.csproj" />
       <ProjectReference Include="..\NetWork\NetWork.csproj" />
     </ItemGroup>
 

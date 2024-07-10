@@ -8,8 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ClientAuto\ClientAuto.csproj" />
       <ProjectReference Include="..\NetWork\NetWork.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="protobuf-net" Version="3.2.30" />
     </ItemGroup>
 
 </Project>

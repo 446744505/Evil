@@ -5,10 +5,10 @@ namespace Generator.Kind
 {
     public abstract class BaseKind : IKind
     {
-        private readonly IKind m_Parent;
+        private readonly IKind? m_Parent;
         private readonly List<IKind> m_Children = new();
 
-        protected BaseKind(IKind parent)
+        protected BaseKind(IKind? parent)
         {
             m_Parent = parent;
             parent?.AddChild(this);
@@ -16,7 +16,7 @@ namespace Generator.Kind
 
         public IKind Parent()
         {
-            return m_Parent;
+            return m_Parent!;
         }
 
         public void AddChild(IKind child)

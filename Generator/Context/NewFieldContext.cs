@@ -26,7 +26,7 @@ namespace Generator.Context
             var name = AnalysisUtil.GetFieldName(syntax);
             return new NewFieldContext(name, type)
             {
-                Comment = AnalysisUtil.GetFieldComment(syntax)
+                Comment = AnalysisUtil.GetComment(syntax)
             };
         }
     }

@@ -8,7 +8,7 @@ namespace Generator.Kind
     {
         public string Name { get; }
     
-        public NamespaceKind(string name) : base(null!)
+        public NamespaceKind(string name) : base(null)
         {
             Name = name;
         }

@@ -15,7 +15,7 @@ namespace NetWork
             m_Context = context;
         }
 
-        public Task Send(Message msg)
+        public Task SendAnync(Message msg)
         {
             return m_Context.WriteAsync(msg);
         }

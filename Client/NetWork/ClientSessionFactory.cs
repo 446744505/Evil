@@ -1,4 +1,3 @@
-using Logic.Hero;
 using NetWork;
 
 namespace Client.NetWork
@@ -16,9 +15,6 @@ namespace Client.NetWork
         public override void OnAddSession(Session session)
         {
             base.OnAddSession(session);
-            
-            var hero = new Hero();
-            session.Send(hero);
         }
     }
 }

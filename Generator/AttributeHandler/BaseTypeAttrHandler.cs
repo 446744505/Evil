@@ -19,6 +19,5 @@ namespace Generator.AttributeHandler
         }
 
         protected abstract void Parse0(TypeContext tc, AttributeSyntax attr);
-        public abstract string GetAttrName();
     }
 }

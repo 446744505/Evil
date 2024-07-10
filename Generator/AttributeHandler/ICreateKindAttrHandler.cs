@@ -2,6 +2,7 @@ using Generator.Context;
 using Generator.Factory;
 using Generator.Kind;
 using Generator.Type;
+using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Generator.AttributeHandler
@@ -26,6 +27,7 @@ namespace Generator.AttributeHandler
             var identiferType = TypeBuilder.I.ParseType(tc.OldTypeSyntax);
             var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName);
             tc.ClassKind = identiferType.CreateKind(namespaceKind);
+            tc.ClassKind.Comment = AnalysisUtil.GetComment(tc.OldTypeSyntax);
         }
 
         public FieldKind NewField(NewFieldContext ctx)

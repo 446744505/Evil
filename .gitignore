@@ -5,10 +5,10 @@
 /Interface/obj/
 /Game/obj/
 /Game/bin/
+/Game/Generator/**
 /Client/obj/
 /Client/bin/
+/Client/Generator/**
 /NetWork/obj/
 /NetWork/bin/
-/GameAuto/**
-/ClientAuto/**
 **/*.g.cs

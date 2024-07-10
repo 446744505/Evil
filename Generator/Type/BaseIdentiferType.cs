@@ -21,6 +21,12 @@ namespace Generator.Type
             Name = typeSyntax.Identifier.Text;
             return this;
         }
+        
+        public BaseIdentiferType Parse(MethodDeclarationSyntax methodSyntax)
+        {
+            Name = methodSyntax.Identifier.Text;
+            return this;
+        }
 
         public abstract IType Compile(CompileContext ctx);
         public abstract BaseIdentiferKind CreateKind(IKind parent);

@@ -14,23 +14,36 @@ namespace Generator.AttributeHandler
     
     public class DefaultCreateSyntaxAttrHandler : ICreateSyntaxAttrHandler
     {
-        private TypeContext m_TypeContext = null!;
-        private AttributeSyntax m_Attr = null!;
+        protected TypeContext m_TypeContext = null!;
+        protected AttributeSyntax m_Attr = null!;
 
         public void InitSyntax(TypeContext tc, AttributeSyntax attr)
         {
             m_TypeContext = tc;
             m_Attr = attr;
+
+            NewNamespaceSyntax();
+            NewClassSyntax();
+        }
+        
+        protected virtual void NewNamespaceSyntax()
+        {
+            var tc = m_TypeContext;
+            tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(tc.OldNameSpaceName))
+                .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
+        }
+        
+        protected virtual void NewClassSyntax()
+        {
+            var tc = m_TypeContext;
             var modifiers = SyntaxFactory.TokenList();
             modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.PublicKeyword)); // 设置为public
             modifiers = modifiers.Add(SyntaxFactory.Token(SyntaxKind.PartialKeyword)); // 设置为partial
-            tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(tc.OldNameSpaceName))
-                .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
             tc.NewClassSyntax = SyntaxFactory.ClassDeclaration(tc.OldClassName)
                 .AddModifiers(modifiers.ToArray());
         }
 
-        public void FinishSyntax()
+        public virtual void FinishSyntax()
         {
             var tc = m_TypeContext;
             tc.NewNamespaceSyntax = tc.NewNamespaceSyntax!.AddMembers(tc.NewClassSyntax!);

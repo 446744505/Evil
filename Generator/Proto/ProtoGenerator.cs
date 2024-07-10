@@ -61,6 +61,7 @@ namespace Generator.Proto
                 foreach (var identiferKind in identiferKinds)
                 {
                     MakeMessage(writer, identiferKind, context);
+                    writer.WriteLine();
                 }
                 var fileName = CreateFile(writer, namespaceName);
                 fileSet.Add(fileName);
@@ -112,6 +113,11 @@ namespace Generator.Proto
 
         private void MakeMessage(Writer writer, BaseIdentiferKind identiferKind, ProtoContext ctx)
         {
+            // 注释
+            if (!string.IsNullOrWhiteSpace(identiferKind.Comment))
+            {
+                writer.WriteLine($"// {identiferKind.Comment}");   
+            }
             writer.WriteLine("message " + identiferKind.Name + " {");
             foreach (var field in identiferKind.Children())
             {
@@ -126,7 +132,7 @@ namespace Generator.Proto
         {
             writer.WriteLine(@"syntax = ""proto3"";");
             writer.WriteLine();
-            writer.WriteLine("package " + namespaceName + ";");
+            writer.WriteLine($"package {namespaceName}.{Namespaces.ProtoNamespace};");
             writer.WriteLine();
         }
         

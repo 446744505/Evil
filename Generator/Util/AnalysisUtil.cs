@@ -32,23 +32,10 @@ namespace Generator.Util
         {
             return field.Declaration.Variables.First().Identifier.Text;
         }
-        
-        public static string GetFieldComment(FieldDeclarationSyntax field)
+
+        private static string GetLeadingComment(SyntaxTriviaList triviaList)
         {
-            var comment = field.GetTrailingTrivia().ToString();
-            // 删除注释符号
-            comment = comment.Replace("//", string.Empty);
-            // 删除换行
-            comment = comment.Replace("\n", string.Empty);
-            comment = comment.Replace("\r", string.Empty);
-            // 删除前后面的空格
-            comment = comment.Trim().TrimStart();
-            if (!string.IsNullOrWhiteSpace(comment))
-            {
-                return comment;
-            }
-            
-            foreach (var trivia in field.GetLeadingTrivia())
+            foreach (var trivia in triviaList)
             {
                 if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia))
                 {
@@ -79,6 +66,54 @@ namespace Generator.Util
             }
 
             return string.Empty;
+        }
+
+        private static string GetTrailingComment(SyntaxTriviaList triviaList)
+        {
+            var comment = triviaList.ToString();
+            // 删除注释符号
+            comment = comment.Replace("//", string.Empty);
+            // 删除换行
+            comment = comment.Replace("\n", string.Empty);
+            comment = comment.Replace("\r", string.Empty);
+            // 删除前后面的空格
+            comment = comment.Trim().TrimStart();
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                return comment;
+            }
+
+            return string.Empty;
+        }
+
+        public static string GetComment(TypeDeclarationSyntax type)
+        {
+            var trailingComment = GetTrailingComment(type.GetTrailingTrivia());
+            if (!string.IsNullOrWhiteSpace(trailingComment))
+            {
+                return trailingComment;
+            }
+            return GetLeadingComment(type.GetLeadingTrivia());
+        }
+        
+        public static string GetComment(MethodDeclarationSyntax type)
+        {
+            var trailingComment = GetTrailingComment(type.GetTrailingTrivia());
+            if (!string.IsNullOrWhiteSpace(trailingComment))
+            {
+                return trailingComment;
+            }
+            return GetLeadingComment(type.GetLeadingTrivia());
+        }
+        
+        public static string GetComment(FieldDeclarationSyntax field)
+        {
+            var trailingComment = GetTrailingComment(field.GetTrailingTrivia());
+            if (!string.IsNullOrWhiteSpace(trailingComment))
+            {
+                return trailingComment;
+            }
+            return GetLeadingComment(field.GetLeadingTrivia());
         }
 
         public static bool HadAttribute(MemberDeclarationSyntax type, string attrName, out AttributeSyntax? syntax)

@@ -24,9 +24,13 @@ namespace Generator.Context
         
         public void CleanGeneratedFiles()
         {
+            if (!Path.Exists(OutPath))
+            {
+                return;
+            }
             foreach (var file in Directory.GetFiles(OutPath, $"*{Files.GeneratorFileSuffix}", SearchOption.AllDirectories))
             {
-                File.Delete(file);
+                File.Delete(file);  
             }
         }
         

@@ -15,6 +15,7 @@ namespace Generator.Kind
         #region 属性
         
         public string Name => Type.Name;
+        public string Comment { get; set; }
         public BaseIdentiferType Type { get; }
 
         #endregion
@@ -29,14 +30,24 @@ namespace Generator.Kind
             m_Fields.Add(field);
         }
         
-        public string FullName()
+        public string NamespaceName()
         {
             var parent = Parent();
             if (parent is NamespaceKind namespaceKind)
             {
-                return $"{namespaceKind.Name}.{Type.Name}";
+                return namespaceKind.Name;
             }
-            return Type.Name;
+            return "";
+        }
+        
+        public string FullName()
+        {
+            var nameSpace = NamespaceName();
+            if (string.IsNullOrEmpty(nameSpace))
+            {
+                return Name;
+            }
+            return $"{nameSpace}.{Name}";
         }
 
         protected override void Compile0(CompileContext ctx)

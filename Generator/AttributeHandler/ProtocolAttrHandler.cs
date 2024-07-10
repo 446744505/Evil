@@ -58,11 +58,6 @@ namespace Generator.AttributeHandler
             }
         }
 
-        public override string GetAttrName()
-        {
-            return Attributes.Protocol;
-        }
-
         public void InitKind(TypeContext tc, AttributeSyntax attr)
         {
             m_CreateKindAttrHandler.InitKind(tc, attr);
