@@ -88,5 +88,10 @@ namespace Generator.Proto
             type.Value().Accept(valImportVisitor);
             AddImports(valImportVisitor.Imports);
         }
+
+        public void Visit(TaskType type)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

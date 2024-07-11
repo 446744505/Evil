@@ -4,6 +4,9 @@ using Generator.Type;
 
 namespace Generator.Visitor
 {
+    /// <summary>
+    /// 计算生成proto文件时字段的类型定义
+    /// </summary>
     public class ProtoTypeNameTypeVisitor : ITypeVisitor
     {
         private readonly ProtoContext m_Pc;
@@ -73,6 +76,11 @@ namespace Generator.Visitor
             var valVisitor = new ProtoTypeNameTypeVisitor(m_Pc);
             type.Value().Accept(valVisitor);
             Result = $"map<{keyVisitor.Result}, {valVisitor.Result}>";
+        }
+
+        public void Visit(TaskType type)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

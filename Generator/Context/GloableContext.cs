@@ -10,6 +10,10 @@ namespace Generator.Context
 
         public string OutPath { get; }
         public List<FileContext> FileContexts { get; } = new();
+        /// <summary>
+        /// proto里是message(req、ntf、ack)的class name
+        /// </summary>
+        public HashSet<string> ProtocolMessageNames { get; } = new();
 
         #endregion
         public GloableContext(string outPath)
@@ -20,6 +24,11 @@ namespace Generator.Context
         public void AddFileContext(FileContext fc)
         {
             FileContexts.Add(fc);
+        }
+        
+        public void AddProtocolMessageName(string name)
+        {
+            ProtocolMessageNames.Add(name);
         }
         
         public void CleanGeneratedFiles()

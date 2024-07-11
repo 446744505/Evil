@@ -14,5 +14,6 @@ namespace Generator.Visitor
         public void Visit(DoubleType type);
         public void Visit(ListType type);
         public void Visit(MapType type);
+        public void Visit(TaskType type);
     }
 }

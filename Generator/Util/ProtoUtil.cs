@@ -1,10 +1,11 @@
-namespace Generator.Util;
-
-public class ProtoUtil
+namespace Generator.Util
 {
-    public static string CalProtoFileNameByNamespace(string name)
+    public class ProtoUtil
     {
-        // 将.换成_，且转换为小写
-        return name.Replace(".", "_").ToLower() + ".proto";
+        public static string CalProtoFileNameByNamespace(string name)
+        {
+            // 将.换成_，且转换为小写
+            return name.Replace(".", "_").ToLower() + ".proto";
+        }
     }
 }

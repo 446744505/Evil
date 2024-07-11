@@ -1,15 +1,10 @@
 using System;
+using Generator.Util;
 
 namespace Generator.AttributeHandler
 {
-    public class AttrHandlerMgr
+    public class AttrHandlerMgr : Singleton<AttrHandlerMgr>
     {
-        public static readonly AttrHandlerMgr I = new();
-
-        private AttrHandlerMgr()
-        {
-        }
-
         public IAttributeHandler CreateHandler(string attrName)
         {
             return attrName switch

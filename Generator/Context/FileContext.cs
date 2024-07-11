@@ -23,6 +23,7 @@ namespace Generator.Context
 
         #region 属性
 
+        public GloableContext GloableContext => m_Gc;
         public Document Document { get; }
         public List<TypeContext> TypeContexts { get; } = new();
         public List<Kind.NamespaceKind> NamespaceKinds => m_NamespaceKinds.Values.ToList();
@@ -37,7 +38,7 @@ namespace Generator.Context
             m_Path = path;
             gc.AddFileContext(this);
         }
-        
+
         public void AddNamespaceSyntax(NamespaceDeclarationSyntax ns)
         {
             m_NamespaceSyntaxes.Add(ns);

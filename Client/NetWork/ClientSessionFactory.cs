@@ -6,7 +6,7 @@ namespace Client.NetWork
     {
         public override ISessionMgr CreateSessionMgr()
         {
-            return new ClientSessionMgr();
+            return Net.I.SessionMgr;
         }
     }
     
@@ -15,6 +15,7 @@ namespace Client.NetWork
         public override void OnAddSession(Session session)
         {
             base.OnAddSession(session);
+            // Net.I.Send();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 using Generator.Context;
+using Generator.Message;
 using Generator.Proto;
 using Microsoft.CodeAnalysis.MSBuild;
 
@@ -7,6 +8,10 @@ namespace Generator
 {
     public static class Program
     {
+        static Program()
+        {
+        }
+
         public static void Main(string[] args)
         {
             // 解析命令行参数
@@ -37,9 +42,12 @@ namespace Generator
                 // 编译
                 progress.Compile();
 
-                // 生成.proto文件
+                // 生成proto文件
                 var pg = new ProtoGenerator(gc);
-                pg.GenerateMeta(gc);
+                pg.GenerateProto(gc);
+                // 生成message文件
+                var mg = new MessageGenerator(gc);
+                mg.GenerateMessage();
             } catch (System.Exception e)
             {
                 gc.Exception(e);

@@ -4,6 +4,9 @@ using Generator.Type;
 
 namespace Generator.Visitor
 {
+    /// <summary>
+    /// 计算生成proto文件时每个字段的一行
+    /// </summary>
     public class ProtoFieldTypeVisitor : ITypeVisitor
     {
         private readonly ProtoFieldKind m_Field;
@@ -78,6 +81,10 @@ namespace Generator.Visitor
         {
             Visit0(type);
         }
-        
+
+        public void Visit(TaskType type)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

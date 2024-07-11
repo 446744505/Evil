@@ -17,20 +17,24 @@ namespace Generator.Proto
             m_Gc = gc;
         }
 
-        public void GenerateMeta(GloableContext gc)
+        /// <summary>
+        /// 生成所有.proto文件和对应的C#文件
+        /// </summary>
+        /// <param name="gc"></param>
+        public void GenerateProto(GloableContext gc)
         {
             var context = new ProtoContext();
             context.IdentiferFind = name =>
             {
                 return m_Gc.FindIdentiferKind(name);
             };
-            // 清空并创建临时文件夹
-            var tmpPath = Path.Combine(m_Gc.OutPath, Files.ProtoPath);
-            if (Directory.Exists(tmpPath))
+            // 清空并创建文件夹
+            var protoPath = Path.Combine(m_Gc.OutPath, Files.ProtoPath);
+            if (Directory.Exists(protoPath))
             {
-                Directory.Delete(tmpPath, true);
+                Directory.Delete(protoPath, true);
             }
-            Directory.CreateDirectory(tmpPath);
+            Directory.CreateDirectory(protoPath);
             
             // 从context中获取所有的namespace和class
             Dictionary<string, List<BaseIdentiferKind>> namespaceClassKinds = new();

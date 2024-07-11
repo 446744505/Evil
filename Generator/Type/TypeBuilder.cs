@@ -1,15 +1,12 @@
 using Generator.Exception;
+using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Generator.Type
 {
-    public class TypeBuilder
+    public class TypeBuilder : Singleton<TypeBuilder>
     {
-        public static readonly TypeBuilder I = new();
-        
-        private TypeBuilder() { }
-
         public BaseIdentiferType ParseType(TypeDeclarationSyntax typeSyntax)
         {
             var kind = typeSyntax.Kind();
@@ -45,6 +42,7 @@ namespace Generator.Type
             {
                 "List" => new ListType().Parse(typeSyntax),
                 "Dictionary" => new MapType().Parse(typeSyntax),
+                "Task" => new TaskType().Parse(typeSyntax),
                 _ => throw new TypeException($"不支持的泛型类型:{typeSyntax.Identifier.Text}")
             };
         }
