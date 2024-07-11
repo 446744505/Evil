@@ -14,10 +14,17 @@ namespace NetWork
             Id = IdGenerator.NextId();
             m_Context = context;
         }
-
-        public Task SendAnync(Message msg)
+        
+        public void Send(Message msg)
         {
-            return m_Context.WriteAsync(msg);
+            m_Context.WriteAsync(msg);
+        }
+
+        public async Task<T> SendAsync<T>(Message msg)
+        {
+            await m_Context.WriteAsync(msg);
+            var taskCompletionSource = new TaskCompletionSource<T>();
+            return await taskCompletionSource.Task;
         }
         
         public virtual void OnClose()

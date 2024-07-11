@@ -6,6 +6,7 @@ using Generator.AttributeHandler;
 using Generator.Context;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Generator
 {

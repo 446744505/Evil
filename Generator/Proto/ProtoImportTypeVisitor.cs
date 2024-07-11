@@ -93,5 +93,10 @@ namespace Generator.Proto
         {
             throw new System.NotImplementedException();
         }
+
+        public void Visit(WaitCompileIdentiferType type)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

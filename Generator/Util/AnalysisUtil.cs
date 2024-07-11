@@ -10,7 +10,20 @@ namespace Generator.Util
 {
     public class AnalysisUtil
     {
-        public static NamespaceDeclarationSyntax GetNameSpaceName(TypeDeclarationSyntax type)
+        public static NamespaceDeclarationSyntax GetNameSpaceSyntax(TypeDeclarationSyntax type)
+        {
+            foreach (var syntaxNode in type.AncestorsAndSelf())
+            {
+                if (syntaxNode is NamespaceDeclarationSyntax namespaceDeclaration)
+                {
+                    return namespaceDeclaration;
+                }
+            }
+
+            throw new AnalysException($"{type.Identifier}没有找到命名空间");
+        }
+        
+        public static NamespaceDeclarationSyntax GetNameSpaceSyntax(IdentifierNameSyntax type)
         {
             foreach (var syntaxNode in type.AncestorsAndSelf())
             {

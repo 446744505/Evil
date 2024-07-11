@@ -1,5 +1,4 @@
 using Generator.Context;
-using Generator.Kind;
 using Generator.Type;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -90,15 +89,12 @@ namespace Generator.Visitor
         public void Visit(TaskType type)
         {
             var valueType = type.Value();
-            // IdentiferType本来就不需要生成Ack，所以这里过滤掉
-            // 这里不过滤的话，因为还没执行Compile，会因为找不到类型而报错
-            if (valueType is WaitCompileIdentiferType waitCompileIdentiferType)
-            {
-                // 2、设置为Message类型
-                m_Gc.AddProtocolMessageName(waitCompileIdentiferType.Name);
-                return;
-            }
             valueType.Accept(this);
+        }
+
+        public void Visit(WaitCompileIdentiferType type)
+        {
+            m_Gc.AddProtocolMessageName(type.Name);
         }
     }
 }

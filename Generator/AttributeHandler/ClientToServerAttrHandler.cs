@@ -20,6 +20,7 @@ namespace Generator.AttributeHandler
             // namespace添加Proto
             tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName($"{tc.OldNameSpaceName}.{Namespaces.ProtoNamespace}"))
                 .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
+            tc.NewNamespaceSyntax = tc.NewNamespaceSyntax.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Client.NetWork")));
         }
     }
     public class ClientToServerAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
@@ -44,9 +45,7 @@ namespace Generator.AttributeHandler
 
         private MethodDeclarationSyntax ParseMethod(TypeContext tc, MethodDeclarationSyntax m)
         {
-            var body = SyntaxFactory.ParseStatement("return null;");
-            var method = SyntaxFactory.MethodDeclaration(m.ReturnType, m.Identifier)
-                .WithBody(SyntaxFactory.Block(body));
+            var method = SyntaxFactory.MethodDeclaration(m.ReturnType, m.Identifier);
             var modifiers = m.Modifiers;
             var isReturnVoid = m.ReturnType.IsKind(SyntaxKind.VoidKeyword);
             // 如果返回值不是void,则设置为异步方法
@@ -66,6 +65,8 @@ namespace Generator.AttributeHandler
                 .CreateKind(tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName));
             reqClassKind.Comment = AnalysisUtil.GetComment(m);
             tc.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name);
+            var sendBody = new Writer();
+            const string reqName = "req";
             // 可能会创建一个响应协议
             if (!isReturnVoid)
             {
@@ -83,7 +84,21 @@ namespace Generator.AttributeHandler
                     field.Index = 1; // index永远是1
                     reqClassKind.AddField(field);
                 }
+                // 异步发送
+                var fullNameVisitor = new FullNameTypeVisitor();
+                returnType.Accept(fullNameVisitor);
+                sendBody.WriteLine($"return await Net.I.SendAsync<{fullNameVisitor.Result}>({reqName});");
             }
+            else
+            {
+                // 直接发送
+                sendBody.WriteLine($"Net.I.Send({reqName});");
+            }
+            // 生成方法体
+            var body = new Writer();
+            body.WriteLine($"var {reqName} = new {reqClassKind.Name}");
+            body.WriteLine("{");
+
             // 拷贝参数,去掉参数注解
             foreach (var p in m.ParameterList.Parameters)
             {
@@ -114,8 +129,13 @@ namespace Generator.AttributeHandler
                 var field = new ProtoFieldKind(p.Identifier.Text, TypeBuilder.I.ParseType(p.Type!), reqClassKind);
                 field.Index = int.Parse(index);
                 reqClassKind.AddField(field);
+                // 添加方法体赋值
+                body.WriteLine(1, $"{p.Identifier} = {p.Identifier},");
             }
-
+            // 方法体结束部分
+            body.WriteLine("};");
+            body.WriteLine(sendBody.ToString());
+            method = method.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(body.ToString())));
             return method;
         }
 

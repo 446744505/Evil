@@ -5,6 +5,8 @@ using Generator.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Formatting;
+using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Generator.Context
 {
@@ -81,6 +83,19 @@ namespace Generator.Context
                     .AddMembers(ns);
             }
             var code = cu.NormalizeWhitespace().ToFullString();
+            
+            // 格式化代码
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var root = tree.GetRoot();
+            var workspace = MSBuildWorkspace.Create();
+            var options = workspace.Options
+                .WithChangedOption(FormattingOptions.UseTabs, LanguageNames.CSharp, false)
+                .WithChangedOption(FormattingOptions.TabSize, LanguageNames.CSharp, 4)
+                .WithChangedOption(FormattingOptions.IndentationSize, LanguageNames.CSharp, 4)
+                .WithChangedOption(FormattingOptions.NewLine, LanguageNames.CSharp, Files.NewLine);
+            var formattedRoot = Formatter.Format(root, workspace, options);
+            code = formattedRoot.ToFullString();
+            
             File.WriteAllText(outputPath, code);
             m_Gc.Log($"生成文件:{outputPath}");
         }

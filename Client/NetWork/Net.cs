@@ -9,14 +9,24 @@ namespace Client.NetWork
         private readonly ConnectorSessionMgr m_SessionMgr = new ClientSessionMgr();
         public ConnectorSessionMgr SessionMgr => m_SessionMgr;
 
-        public Task Send(Message msg)
+        public void Send(Message msg)
         {
             var session = m_SessionMgr.Session;
             if (session == null)
             {
                 throw new NetWorkException("session is null");
             }
-            return session.SendAnync(msg);
+            session.Send(msg);
+        }
+
+        public async Task<T> SendAsync<T>(Message msg)
+        {
+            var session = m_SessionMgr.Session;
+            if (session == null)
+            {
+                throw new NetWorkException("session is null");
+            }
+            return await session.SendAsync<T>(msg);
         }
     }
 }

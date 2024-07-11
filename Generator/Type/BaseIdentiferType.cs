@@ -1,5 +1,6 @@
 ﻿using Generator.Context;
 using Generator.Kind;
+using Generator.Util;
 using Generator.Visitor;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -7,8 +8,8 @@ namespace Generator.Type
 {
     public abstract class BaseIdentiferType  : IType
     {
-        public string Name { get; set; }
-        
+        public string Name { get; protected set; }
+
         public virtual IType Parse(TypeSyntax typeSyntax)
         {
             var identifierSyntax = (IdentifierNameSyntax) typeSyntax;

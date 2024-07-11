@@ -15,4 +15,8 @@
       <PackageReference Include="protobuf-net" Version="3.2.30" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Generator\Logic\Hero" />
+    </ItemGroup>
+
 </Project>

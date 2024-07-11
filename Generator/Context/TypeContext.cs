@@ -25,7 +25,7 @@ namespace Generator.Context
         {
             FileContext = fc;
             OldTypeSyntax = oldTypeSyntax;
-            OldNameSpaceSyntax = AnalysisUtil.GetNameSpaceName(oldTypeSyntax);
+            OldNameSpaceSyntax = AnalysisUtil.GetNameSpaceSyntax(oldTypeSyntax);
             OldClassName = AnalysisUtil.GetClassName(oldTypeSyntax);
             fc.AddTypeContext(this);
         }

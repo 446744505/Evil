@@ -1,5 +1,4 @@
-﻿using System;
-using Generator.Context;
+﻿using Generator.Context;
 using Generator.Visitor;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -8,7 +7,7 @@ namespace Generator.Type
     public class WaitCompileIdentiferType : IType
     {
         public string Name { get; }
-    
+
         public WaitCompileIdentiferType(string name)
         {
             Name = name;
@@ -27,7 +26,7 @@ namespace Generator.Type
 
         public void Accept(ITypeVisitor visitor)
         {
-            throw new NotImplementedException();
+            visitor.Visit(this);
         }
     }
 }
