@@ -17,7 +17,7 @@ namespace Client
             try
             {
                 var config = new ConnectorTransportConfig();
-                config.SessionFactory = new ClientSessionFactory();
+                config.NetWorkFactory = new ClientNetWorkFactory();
                 var connector = new ConnectorTransport(config);
                 connector.Start();
                 Console.WriteLine("client started");

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Game.NetWork;
 using NetWork;
 using NetWork.Transport;
 using NetWork.Util;
@@ -13,7 +13,7 @@ namespace Game
             try
             {
                 var config = new AcceptorTransportConfig();
-                config.SessionFactory = new DefaultAcceptorSessionFactory();
+                config.NetWorkFactory = new GameNetWorkFactory();
                 var acceptor = new AcceptorTransport(config);
                 acceptor.Start();
                 Log.I.Info("server started");

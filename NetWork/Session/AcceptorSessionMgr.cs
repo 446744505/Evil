@@ -15,5 +15,11 @@ namespace NetWork
         {
             m_Sessions.Remove(session.Id, out _);
         }
+        
+        public Session? GetSession(long id)
+        {
+            m_Sessions.TryGetValue(id, out var session);
+            return session;
+        }
     }
 }

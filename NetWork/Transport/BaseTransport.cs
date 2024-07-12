@@ -7,6 +7,7 @@ namespace NetWork.Transport
         #region 字段
 
         protected ISessionMgr m_SessionMgr;
+        protected IMessageProcessor m_MessageProcessor;
 
         private volatile bool m_IsStop;
         private readonly AutoResetEvent m_StopEvent = new(false);
@@ -22,7 +23,10 @@ namespace NetWork.Transport
         public BaseTransport(T config)
         {
             Config = config;
-            m_SessionMgr = Config.SessionFactory.CreateSessionMgr();
+            m_SessionMgr = Config.NetWorkFactory.CreateSessionMgr();
+            var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
+            m_MessageProcessor = new MessageProcessor();
+            messageRegister.Register(m_MessageProcessor);
         }
 
         protected void WaitStop()

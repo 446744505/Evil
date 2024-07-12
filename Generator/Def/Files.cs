@@ -24,5 +24,9 @@ namespace Generator
         /// Interface项目里存在所有Attribute的目录
         /// </summary>
         public const string AttributesDir = "Attributes";
+        /// <summary>
+        /// 消息注册类的文件名
+        /// </summary>
+        public const string MessageRegister = "MessageRegister";
     }
 }

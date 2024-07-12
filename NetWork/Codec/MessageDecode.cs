@@ -9,6 +9,13 @@ namespace NetWork.Codec
 {
     internal class MessageDecode : ByteToMessageDecoder
     {
+        private readonly IMessageProcessor m_MessageProcessor;
+
+        public MessageDecode(IMessageProcessor messageProcessor)
+        {
+            m_MessageProcessor = messageProcessor;
+        }
+
         protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
         {
             using (var stream = new MemoryStream(input.ReadableBytes))
@@ -18,7 +25,8 @@ namespace NetWork.Codec
                 {
                     stream.Position = 0;
                     var messageId = reader.ReadUInt32();
-                    Console.WriteLine(messageId);
+                    var message = m_MessageProcessor.CreateMessage(messageId);
+                    
                 }
             }
             

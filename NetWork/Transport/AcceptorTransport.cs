@@ -31,9 +31,9 @@ namespace NetWork.Transport
                         pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
                             Messages.HeaderSize, 0, Messages.HeaderSize));
                         pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
-                        pipeline.AddLast(new MessageDecode());
+                        pipeline.AddLast(new MessageDecode(m_MessageProcessor));
                         pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler(Config.SessionFactory, m_SessionMgr));
+                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr));
                     }));
                 
                 var channel = await bootstrap.BindAsync(Config.Port);
