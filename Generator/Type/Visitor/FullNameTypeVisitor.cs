@@ -49,7 +49,7 @@ namespace Generator.Visitor
         {
             var valueVisitor = new FullNameTypeVisitor();
             type.Value().Accept(valueVisitor);
-            Result = $"List<{valueVisitor.Result}>";
+            Result = $"System.Collections.Generic.List<{valueVisitor.Result}>";
         }
 
         public void Visit(MapType type)
@@ -58,7 +58,7 @@ namespace Generator.Visitor
             var valueVisitor = new FullNameTypeVisitor();
             type.Key().Accept(keyVisitor);
             type.Value().Accept(valueVisitor);
-            Result = $"Dictionary<{keyVisitor.Result}, {valueVisitor.Result}>";
+            Result = $"System.Collections.Generic.Dictionary<{keyVisitor.Result}, {valueVisitor.Result}>";
         }
 
         public void Visit(TaskType type)

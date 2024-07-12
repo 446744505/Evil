@@ -3,6 +3,7 @@ using System.Linq;
 using Generator.Context;
 using Generator.Exception;
 using Generator.Kind;
+using Generator.Proto;
 using Generator.Type;
 using Generator.Util;
 using Generator.Visitor;
@@ -61,9 +62,11 @@ namespace Generator.AttributeHandler
             // 用来检查协议字段的索引是否重复
             HashSet<string> fieldIndex = new();
             // 每个方法创建一个请求协议
-            var reqClassKind = new ClassType().Parse(method)
-                .CreateKind(tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName));
-            reqClassKind.Comment = AnalysisUtil.GetComment(m);
+            var reqClassKind = new ReqClassKind(new ClassType().Parse(method),
+                tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName))
+            {
+                Comment = AnalysisUtil.GetComment(m)
+            };
             tc.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name);
             var sendBody = new Writer();
             const string reqName = "req";
@@ -84,9 +87,11 @@ namespace Generator.AttributeHandler
                     field.Index = 1; // index永远是1
                     reqClassKind.AddField(field);
                 }
-                // 异步发送
                 var fullNameVisitor = new FullNameTypeVisitor();
                 returnType.Accept(fullNameVisitor);
+                // 设置给req
+                reqClassKind.AckFullName = fullNameVisitor.Result;
+                // 异步发送
                 sendBody.WriteLine($"return await Net.I.SendAsync<{fullNameVisitor.Result}>({reqName});");
             }
             else

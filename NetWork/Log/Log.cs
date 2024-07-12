@@ -16,6 +16,10 @@ namespace NetWork
         public void Error(Exception e)
         {
             m_Logger.Error($"{e.Message}{e.StackTrace}");
+            if (e.InnerException != null)
+            {
+                Error(e.InnerException);
+            }
         }
 
         public void Error(string log)

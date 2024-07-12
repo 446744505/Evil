@@ -15,6 +15,7 @@ namespace NetWork.Codec
                 using (var writer = new BinaryWriter(stream))
                 {
                     writer.Write(message.MessageId);
+                    message.Encode(writer);
                     Serializer.Serialize(stream, message);
                     output.WriteBytes(stream.GetBuffer(), 0, (int)stream.Length);
                 }

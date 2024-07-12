@@ -15,18 +15,11 @@ namespace NetWork
             m_Context = context;
         }
         
-        public void Send(Message msg)
+        public Task Send(Message msg)
         {
-            m_Context.WriteAndFlushAsync(msg);
+            return m_Context.WriteAndFlushAsync(msg);
         }
 
-        public async Task<T> SendAsync<T>(Message msg)
-        {
-            await m_Context.WriteAndFlushAsync(msg);
-            var taskCompletionSource = new TaskCompletionSource<T>();
-            return await taskCompletionSource.Task;
-        }
-        
         public virtual void OnClose()
         {
         }

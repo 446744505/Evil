@@ -35,12 +35,13 @@ namespace NetWork.Handler
         {
             base.ExceptionCaught(context, exception);
             Log.I.Error(exception);
+            context.CloseAsync();
         }
 
         protected override void ChannelRead0(IChannelHandlerContext ctx, Message msg)
         {
             msg.Session = m_Session;
-            Console.WriteLine(msg);
+            msg.Process();
         }
     }
 }

@@ -13,22 +13,12 @@ namespace Client.NetWork
 
         public void Send(Message msg)
         {
-            var session = m_SessionMgr.Session;
-            if (session == null)
-            {
-                throw new NetWorkException("session is null");
-            }
-            session.Send(msg);
+            msg.Send(m_SessionMgr.Session);
         }
 
-        public async Task<T> SendAsync<T>(Message msg)
+        public async Task<T> SendAsync<T>(Rpc<T> rpc)
         {
-            var session = m_SessionMgr.Session;
-            if (session == null)
-            {
-                throw new NetWorkException("session is null");
-            }
-            return await session.SendAsync<T>(msg);
+            return await rpc.SendAsync(m_SessionMgr.Session);
         }
     }
 }

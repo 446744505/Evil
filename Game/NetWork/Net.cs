@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Logic.Hero.Proto;
 using NetWork;
 using NetWork.Util;
 
@@ -15,21 +14,13 @@ namespace Game.NetWork
         public void Send(Message msg)
         {
             var session = m_SessionMgr.GetSession(1);
-            if (session == null)
-            {
-                throw new NetWorkException("session is null");
-            }
-            session.Send(msg);
+            msg.Send(session);
         }
 
-        public async Task<T> SendAsync<T>(Message msg)
+        public async Task<T> SendAsync<T>(Rpc<T> rpc)
         {
             var session = m_SessionMgr.GetSession(1);
-            if (session == null)
-            {
-                throw new NetWorkException("session is null");
-            }
-            return await session.SendAsync<T>(msg);
+            return await rpc.SendAsync(session);
         }
     }
 }

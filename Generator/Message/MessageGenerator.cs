@@ -1,6 +1,7 @@
 using System.IO;
 using Generator.Context;
 using Generator.Kind;
+using Generator.Proto;
 using Generator.Util;
 
 namespace Generator.Message
@@ -55,10 +56,16 @@ namespace NetWork
             var filePath = Path.Combine(messagePath, $"{kind.Name}{Files.CodeFileSuffix}");
             var namespaceName = $"{kind.NamespaceName()}.{Namespaces.ProtoNamespace}";
             var messageId = MessageIdGenerator.CalMessageId(kind.Name);
+            var parent = "NetWork.Message";
+            // 是rpc req
+            if (kind is ReqClassKind reqClassKind)
+            {
+                parent = $"NetWork.Rpc<{reqClassKind.AckFullName}>";
+            }
             var code = $@"
 namespace {namespaceName}
 {{
-    public partial class {kind.Name} : NetWork.Message
+    public partial class {kind.Name} : {parent}
     {{
         public override uint MessageId => {messageId};
     }}
