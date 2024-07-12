@@ -1,4 +1,5 @@
 using System.Threading;
+using NetWork.Proto;
 
 namespace NetWork.Transport
 {
@@ -26,7 +27,14 @@ namespace NetWork.Transport
             m_SessionMgr = Config.NetWorkFactory.CreateSessionMgr();
             var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
             m_MessageProcessor = new MessageProcessor();
+            RegisterMessages();
             messageRegister.Register(m_MessageProcessor);
+        }
+
+        private void RegisterMessages()
+        {
+            m_MessageProcessor.Register(MessageId.RpcResponse, () => new RpcResponse());
+            RegisterExtMessages();
         }
 
         protected void WaitStop()
@@ -49,5 +57,6 @@ namespace NetWork.Transport
         }
     
         public abstract void Start();
+        public abstract void RegisterExtMessages();
     }
 }

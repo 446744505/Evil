@@ -20,7 +20,7 @@ namespace Client
                 config.NetWorkFactory = new ClientNetWorkFactory();
                 var connector = new ConnectorTransport(config);
                 connector.Start();
-                Console.WriteLine("client started");
+                Log.I.Info("client started");
                 Test();
                 stopper = new Stopper()
                     .BindSignal()

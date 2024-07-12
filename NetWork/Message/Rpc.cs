@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using NetWork.Proto;
 using NetWork.Util;
+using ProtoBuf;
 
 namespace NetWork
 {
@@ -32,8 +34,15 @@ namespace NetWork
 
         public override void Process()
         {
-            var response = DeRequest();
-            
+            var result = DeRequest();
+            var rsp = new RpcResponse() { RequestId = m_RequestId };
+            using (var stream = new MemoryStream())
+            {
+                Serializer.Serialize(stream, result);
+                rsp.Data = stream.ToArray();
+            }
+
+            Session.Send(rsp);
         }
 
         public override void Encode(BinaryWriter writer)
