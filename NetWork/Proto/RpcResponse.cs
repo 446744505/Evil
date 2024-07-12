@@ -1,3 +1,4 @@
+using System.IO;
 using ProtoBuf;
 
 namespace NetWork.Proto
@@ -14,7 +15,16 @@ namespace NetWork.Proto
 
         public override void Process()
         {
-            Log.I.Info(ToString());
+            var completionSource = RpcMgr.I.RemovePending(RequestId);
+            if (completionSource == null)
+            {
+                return;
+            }
+            using (var stream = new MemoryStream(Data))
+            {
+                var message = Serializer.Deserialize(completionSource.Task.GetType(), stream) as Message;
+                completionSource.TrySetResult(message!);
+            }
         }
     }
 }

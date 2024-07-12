@@ -57,6 +57,9 @@ namespace NetWork.Transport
         }
     
         public abstract void Start();
-        public abstract void RegisterExtMessages();
+
+        public virtual void RegisterExtMessages()
+        {
+        }
     }
 }

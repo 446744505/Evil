@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
 using NetWork.Proto;
@@ -10,7 +11,6 @@ namespace NetWork
     public abstract class Rpc<T> : Message where T : Message
     {
         private long m_RequestId = IdGenerator.NextId();
-        private TaskCompletionSource<T> m_TaskCompletionSource;
 
         public async Task<T> SendAsync(Session? session, int timeout = 10000)
         {
@@ -20,14 +20,16 @@ namespace NetWork
             }
 
             await session.Send(this);
-            m_TaskCompletionSource = new TaskCompletionSource<T>();
-            var timeoutTask = Task.Delay(timeout).ContinueWith(_ => m_TaskCompletionSource.TrySetCanceled());
-            await Task.WhenAny(timeoutTask, m_TaskCompletionSource.Task);
+            var completionSource = new TaskCompletionSource<T>();
+            RpcMgr.I.PendRequest(m_RequestId, completionSource);
+            var timeoutTask = Task.Delay(timeout).ContinueWith(_ => completionSource.TrySetCanceled());
+            await Task.WhenAny(timeoutTask, completionSource.Task);
             try
             {
-                return await m_TaskCompletionSource.Task;
+                return await completionSource.Task;
             } catch (TaskCanceledException)
             {
+                RpcMgr.I.RemovePending(m_RequestId);
                 throw new TimeoutException(ToString()!);
             }
         }
@@ -39,7 +41,7 @@ namespace NetWork
             using (var stream = new MemoryStream())
             {
                 Serializer.Serialize(stream, result);
-                rsp.Data = stream.ToArray();
+                rsp.Data = stream.GetBuffer()[..(int)stream.Length];
             }
 
             Session.Send(rsp);
