@@ -26,25 +26,31 @@ namespace Generator.AttributeHandler
     }
     public class ClientToServerAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
     {
-        private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler = new ClientToServerCreateSyntaxAttrHandler();
+        private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler;
+        public ClientToServerAttrHandler(TypeContext tc, AttributeSyntax attr) : base(tc, attr)
+        {
+            m_CreateSyntaxAttrHandler = new ClientToServerCreateSyntaxAttrHandler()
+            {
+                IsCreateFile = tc.FileContext.GloableContext.IsClient,
+            };
+        }
+        
         /// <summary>
         /// 解析类型里的所有方法，并生成对应的方法
         /// 会为每个方法生成一个请求协议，如果方法有返回值且类型不是class/struct也会生成一个响应协议
         /// </summary>
-        /// <param name="tc"></param>
-        /// <param name="attr"></param>
         /// <returns></returns>
-        protected override void Parse0(TypeContext tc, AttributeSyntax attr)
+        protected override void Parse0()
         {
-            var methodList = tc.OldTypeSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>();
+            var methodList = TypeContext.OldTypeSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>();
             foreach (var m in methodList)
             {
-                var method = ParseMethod(tc, m);
-                tc.NewClassSyntax = tc.NewClassSyntax!.AddMembers(method);
+                var method = ParseMethod(m);
+                TypeContext.NewClassSyntax = TypeContext.NewClassSyntax!.AddMembers(method);   
             }
         }
 
-        private MethodDeclarationSyntax ParseMethod(TypeContext tc, MethodDeclarationSyntax m)
+        private MethodDeclarationSyntax ParseMethod(MethodDeclarationSyntax m)
         {
             var method = SyntaxFactory.MethodDeclaration(m.ReturnType, m.Identifier);
             var modifiers = m.Modifiers;
@@ -63,27 +69,27 @@ namespace Generator.AttributeHandler
             HashSet<string> fieldIndex = new();
             // 每个方法创建一个请求协议
             var reqClassKind = new ReqClassKind(new ClassType().Parse(method),
-                tc.FileContext.GetOrCreateNamespaceKind(tc.NewNameSpaceName))
+                TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName))
             {
                 Comment = AnalysisUtil.GetComment(m)
             };
-            tc.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name);
+            TypeContext.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name);
             var sendBody = new Writer();
             const string reqName = "req";
             // 可能会创建一个响应协议
             if (!isReturnVoid)
             {
                 var returnType = TypeBuilder.I.ParseType(m.ReturnType);
-                var protoAckVisitor = new ProtoAckTypeVisitor(reqClassKind.Name, tc.FileContext.GloableContext);
+                var protoAckVisitor = new ProtoAckTypeVisitor(reqClassKind.Name, TypeContext.FileContext.GloableContext);
                 returnType.Accept(protoAckVisitor);
                 var fullNameVisitor = new FullNameTypeVisitor();
                 returnType.Accept(fullNameVisitor);
                 if (protoAckVisitor.SyntaxResult != null)
                 {
                     var ackClassKind = new ClassType().Parse(protoAckVisitor.SyntaxResult)
-                        .CreateKind(tc.FileContext.GetOrCreateNamespaceKind(tc.NewNameSpaceName));
+                        .CreateKind(TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName));
                     ackClassKind.Comment = reqClassKind.Comment;
-                    tc.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name);
+                    TypeContext.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name);
                     // 字段名永远是data
                     var field = new ProtoFieldKind(Fields.MessageAckFieldName, protoAckVisitor.TypeResult!, ackClassKind);
                     field.Index = 1; // index永远是1
@@ -120,20 +126,20 @@ namespace Generator.AttributeHandler
                 if (!AnalysisUtil.HadAttribute(p, Attributes.ProtocolField, out var attr))
                 {
                     throw new AttributeException(
-                        $"{tc.OldClassName}方法{m.Identifier}的参数{p.Identifier}必须要{Attributes.ProtocolField}注解");
+                        $"{TypeContext.OldClassName}方法{m.Identifier}的参数{p.Identifier}必须要{Attributes.ProtocolField}注解");
                 }
 
                 // 检查是否有index字段
                 if (!AnalysisUtil.HadAttrArgument(attr!, AttributeFields.ProtocolFieldIndex, out var index))
                 {
                     throw new AttributeException(
-                        $"{tc.OldClassName}方法{m.Identifier}的参数{p.Identifier}的{Attributes.ProtocolField}注解取不到index={AttributeFields.ProtocolFieldIndex}的字段");
+                        $"{TypeContext.OldClassName}方法{m.Identifier}的参数{p.Identifier}的{Attributes.ProtocolField}注解取不到index={AttributeFields.ProtocolFieldIndex}的字段");
                 }
 
                 // 检查索引是否重复
                 if (!fieldIndex.Add(index))
                 {
-                    throw new AttributeException($"{tc.OldClassName}方法{m.Identifier}的参数{p.Identifier}的索引{index}重复");
+                    throw new AttributeException($"{TypeContext.OldClassName}方法{m.Identifier}的参数{p.Identifier}的索引{index}重复");
                 }
 
                 var param = SyntaxFactory.Parameter(p.Identifier)

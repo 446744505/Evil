@@ -17,11 +17,16 @@ namespace Generator.AttributeHandler
         protected TypeContext m_TypeContext = null!;
         protected AttributeSyntax m_Attr = null!;
 
+        /// <summary>
+        /// 是不是要创建文件
+        /// </summary>
+        public bool IsCreateFile { get; set; } = true;
+
         public void InitSyntax(TypeContext tc, AttributeSyntax attr)
         {
             m_TypeContext = tc;
             m_Attr = attr;
-
+            
             NewNamespaceSyntax();
             NewClassSyntax();
         }
@@ -30,7 +35,7 @@ namespace Generator.AttributeHandler
         {
             var tc = m_TypeContext;
             tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(tc.OldNameSpaceName))
-                .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
+                    .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
         }
         
         protected virtual void NewClassSyntax()
@@ -45,6 +50,8 @@ namespace Generator.AttributeHandler
 
         public virtual void FinishSyntax()
         {
+            if (!IsCreateFile) return;
+            
             var tc = m_TypeContext;
             tc.NewNamespaceSyntax = tc.NewNamespaceSyntax!.AddMembers(tc.NewClassSyntax!);
             tc.FileContext.AddNamespaceSyntax(tc.NewNamespaceSyntax);

@@ -10,6 +10,8 @@ namespace Generator
         public string InterfaceProject { get; set; } = null!;
         [ConfigurationKeyName("codeOut")] 
         public string CodeOutputPath { get; set; } = null!;
+        [ConfigurationKeyName("node")]
+        public string Node { get; set; } = null!;
 
         public static void Init(string[] args)
         {

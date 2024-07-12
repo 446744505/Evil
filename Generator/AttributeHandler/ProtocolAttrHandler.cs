@@ -14,35 +14,40 @@ namespace Generator.AttributeHandler
     /// </summary>
     public class ProtocolAttrHandler : BaseTypeAttrHandler, ICreateKindAttrHandler
     {
-        private readonly ICreateKindAttrHandler m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler()
-        {
-            CreateFieldFactory = new ProtoCreateFieldFactory(),
-            NameSpaceSuffix = Namespaces.ProtoNamespace
-        };
+        private readonly ICreateKindAttrHandler m_CreateKindAttrHandler;
         
-        protected override void Parse0(TypeContext tc, AttributeSyntax attr)
+        public ProtocolAttrHandler(TypeContext typeContext, AttributeSyntax attr) : base(typeContext, attr)
         {
-            var fields = tc.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
+            m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler()
+            {
+                CreateFieldFactory = new ProtoCreateFieldFactory(),
+                NameSpaceSuffix = Namespaces.ProtoNamespace
+            };
+        }
+        
+        protected override void Parse0()
+        {
+            var fields = TypeContext.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
             // 用来检查协议字段的索引是否重复
             HashSet<string> fieldIndex = new();
             foreach (var f in fields)
             {
                 // 不是协议字段
-                if (!AnalysisUtil.HadAttribute(f, Attributes.ProtocolField, out attr!))
+                if (!AnalysisUtil.HadAttribute(f, Attributes.ProtocolField, out var attr))
                 {
                     continue;
                 }
                 var fieldName = AnalysisUtil.GetFieldName(f);
                 // 检查是否有index字段
-                if (!AnalysisUtil.HadAttrArgument(attr, AttributeFields.ProtocolFieldIndex, out var index))
+                if (!AnalysisUtil.HadAttrArgument(attr!, AttributeFields.ProtocolFieldIndex, out var index))
                 {
                     throw new AttributeException(
-                        $"{tc.OldClassName}的字段{fieldName}的{Attributes.ProtocolField}注解取不到index={AttributeFields.ProtocolFieldIndex}的字段");
+                        $"{TypeContext.OldClassName}的字段{fieldName}的{Attributes.ProtocolField}注解取不到index={AttributeFields.ProtocolFieldIndex}的字段");
                 }
                 // 检查索引是否重复
                 if (!fieldIndex.Add(index))
                 {
-                    throw new AttributeException($"{tc.OldClassName}的字段{fieldName}的索引{index}重复");
+                    throw new AttributeException($"{TypeContext.OldClassName}的字段{fieldName}的索引{index}重复");
                 }
                 // 获取字段类型
                 try
@@ -54,7 +59,7 @@ namespace Generator.AttributeHandler
                 }
                 catch (System.Exception e)
                 {
-                    throw new TypeException($"{tc.OldClassName}的字段{fieldName}的类型解析失败", e);
+                    throw new TypeException($"{TypeContext.OldClassName}的字段{fieldName}的类型解析失败", e);
                 }
             }
         }

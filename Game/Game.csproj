@@ -11,8 +11,4 @@
       <ProjectReference Include="..\NetWork\NetWork.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Generator\Logic\Hero" />
-    </ItemGroup>
-
 </Project>

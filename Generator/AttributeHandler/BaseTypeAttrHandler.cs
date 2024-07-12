@@ -6,18 +6,27 @@ namespace Generator.AttributeHandler
 {
     public abstract class BaseTypeAttrHandler : IAttributeHandler
     {
-        public void Parse(TypeContext tc, AttributeSyntax attr)
+        public TypeContext TypeContext { get; }
+        protected AttributeSyntax Attr { get; }
+
+        protected BaseTypeAttrHandler(TypeContext typeContext, AttributeSyntax attr)
+        {
+            TypeContext = typeContext;
+            Attr = attr;
+        }
+
+        public void Parse()
         {
             var createKindAttrHandler = this as ICreateKindAttrHandler;
-            createKindAttrHandler?.InitKind(tc, attr);
+            createKindAttrHandler?.InitKind(TypeContext, Attr);
             var createSyntaxAttrHandler = this as ICreateSyntaxAttrHandler;
-            createSyntaxAttrHandler?.InitSyntax(tc, attr);
+            createSyntaxAttrHandler?.InitSyntax(TypeContext, Attr);
             
-            Parse0(tc, attr);
+            Parse0();
             
             createSyntaxAttrHandler?.FinishSyntax();
         }
 
-        protected abstract void Parse0(TypeContext tc, AttributeSyntax attr);
+        protected abstract void Parse0();
     }
 }

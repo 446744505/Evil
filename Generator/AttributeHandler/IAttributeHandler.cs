@@ -5,6 +5,6 @@ namespace Generator.AttributeHandler
 {
     public interface IAttributeHandler
     {
-        void Parse(TypeContext tc, AttributeSyntax attr);
+        void Parse();
     }
 }

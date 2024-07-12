@@ -62,9 +62,9 @@ namespace Generator
                 foreach (var attribute in attributes)
                 {
                     var attributeName = attribute.Name.ToString();
-                    var handler = AttrHandlerMgr.I.CreateHandler(attributeName);
+                    var handler = AttrHandlerMgr.I.CreateHandler(attributeName, tc, attribute);
                     // 找到特效处理器，解析特性
-                    handler.Parse(tc, attribute);
+                    handler.Parse();
                 }
             }
 

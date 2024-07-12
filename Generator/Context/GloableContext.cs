@@ -8,6 +8,9 @@ namespace Generator.Context
     {
         #region 属性
 
+        public bool IsGame => CmdLine.I.Node == Nodes.Server;
+        public bool IsClient => CmdLine.I.Node == Nodes.Client;
+
         public string OutPath { get; }
         public List<FileContext> FileContexts { get; } = new();
         /// <summary>
