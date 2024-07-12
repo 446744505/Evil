@@ -17,12 +17,12 @@ namespace NetWork
         
         public void Send(Message msg)
         {
-            m_Context.WriteAsync(msg);
+            m_Context.WriteAndFlushAsync(msg);
         }
 
         public async Task<T> SendAsync<T>(Message msg)
         {
-            await m_Context.WriteAsync(msg);
+            await m_Context.WriteAndFlushAsync(msg);
             var taskCompletionSource = new TaskCompletionSource<T>();
             return await taskCompletionSource.Task;
         }

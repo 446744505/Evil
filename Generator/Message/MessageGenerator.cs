@@ -1,6 +1,7 @@
 using System.IO;
 using Generator.Context;
 using Generator.Kind;
+using Generator.Util;
 
 namespace Generator.Message
 {
@@ -39,6 +40,7 @@ namespace {namespaceName}
 {{
     public partial class {kind.Name} : NetWork.Message
     {{
+        public override uint MessageId => {MessageIdGenerator.CalMessageId(kind.Name)};
     }}
 }}
               ";

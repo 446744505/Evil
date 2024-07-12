@@ -1,15 +1,24 @@
-using System;
-using System.Collections.Generic;
+using System.IO;
+using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
+using ProtoBuf;
 
 namespace NetWork.Codec
 {
-    internal class MessageEncode : MessageToMessageEncoder<Message>
+    internal class MessageEncode : MessageToByteEncoder<Message>
     {
-        protected override void Encode(IChannelHandlerContext context, Message message, List<object> output)
+        protected override void Encode(IChannelHandlerContext context, Message message, IByteBuffer output)
         {
-            Console.WriteLine();
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BinaryWriter(stream))
+                {
+                    writer.Write(message.MessageId);
+                    Serializer.Serialize(stream, message);
+                    output.WriteBytes(stream.GetBuffer(), 0, (int)stream.Length);
+                }
+            }
         }
     }
 }

@@ -31,6 +31,12 @@ namespace NetWork.Handler
             Log.I.Info($"remove session {m_Session}");
         }
 
+        public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
+        {
+            base.ExceptionCaught(context, exception);
+            Log.I.Error(exception);
+        }
+
         protected override void ChannelRead0(IChannelHandlerContext ctx, Message msg)
         {
             msg.Session = m_Session;
