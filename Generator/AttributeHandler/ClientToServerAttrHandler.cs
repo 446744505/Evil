@@ -63,7 +63,7 @@ namespace Generator.AttributeHandler
             HashSet<string> fieldIndex = new();
             // 每个方法创建一个请求协议
             var reqClassKind = new ReqClassKind(new ClassType().Parse(method),
-                tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName))
+                tc.FileContext.GetOrCreateNamespaceKind(tc.NewNameSpaceName))
             {
                 Comment = AnalysisUtil.GetComment(m)
             };
@@ -76,23 +76,32 @@ namespace Generator.AttributeHandler
                 var returnType = TypeBuilder.I.ParseType(m.ReturnType);
                 var protoAckVisitor = new ProtoAckTypeVisitor(reqClassKind.Name, tc.FileContext.GloableContext);
                 returnType.Accept(protoAckVisitor);
+                var fullNameVisitor = new FullNameTypeVisitor();
+                returnType.Accept(fullNameVisitor);
                 if (protoAckVisitor.SyntaxResult != null)
                 {
                     var ackClassKind = new ClassType().Parse(protoAckVisitor.SyntaxResult)
-                        .CreateKind(tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName));
+                        .CreateKind(tc.FileContext.GetOrCreateNamespaceKind(tc.NewNameSpaceName));
                     ackClassKind.Comment = reqClassKind.Comment;
                     tc.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name);
                     // 字段名永远是data
                     var field = new ProtoFieldKind(Fields.MessageAckFieldName, protoAckVisitor.TypeResult!, ackClassKind);
                     field.Index = 1; // index永远是1
                     reqClassKind.AddField(field);
+                    reqClassKind.AckFullName = ackClassKind.FullName();
+                    // 修改返回值类型 生成泛型Task<T>类型
+                    method = method.WithReturnType(SyntaxFactory.GenericName(SyntaxFactory.Identifier("Task"))
+                        .WithTypeArgumentList(SyntaxFactory.TypeArgumentList(
+                            SyntaxFactory.SingletonSeparatedList(
+                                SyntaxFactory.ParseTypeName(ackClassKind.FullName())))));
                 }
-                var fullNameVisitor = new FullNameTypeVisitor();
-                returnType.Accept(fullNameVisitor);
-                // 设置给req
-                reqClassKind.AckFullName = fullNameVisitor.Result;
+                else
+                {
+                    reqClassKind.AckFullName = fullNameVisitor.Result;
+                }
+
                 // 异步发送
-                sendBody.WriteLine($"return await Net.I.SendAsync<{fullNameVisitor.Result}>({reqName});");
+                sendBody.WriteLine($"return await Net.I.SendAsync<{reqClassKind.AckFullName}>({reqName});");
             }
             else
             {

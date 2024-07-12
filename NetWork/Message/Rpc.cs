@@ -1,10 +1,11 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using NetWork.Util;
 
 namespace NetWork
 {
-    public class Rpc<T> : Message
+    public abstract class Rpc<T> : Message where T : Message
     {
         private long m_RequestId = IdGenerator.NextId();
         private TaskCompletionSource<T> m_TaskCompletionSource;
@@ -18,8 +19,21 @@ namespace NetWork
 
             await session.Send(this);
             m_TaskCompletionSource = new TaskCompletionSource<T>();
-            await Task.Delay(timeout).ContinueWith(_ => m_TaskCompletionSource.TrySetException(new TimeoutException(ToString()!)));
-            return await m_TaskCompletionSource.Task;
+            var timeoutTask = Task.Delay(timeout).ContinueWith(_ => m_TaskCompletionSource.TrySetCanceled());
+            await Task.WhenAny(timeoutTask, m_TaskCompletionSource.Task);
+            try
+            {
+                return await m_TaskCompletionSource.Task;
+            } catch (TaskCanceledException)
+            {
+                throw new TimeoutException(ToString()!);
+            }
+        }
+
+        public override void Process()
+        {
+            var response = DeRequest();
+            
         }
 
         public override void Encode(BinaryWriter writer)
@@ -32,6 +46,11 @@ namespace NetWork
         {
             base.Decode(reader);
             m_RequestId = reader.ReadInt64();
+        }
+
+        public virtual T DeRequest()
+        {
+            throw new NotImplementedException();
         }
     }
 }

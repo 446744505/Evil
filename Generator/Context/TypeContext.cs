@@ -14,6 +14,7 @@ namespace Generator.Context
         public string OldClassName { get; }
         public FileContext FileContext { get; }
         public NamespaceDeclarationSyntax? NewNamespaceSyntax { get; set; }
+        public string NewNameSpaceName => NewNamespaceSyntax!.Name.ToString();
 
         public ClassDeclarationSyntax? NewClassSyntax { get; set; }
 

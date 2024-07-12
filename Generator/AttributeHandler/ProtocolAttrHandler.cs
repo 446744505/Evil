@@ -16,7 +16,8 @@ namespace Generator.AttributeHandler
     {
         private readonly ICreateKindAttrHandler m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler()
         {
-            CreateFieldFactory = new ProtoCreateFieldFactory()
+            CreateFieldFactory = new ProtoCreateFieldFactory(),
+            NameSpaceSuffix = Namespaces.ProtoNamespace
         };
         
         protected override void Parse0(TypeContext tc, AttributeSyntax attr)

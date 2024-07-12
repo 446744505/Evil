@@ -136,7 +136,7 @@ namespace Generator.Proto
         {
             writer.WriteLine(@"syntax = ""proto3"";");
             writer.WriteLine();
-            writer.WriteLine($"package {namespaceName}.{Namespaces.ProtoNamespace};");
+            writer.WriteLine($"package {namespaceName};");
             writer.WriteLine();
         }
         

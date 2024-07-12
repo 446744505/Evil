@@ -41,7 +41,7 @@ namespace NetWork.Handler
         protected override void ChannelRead0(IChannelHandlerContext ctx, Message msg)
         {
             msg.Session = m_Session;
-            msg.Process();
+            msg.Dispatch();
         }
     }
 }

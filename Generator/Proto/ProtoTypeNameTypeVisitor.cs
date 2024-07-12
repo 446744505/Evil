@@ -19,7 +19,7 @@ namespace Generator.Visitor
         private void VisitIdentiferType(BaseIdentiferType identiferType)
         {
             var identiferKind = m_Pc.IdentiferFind.Invoke(identiferType.Name);
-            Result = $"{identiferKind.NamespaceName()}.{Namespaces.ProtoNamespace}.{identiferKind.Name}";
+            Result = $"{identiferKind.NamespaceName()}.{identiferKind.Name}";
         }
 
         public void Visit(StructType type)

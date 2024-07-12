@@ -19,13 +19,22 @@ namespace Generator.AttributeHandler
         private AttributeSyntax m_Attr = null!;
 
         public ICreateFieldFactory<FieldKind> CreateFieldFactory { get; set; }
+        /// <summary>
+        /// 附加的命名空间后缀
+        /// </summary>
+        public string NameSpaceSuffix { get; set; } = "";
 
         public void InitKind(TypeContext tc, AttributeSyntax attr)
         {
             m_TypeContext = tc;
             m_Attr = attr;
             var identiferType = TypeBuilder.I.ParseType(tc.OldTypeSyntax);
-            var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(tc.OldNameSpaceName);
+            var nameSpace = tc.OldNameSpaceName;
+            if (!string.IsNullOrEmpty(NameSpaceSuffix))
+            {
+                nameSpace += "." + NameSpaceSuffix;
+            }
+            var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(nameSpace);
             tc.ClassKind = identiferType.CreateKind(namespaceKind);
             tc.ClassKind.Comment = AnalysisUtil.GetComment(tc.OldTypeSyntax);
         }

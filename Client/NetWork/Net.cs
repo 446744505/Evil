@@ -16,7 +16,7 @@ namespace Client.NetWork
             msg.Send(m_SessionMgr.Session);
         }
 
-        public async Task<T> SendAsync<T>(Rpc<T> rpc)
+        public async Task<T> SendAsync<T>(Rpc<T> rpc) where T : Message
         {
             return await rpc.SendAsync(m_SessionMgr.Session);
         }

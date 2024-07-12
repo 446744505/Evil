@@ -54,7 +54,7 @@ namespace NetWork
         private string CreateMessageFile(BaseIdentiferKind kind, string messagePath)
         {
             var filePath = Path.Combine(messagePath, $"{kind.Name}{Files.CodeFileSuffix}");
-            var namespaceName = $"{kind.NamespaceName()}.{Namespaces.ProtoNamespace}";
+            var namespaceName = $"{kind.NamespaceName()}";
             var messageId = MessageIdGenerator.CalMessageId(kind.Name);
             var parent = "NetWork.Message";
             // 是rpc req

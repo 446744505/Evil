@@ -17,7 +17,7 @@ namespace Game.NetWork
             msg.Send(session);
         }
 
-        public async Task<T> SendAsync<T>(Rpc<T> rpc)
+        public async Task<T> SendAsync<T>(Rpc<T> rpc) where T : Message
         {
             var session = m_SessionMgr.GetSession(1);
             return await rpc.SendAsync(session);
