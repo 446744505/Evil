@@ -15,16 +15,14 @@ namespace NetWork.Proto
 
         public override void Process()
         {
-            var completionSource = RpcMgr.I.RemovePending(RequestId);
-            if (completionSource == null)
+            var func = RpcMgr.I.RemovePending(RequestId);
+            if (func == null)
             {
                 return;
             }
-            using (var stream = new MemoryStream(Data))
-            {
-                var message = Serializer.Deserialize(completionSource.Task.GetType(), stream) as Message;
-                completionSource.TrySetResult(message!);
-            }
+
+            using var stream = new MemoryStream(Data);
+            func.Invoke(stream);
         }
     }
 }

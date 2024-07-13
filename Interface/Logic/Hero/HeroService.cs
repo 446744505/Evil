@@ -13,17 +13,17 @@ namespace Logic.Hero
           /// </summary>
           /// <param name="heroId"></param>
           /// <returns></returns>
-          public Task<Hero> GetHero([ProtocolField(1)]long heroId);
+          public Hero GetHero([ProtocolField(1)]long heroId);
           /// <summary>
           /// 获取所有英雄信息
           /// </summary>
           /// <returns></returns>
-          public Task<List<Hero>> ListHeroes();
+          public List<Hero> ListHeroes();
           /// <summary>
           /// 英雄升星
           /// </summary>
           /// <param name="heroId"></param>
           /// <returns></returns>
-          public Task<HeroStarAck> HeroStar([ProtocolField(1)]long heroId);
+          public HeroStarAck HeroStar([ProtocolField(1)]long heroId);
      }
 }

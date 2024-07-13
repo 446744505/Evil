@@ -95,16 +95,17 @@ namespace Generator.AttributeHandler
                     field.Index = 1; // index永远是1
                     reqClassKind.AddField(field);
                     reqClassKind.AckFullName = ackClassKind.FullName();
-                    // 修改返回值类型 生成泛型Task<T>类型
-                    method = method.WithReturnType(SyntaxFactory.GenericName(SyntaxFactory.Identifier("Task"))
-                        .WithTypeArgumentList(SyntaxFactory.TypeArgumentList(
-                            SyntaxFactory.SingletonSeparatedList(
-                                SyntaxFactory.ParseTypeName(ackClassKind.FullName())))));
                 }
                 else
                 {
                     reqClassKind.AckFullName = fullNameVisitor.Result;
                 }
+                
+                // 修改返回值类型 生成泛型Task<T>类型
+                method = method.WithReturnType(SyntaxFactory.GenericName(SyntaxFactory.Identifier("Task"))
+                    .WithTypeArgumentList(SyntaxFactory.TypeArgumentList(
+                        SyntaxFactory.SingletonSeparatedList(
+                            SyntaxFactory.ParseTypeName(reqClassKind.AckFullName)))));
 
                 // 异步发送
                 sendBody.WriteLine($"return await Net.I.SendAsync<{reqClassKind.AckFullName}>({reqName});");

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
 using NetWork.Proto;
@@ -21,7 +20,11 @@ namespace NetWork
 
             await session.Send(this);
             var completionSource = new TaskCompletionSource<T>();
-            RpcMgr.I.PendRequest(m_RequestId, completionSource);
+            RpcMgr.I.PendRequest(m_RequestId, stream =>
+            {
+                var message = Serializer.NonGeneric.Deserialize(typeof(T), stream) as T;
+                return completionSource.TrySetResult(message!);
+            });
             var timeoutTask = Task.Delay(timeout).ContinueWith(_ => completionSource.TrySetCanceled());
             await Task.WhenAny(timeoutTask, completionSource.Task);
             try
