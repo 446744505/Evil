@@ -14,9 +14,10 @@ namespace Generator.Context
     {
         #region 字段
 
-        private readonly GloableContext m_Gc;
+        private readonly GloableContext m_Gc = null!;
         private readonly string m_Path;
         private readonly CompilationUnitSyntax m_Root;
+        private readonly SyntaxTree m_Tree = null!;
         
         private readonly List<NamespaceDeclarationSyntax> m_NamespaceSyntaxes = new();
         private readonly Dictionary<string, Kind.NamespaceKind> m_NamespaceKinds = new();
@@ -32,9 +33,10 @@ namespace Generator.Context
 
         #endregion
 
-        public FileContext(GloableContext gc, CompilationUnitSyntax root, Document document, string path)
+        public FileContext(GloableContext gc, SyntaxTree tree, CompilationUnitSyntax root, Document document, string path)
         {
             m_Gc = gc;
+            m_Tree = tree;
             m_Root = root;
             Document = document;
             m_Path = path;
@@ -60,6 +62,12 @@ namespace Generator.Context
             ns = new Kind.NamespaceKind(name);
             m_NamespaceKinds.Add(name, ns);
             return ns;
+        }
+        
+        public IMethodSymbol? GetDeclaredSymbol(MethodDeclarationSyntax method)
+        {
+            var model = m_Gc.Compilation.GetSemanticModel(m_Tree);
+            return model.GetDeclaredSymbol(method);
         }
 
         public void CreateFile()

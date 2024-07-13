@@ -1,6 +1,5 @@
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Attributes;
 
 namespace Logic.Hero
@@ -8,6 +7,7 @@ namespace Logic.Hero
      [ClientToServer]
      public interface HeroService
      {
+          public Hero AddHero([ProtocolField(1)]long heroId);
           /// <summary>
           /// 获取英雄信息
           /// </summary>
@@ -24,6 +24,6 @@ namespace Logic.Hero
           /// </summary>
           /// <param name="heroId"></param>
           /// <returns></returns>
-          public HeroStarAck HeroStar([ProtocolField(1)]long heroId);
+          public void HeroStar([ProtocolField(1)]long heroId);
      }
 }

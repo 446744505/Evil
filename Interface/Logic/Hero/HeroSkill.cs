@@ -2,7 +2,7 @@ using Attributes;
 
 namespace Logic.Hero
 {
-    [Protocol]
+    [Protocol(Node.Client | Node.Game)]
     public class HeroSkill
     {
         [ProtocolField(1)]

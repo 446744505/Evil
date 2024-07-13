@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO.Compression;
 using System.Threading.Tasks;
 using Client.NetWork;
 using Logic.Hero.Proto;
@@ -21,7 +20,7 @@ namespace Client
                 var connector = new ConnectorTransport(config);
                 connector.Start();
                 Log.I.Info("client started");
-                Test();
+                
                 stopper = new Stopper()
                     .BindSignal()
                     .BindCancelKey()
@@ -31,15 +30,6 @@ namespace Client
             {
                 stopper?.SignalWeakUp();
             }
-        }
-
-        public static async void Test()
-        {
-            await Task.Delay(2000);
-            Log.I.Info("Send Message");
-            var heroService = new HeroService();
-            var hero = await heroService.GetHero(999);
-            Console.WriteLine(hero);
         }
     }
 }

@@ -5,8 +5,8 @@ namespace Logic.Hero
     /// <summary>
     /// 升星返回
     /// </summary>
-    [Protocol]
-    public class HeroStarAck
+    [Protocol(Node.Client|Node.Game)]
+    public class HeroStarNtf
     {
         /// <summary>
         /// 英雄id

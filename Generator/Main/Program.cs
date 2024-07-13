@@ -20,7 +20,7 @@ namespace Generator
             var workspace = MSBuildWorkspace.Create();
             var project = workspace.OpenProjectAsync(CmdLine.I.InterfaceProject).Result;
             // 初始化全局上下文
-            var gc = new GloableContext(CmdLine.I.CodeOutputPath);
+            var gc = new GloableContext(project, CmdLine.I.CodeOutputPath);
             // 删除旧的生成文件
             gc.CleanGeneratedFiles();
             try

@@ -54,7 +54,8 @@ namespace Generator.AttributeHandler
         {
             var method = SyntaxFactory.MethodDeclaration(m.ReturnType, m.Identifier);
             var modifiers = m.Modifiers;
-            var isReturnVoid = m.ReturnType.IsKind(SyntaxKind.VoidKeyword);
+            var symbol = TypeContext.FileContext.GetDeclaredSymbol(m);
+            var isReturnVoid = symbol!.ReturnsVoid;
             // 如果返回值不是void,则设置为异步方法
             if (!isReturnVoid)
             {
@@ -102,7 +103,7 @@ namespace Generator.AttributeHandler
                 }
                 
                 // 修改返回值类型 生成泛型Task<T>类型
-                method = method.WithReturnType(SyntaxFactory.GenericName(SyntaxFactory.Identifier("Task"))
+                method = method.WithReturnType(SyntaxFactory.GenericName(SyntaxFactory.Identifier("System.Threading.Tasks.Task"))
                     .WithTypeArgumentList(SyntaxFactory.TypeArgumentList(
                         SyntaxFactory.SingletonSeparatedList(
                             SyntaxFactory.ParseTypeName(reqClassKind.AckFullName)))));

@@ -23,8 +23,10 @@ namespace Generator.AttributeHandler
                 CreateFieldFactory = new ProtoCreateFieldFactory(),
                 NameSpaceSuffix = Namespaces.ProtoNamespace
             };
+            AnalysisUtil.HadAttrArgument(attr, AttributeFields.ProtocolNodes, out var nodes);
+            NeedParse = TypeContext.FileContext.GloableContext.IsNodeAt(nodes);
         }
-        
+
         protected override void Parse0()
         {
             var fields = TypeContext.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
@@ -61,6 +63,8 @@ namespace Generator.AttributeHandler
                 {
                     throw new TypeException($"{TypeContext.OldClassName}的字段{fieldName}的类型解析失败", e);
                 }
+                // 设置为Message类型
+                TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName);
             }
         }
 

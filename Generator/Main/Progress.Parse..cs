@@ -50,7 +50,7 @@ namespace Generator
             var tree = document.GetSyntaxTreeAsync().Result!;
             var root = tree.GetRoot();
             // 创建文件上下文
-            var fc = new FileContext(m_Gc, (CompilationUnitSyntax)root, document, relativePath);
+            var fc = new FileContext(m_Gc, tree, (CompilationUnitSyntax)root, document, relativePath);
             // 获取该文件下所有类型：class、struct、interface
             var types = root.DescendantNodes().OfType<TypeDeclarationSyntax>();
             foreach (var type in types)

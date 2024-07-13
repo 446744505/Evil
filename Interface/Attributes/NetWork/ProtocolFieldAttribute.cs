@@ -8,10 +8,10 @@ namespace Attributes;
 [AttributeUsage(AttributeTargets.Field|AttributeTargets.Parameter)]
 public class ProtocolFieldAttribute : Attribute
 {
-    private int _index;
+    private int m_Index;
     
     public ProtocolFieldAttribute(int index)
     {
-        _index = index;
+        m_Index = index;
     }
 }

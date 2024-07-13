@@ -58,7 +58,7 @@ namespace NetWork
             var messageId = MessageIdGenerator.CalMessageId(kind.Name);
             var parent = "NetWork.Message";
             // 是rpc req
-            if (kind is ReqClassKind reqClassKind)
+            if (kind is ReqClassKind reqClassKind && !string.IsNullOrEmpty(reqClassKind.AckFullName))
             {
                 parent = $"NetWork.Rpc<{reqClassKind.AckFullName}>";
             }

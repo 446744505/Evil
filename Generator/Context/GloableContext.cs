@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.CodeAnalysis;
 
 namespace Generator.Context
 {
@@ -12,6 +13,8 @@ namespace Generator.Context
         public bool IsClient => CmdLine.I.Node == Nodes.Client;
 
         public string OutPath { get; }
+        public Project Project { get;}
+        public Compilation Compilation { get; }
         public List<FileContext> FileContexts { get; } = new();
         /// <summary>
         /// proto里是message(req、ntf、ack)的class name
@@ -19,9 +22,11 @@ namespace Generator.Context
         public HashSet<string> ProtocolMessageNames { get; } = new();
 
         #endregion
-        public GloableContext(string outPath)
+        public GloableContext(Project project, string outPath)
         {
+            Project = project;
             OutPath = outPath;
+            Compilation = project.GetCompilationAsync().Result!;
         }
         
         public void AddFileContext(FileContext fc)
@@ -32,6 +37,28 @@ namespace Generator.Context
         public void AddProtocolMessageName(string name)
         {
             ProtocolMessageNames.Add(name);
+        }
+
+        public SemanticModel GetSemanticModel(SyntaxTree tree)
+        {
+            return Compilation.GetSemanticModel(tree);
+        }
+
+        public bool IsNodeAt(string nodes)
+        {
+            if (string.IsNullOrEmpty(nodes))
+            {
+                return false;
+            }
+            // 根据Interface里的Node枚举名字判断
+            // 特性解析后的nodes格式为: "Node.Client|Node.Game"
+            var nodeArr = nodes.Split('|');
+            var parsedNodes = new List<string>();
+            foreach (var node in nodeArr)
+            {
+                parsedNodes.Add(node.Split(".")[1].TrimStart().TrimEnd().ToLower());
+            }
+            return parsedNodes.Contains(CmdLine.I.Node);
         }
         
         public void CleanGeneratedFiles()

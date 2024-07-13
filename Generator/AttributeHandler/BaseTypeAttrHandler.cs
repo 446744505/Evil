@@ -8,6 +8,7 @@ namespace Generator.AttributeHandler
     {
         public TypeContext TypeContext { get; }
         protected AttributeSyntax Attr { get; }
+        protected bool NeedParse { get; set; } = true;
 
         protected BaseTypeAttrHandler(TypeContext typeContext, AttributeSyntax attr)
         {
@@ -17,6 +18,8 @@ namespace Generator.AttributeHandler
 
         public void Parse()
         {
+            if (!NeedParse) return;
+            
             var createKindAttrHandler = this as ICreateKindAttrHandler;
             createKindAttrHandler?.InitKind(TypeContext, Attr);
             var createSyntaxAttrHandler = this as ICreateSyntaxAttrHandler;

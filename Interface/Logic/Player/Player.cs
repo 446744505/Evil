@@ -3,7 +3,7 @@ using Attributes;
 
 namespace Logic.Player
 {
-    [Protocol]
+    [Protocol(Node.Client | Node.Game)]
     public class Player
     {
         [ProtocolField(1)]
