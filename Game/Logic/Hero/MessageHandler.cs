@@ -35,13 +35,12 @@ namespace Logic.Hero.Proto
             if (hero != null)
             {
                 hero.Star += 1;
+                Session.Send(new HeroStarNtf()
+                {
+                    heroId = heroId,
+                    Star = hero.Star,
+                });
             }
-
-            Session.Send(new HeroStarNtf()
-            {
-                heroId = heroId,
-                Star = hero.Star,
-            });
         }
     }
 }

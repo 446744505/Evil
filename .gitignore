@@ -11,4 +11,6 @@
 /Client/Generator/**
 /NetWork/obj/
 /NetWork/bin/
+/Edb/obj/
+/Edb/bin/
 **/*.g.cs
