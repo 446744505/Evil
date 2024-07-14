@@ -1,14 +1,14 @@
 ﻿namespace Edb
 {
-    class Savepoint
+    internal class Savepoint
     {
         private readonly Dictionary<object, ILog> m_Logs = new();
         private readonly List<ILog> m_AddOrder = new();
         private int m_Access = 0;
         
-        public int Access => m_Access;
+        internal int Access => m_Access;
 
-        int Commit()
+        internal int Commit()
         {
             foreach (var log in m_AddOrder)
             {
@@ -18,7 +18,7 @@
             return m_AddOrder.Count;
         }
         
-        int Rollback()
+        internal int Rollback()
         {
             for (var i = m_AddOrder.Count - 1; i >= 0; i--)
             {
@@ -28,24 +28,24 @@
             return m_AddOrder.Count;
         }
 
-        bool IsAccessSince(int a)
+        internal bool IsAccessSince(int a)
         {
             return a != m_Access;
         }
 
-        ILog? Get(LogKey key)
+        internal ILog? Get(LogKey key)
         {
             ++m_Access;
             m_Logs.TryGetValue(key, out var log);
             return log;
         }
         
-        void Add(ILog log)
+        internal void Add(ILog log)
         {
             m_AddOrder.Add(log);
         }
 
-        void Add(LogKey key, ILog log)
+        internal void Add(LogKey key, ILog log)
         {
             ++m_Access;
             var old = m_Logs[key];
@@ -57,7 +57,7 @@
             m_AddOrder.Add(log);
         }
         
-        bool AddIfAbsent(LogKey key, ILog log)
+        internal bool AddIfAbsent(LogKey key, ILog log)
         {
             ++m_Access;
             if (m_Logs.ContainsKey(key))

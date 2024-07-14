@@ -1,14 +1,14 @@
 ﻿namespace Edb
 {
-    class LogKey : IComparable<LogKey>
+    internal class LogKey : IComparable<LogKey>
     {
         private readonly XBean m_XBean;
         private readonly string m_VarName;
         
-        public XBean XBean => m_XBean;
-        public string VarName => m_VarName;
+        internal XBean XBean => m_XBean;
+        internal string VarName => m_VarName;
         
-        LogKey(XBean xBean, string varName)
+        internal LogKey(XBean xBean, string varName)
         {
             m_XBean = xBean;
             m_VarName = varName;

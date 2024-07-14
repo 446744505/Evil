@@ -1,8 +1,8 @@
 ﻿namespace Edb
 {
-    interface ILog
+    internal interface ILog
     {
-        void Commit();
-        void Rollback();
+        internal void Commit();
+        internal void Rollback();
     }
 }

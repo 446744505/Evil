@@ -2,9 +2,9 @@
 {
     public class XBean
     {
-        private static long _objid;
+        private static long _objId = 0;
 
-        private long m_ObjId = Interlocked.Increment(ref _objid);
+        private long m_ObjId = Interlocked.Increment(ref _objId);
         private XBean m_Parent;
         private string m_VarName;
         

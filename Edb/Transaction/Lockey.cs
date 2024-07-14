@@ -1,29 +1,29 @@
 ﻿
 namespace Edb
 {
-    class Lockey : IComparable<Lockey>
+    internal class Lockey : IComparable<Lockey>
     {
         private readonly int m_Index;
         private readonly object m_Key;
         private readonly int m_HashCode;
-        private volatile ReaderWriterLockSlim m_RWLock;
+        private volatile ReaderWriterLockSlim m_RWLock = null!;
         
-        object Key => m_Key;
+        internal object Key => m_Key;
         
-        Lockey(int id, object key)
+        internal Lockey(int id, object key)
         {
             m_Index = id;
             m_Key = key;
             m_HashCode = id ^ (id << 16) ^ key.GetHashCode();
         }
 
-        Lockey Alloc()
+        internal Lockey Alloc()
         {
             m_RWLock = new ReaderWriterLockSlim();
             return this;
         }
 
-        void RLock(int timeoutMills)
+        internal void RLock(int timeoutMills)
         {
             if (!m_RWLock.TryEnterUpgradeableReadLock(timeoutMills))
             {
@@ -31,7 +31,7 @@ namespace Edb
             }
         }
         
-        void WLock(int timeoutMills)
+        internal void WLock(int timeoutMills)
         {
             if (!m_RWLock.TryEnterWriteLock(timeoutMills))
             {
@@ -39,12 +39,12 @@ namespace Edb
             }
         }
         
-        void RUnlock()
+        internal void RUnlock()
         {
             m_RWLock.ExitUpgradeableReadLock();
         }
         
-        void WUnlock()
+        internal void WUnlock()
         {
             m_RWLock.ExitWriteLock();
         }
