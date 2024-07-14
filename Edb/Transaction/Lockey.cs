@@ -1,5 +1,4 @@
-﻿using NeoSmart.AsyncLock;
-
+﻿
 namespace Edb
 {
     class Lockey : IComparable<Lockey>
@@ -21,7 +20,6 @@ namespace Edb
         Lockey Alloc()
         {
             m_RWLock = new ReaderWriterLockSlim();
-            new AsyncLock();
             return this;
         }
 
