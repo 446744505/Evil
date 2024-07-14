@@ -10,8 +10,4 @@
       <Folder Include="Util\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="NeoSmart.AsyncLock" Version="3.2.1" />
-    </ItemGroup>
-
 </Project>
