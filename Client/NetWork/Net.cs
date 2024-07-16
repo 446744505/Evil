@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Client.Logic.Hero;
+using Evil.Util;
 using NetWork;
-using NetWork.Util;
 
 namespace Client.NetWork
 {

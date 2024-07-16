@@ -48,11 +48,11 @@
         internal void Add(LogKey key, ILog log)
         {
             ++m_Access;
-            var old = m_Logs[key];
-            if (old != null)
+            if (m_Logs.TryGetValue(key, out _))
             {
                 throw new XError("impossible:log already exists in savepoint");
             }
+     
             m_Logs.Add(key, log);
             m_AddOrder.Add(log);
         }

@@ -12,11 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="NLog" Version="5.3.2" />
-      <PackageReference Include="NLog.Config" Version="4.7.15" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="C:\Users\ranbo\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />
     </ItemGroup>
 

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
+using Evil.Util;
 using NetWork;
-using NetWork.Util;
 
 namespace Game.NetWork
 {

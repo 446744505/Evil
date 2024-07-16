@@ -1,6 +1,4 @@
-using System.Threading;
-
-namespace NetWork.Util
+namespace Evil.Util
 {
     public class IdGenerator
     {

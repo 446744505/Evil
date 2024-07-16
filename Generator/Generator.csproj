@@ -20,4 +20,8 @@
       <None Remove="Resources\protoc" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Util\Util.csproj" />
+    </ItemGroup>
+
 </Project>

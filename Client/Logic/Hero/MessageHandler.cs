@@ -1,4 +1,4 @@
-﻿using NetWork;
+﻿using Evil.Util;
 
 namespace Logic.Hero.Proto
 {

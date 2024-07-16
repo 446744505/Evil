@@ -1,8 +1,6 @@
-using System;
-using NetWork.Util;
 using NLog;
 
-namespace NetWork
+namespace Evil.Util
 {
     public class Log : Singleton<Log>
     {

@@ -13,4 +13,6 @@
 /NetWork/bin/
 /Edb/obj/
 /Edb/bin/
+/Util/obj/
+/Util/bin/
 **/*.g.cs

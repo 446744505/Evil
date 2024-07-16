@@ -1,8 +1,6 @@
-using System;
 using System.Runtime.Loader;
-using System.Threading;
 
-namespace NetWork.Util
+namespace Evil.Util
 {
     public sealed class Stopper
     {

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Generator.Util
+namespace Evil.Util
 {
     public class MessageIdGenerator
     {

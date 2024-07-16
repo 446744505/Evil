@@ -4,6 +4,7 @@ using DotNetty.Handlers.Logging;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Libuv;
+using Evil.Util;
 using NetWork.Codec;
 using NetWork.Handler;
 

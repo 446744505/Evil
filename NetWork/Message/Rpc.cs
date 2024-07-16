@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Evil.Util;
 using NetWork.Proto;
-using NetWork.Util;
 using ProtoBuf;
 
 namespace NetWork
