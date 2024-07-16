@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Edb
 {
-    internal class LogNotify
+    internal sealed class LogNotify
     {
         private readonly INote m_Note;
         private readonly Deque<LogKey> m_Path = new();

@@ -1,6 +1,6 @@
 namespace Edb
 {
-    public class Transaction
+    public sealed class Transaction
     {
         #region 变量
 

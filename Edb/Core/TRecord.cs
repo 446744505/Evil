@@ -1,6 +1,6 @@
 namespace Edb
 {
-    internal class TRecord<TK, TV> : XBean
+    internal sealed class TRecord<TK, TV> : XBean
     {
         private const string RecordVarName = "m_Value";
 

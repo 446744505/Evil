@@ -1,7 +1,7 @@
 ﻿
 namespace Edb
 {
-    internal class Lockey : IComparable<Lockey>
+    internal sealed class Lockey : IComparable<Lockey>
     {
         private readonly int m_Index;
         private readonly object m_Key;

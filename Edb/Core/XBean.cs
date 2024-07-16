@@ -4,19 +4,18 @@
     {
         private static long _objId = 0;
 
-        private long m_ObjId = Interlocked.Increment(ref _objId);
         private XBean? m_Parent;
-        private string m_VarName;
+        private string? m_VarName;
         
-        internal long ObjId => m_ObjId;
-        
+        internal long ObjId { get; } = Interlocked.Increment(ref _objId);
+
         protected XBean(XBean? parent, string varName)
         {
             m_Parent = parent;
             m_VarName = varName;
         }
 
-        internal void Link(XBean? parent, string varName, bool log)
+        internal void Link(XBean? parent, string? varName, bool log)
         {
             if (parent != null)
             {
@@ -31,12 +30,11 @@
                     throw new XManagedError("not managed");
             }
 
-            if (log)
-            {
-                Transaction.CurrentSavepoint.AddIfAbsent(new LogKey(this, "m_Parent"), new LogParent(this));
-                m_Parent = parent;
-                m_VarName = varName;
-            }
+            if (!log) return;
+            
+            Transaction.CurrentSavepoint.AddIfAbsent(new LogKey(this, "m_Parent"), new LogParent(this));
+            m_Parent = parent;
+            m_VarName = varName;
         }
 
         internal virtual void Notify(LogNotify notify)
@@ -85,11 +83,11 @@
             return GetType().ToString();
         }
 
-        internal class LogParent : ILog
+        private class LogParent : ILog
         {
             private readonly XBean m_XBean;
             private readonly XBean? m_Parent;
-            private readonly string m_VarName;
+            private readonly string? m_VarName;
 
             public LogParent(XBean xBean)
             {

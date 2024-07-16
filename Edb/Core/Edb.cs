@@ -2,7 +2,7 @@ using Evil.Util;
 
 namespace Edb
 {
-    public class Edb : Singleton<Edb>
+    public sealed class Edb : Singleton<Edb>
     {
     
     }

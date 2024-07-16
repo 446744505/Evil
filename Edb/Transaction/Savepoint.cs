@@ -1,6 +1,6 @@
 ﻿namespace Edb
 {
-    internal class Savepoint
+    internal sealed class Savepoint
     {
         private readonly Dictionary<object, ILog> m_Logs = new();
         private readonly List<ILog> m_AddOrder = new();
