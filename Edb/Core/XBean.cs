@@ -59,11 +59,14 @@
 
         protected Action VerifyStandaloneOrLockHeld(string methodName, bool readOnly)
         {
+            if (!Edb.I.Config.Verify)
+                return DoNothing;
             var transaction = Transaction.Current;
             if (transaction == null)
                 return DoNothing;
             var record = GetRecord();
             if (record == null)
+                // TODO 这里因为泛型问题，永远会返回null，还要想办法解决
                 return DoNothing;
             switch (transaction.GetLockeyHolderType(record.Lockey))
             {

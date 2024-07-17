@@ -6,10 +6,13 @@ namespace Edb
 
         private readonly List<Savepoint> m_Savepoints = new();
         private readonly Dictionary<Lockey, LockeyHolder> m_Locks = new();
+        private readonly Dictionary<LogKey, object> m_Wrappers = new();
 
         #endregion
 
         #region 属性
+        
+        internal Dictionary<LogKey, object> Wrappers => m_Wrappers;
 
         #endregion
 

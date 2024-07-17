@@ -1,6 +1,6 @@
 namespace Edb
 {
-    public abstract class TTable<TK, TV> : BaseTable
+    public abstract class TTable<TKey, TValue> : BaseTable
     {
     
     }
