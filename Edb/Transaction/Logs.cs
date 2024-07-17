@@ -22,7 +22,7 @@ namespace Edb
             var wrappers = Transaction.Current!.Wrappers;
             if (!wrappers.TryGetValue(key, out var log))
             {
-                wrappers[key] = log = new LogList<T>(key, (key.Value as IList<T>)!);
+                wrappers[key] = log = new LogList<T>(key, (key.Value as List<T>)!);
             }
 
             return ((LogList<T>)log).SetVerify(verify);
@@ -34,7 +34,7 @@ namespace Edb
             var wrappers = Transaction.Current!.Wrappers;
             if (!wrappers.TryGetValue(key, out var log))
             {
-                wrappers[key] = log = new LogSet<T>(key, (key.Value as ISet<T>)!);
+                wrappers[key] = log = new LogSet<T>(key, (key.Value as HashSet<T>)!);
             }
          
             return ((LogSet<T>)log).SetVerify(verify);
@@ -46,10 +46,10 @@ namespace Edb
             var wrappers = Transaction.Current!.Wrappers;
             if (!wrappers.TryGetValue(key, out var log))
             {
-                wrappers[key] = log = new LogMap<TKey, TValue, IDictionary<TKey, TValue>>(key, (key.Value as IDictionary<TKey, TValue>)!);
+                wrappers[key] = log = new LogMap<TKey, TValue, Dictionary<TKey, TValue>>(key, (key.Value as Dictionary<TKey, TValue>)!);
             }
           
-            return ((LogMap<TKey, TValue, IDictionary<TKey, TValue>>)log).SetVerify(verify);
+            return ((LogMap<TKey, TValue, Dictionary<TKey, TValue>>)log).SetVerify(verify);
         }
 
         internal static void Link(object? bean, XBean? parent, string? varName, bool log = true)
@@ -95,13 +95,13 @@ namespace Edb
     internal class WrapList<T> : IList<T>
     {
         private readonly LogList<T>? m_Root;
-        private readonly IList<T> m_Wrapped;
+        private readonly List<T> m_Wrapped; // 直接用List方便后续扩展
         
-        protected IList<T> Wrapped => m_Wrapped;
+        protected List<T> Wrapped => m_Wrapped;
         public int Count => m_Wrapped.Count;
-        public bool IsReadOnly => m_Wrapped.IsReadOnly;
+        public bool IsReadOnly => false;
         
-        protected WrapList(LogList<T>? root, IList<T> wrapped)
+        protected WrapList(LogList<T>? root, List<T> wrapped)
         {
             m_Root = root;
             m_Wrapped = wrapped;
@@ -211,7 +211,7 @@ namespace Edb
         private readonly LogKey m_LogKey;
         private Action m_Verify = null!;
 
-        public LogList(LogKey logKey, IList<T> wrapped) : base(null, wrapped)
+        public LogList(LogKey logKey, List<T> wrapped) : base(null, wrapped)
         {
             m_LogKey = logKey;
         }
@@ -287,13 +287,13 @@ namespace Edb
     internal class LogSet<T> : ISet<T>
     {
         private readonly LogKey m_LogKey;
-        private readonly ISet<T> m_Wrapped;
+        private readonly HashSet<T> m_Wrapped; // 直接用HashSet方便后续扩展
         private Action m_Verify = null!;
 
         public int Count => m_Wrapped.Count;
-        public bool IsReadOnly => m_Wrapped.IsReadOnly;
+        public bool IsReadOnly => false;
         
-        public LogSet(LogKey logKey, ISet<T> wrapped)
+        public LogSet(LogKey logKey, HashSet<T> wrapped)
         {
             m_LogKey = logKey;
             m_Wrapped = wrapped;
@@ -539,14 +539,14 @@ namespace Edb
         }
     }
 
-    internal class LogMap<TKey, TValue, TW> : IDictionary<TKey, TValue> where TW : IDictionary<TKey, TValue> where TKey : notnull
+    internal class LogMap<TKey, TValue, TW> : IDictionary<TKey, TValue> where TW : Dictionary<TKey, TValue> where TKey : notnull
     {
         readonly LogKey m_LogKey;
         readonly TW m_Wrapped;
         private Action m_Verify = null!;
         
         public int Count => m_Wrapped.Count;
-        public bool IsReadOnly => m_Wrapped.IsReadOnly;
+        public bool IsReadOnly => false;
         public ICollection<TKey> Keys => m_Wrapped.Keys; // 不会修改原始map，无需包装
         public ICollection<TValue> Values => m_Wrapped.Values; // 不会修改原始map，无需包装
         
@@ -607,7 +607,8 @@ namespace Edb
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            m_Wrapped.CopyTo(array, arrayIndex);
+            var id = (IDictionary<TKey, TValue>)m_Wrapped;
+            id.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(KeyValuePair<TKey, TValue> pair)
@@ -622,8 +623,11 @@ namespace Edb
             m_Verify.Invoke();
             if (key == null || value == null)
                 throw new NullReferenceException();
+            var hadOrigin = m_Wrapped.TryGetValue(key, out var origin);
+            if (hadOrigin)
+                throw new ArgumentException($"key={key} already exists in dictionary");
             Logs.Link(value, m_LogKey.XBean, m_LogKey.VarName);
-            var hadOrigin = m_Wrapped.PutAndReturnValue(key, value, out var origin);
+            m_Wrapped[key] = value;
             GetOrCreateMyLog().AfterPut(key, origin, hadOrigin);
         }
 

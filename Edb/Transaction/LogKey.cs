@@ -7,7 +7,10 @@
         
         internal XBean XBean => m_XBean;
         internal string? VarName => m_VarName;
-        internal object Value { get; set;}
+        internal object? Value {
+            get => XBeanInfo.GetValue(m_XBean, m_VarName!);
+            set => XBeanInfo.SetValue(m_XBean, m_VarName!, value);
+        }
 
         internal LogKey(XBean xBean, string? varName)
         {

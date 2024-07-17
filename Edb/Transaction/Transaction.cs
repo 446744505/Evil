@@ -29,9 +29,28 @@ namespace Edb
 
         #endregion
 
+        internal static Transaction Create()
+        {
+            var self = Current;
+            if (self == null)
+                ThreadLocal.Value = self = new Transaction();
+            return self;
+        }
+
         internal LockeyHolderType GetLockeyHolderType(Lockey lockey)
         {
             return m_Locks.TryGetValue(lockey, out var holder) ? holder.m_Type : LockeyHolderType.None;
+        }
+
+        public static int Savepoint()
+        {
+            return Current!.SavepointInternal();
+        }
+        
+        private int SavepointInternal()
+        {
+            m_Savepoints.Add(new Savepoint());
+            return m_Savepoints.Count;
         }
 
         internal enum LockeyHolderType

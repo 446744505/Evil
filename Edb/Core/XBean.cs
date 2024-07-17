@@ -9,7 +9,7 @@
         
         internal long ObjId { get; } = Interlocked.Increment(ref _objId);
 
-        protected XBean(XBean? parent, string varName)
+        protected XBean(XBean? parent, string? varName)
         {
             m_Parent = parent;
             m_VarName = varName;
@@ -55,8 +55,7 @@
             return null;
         }
         
-        private static readonly Action DoNothing = () => { };
-
+        protected static readonly Action DoNothing = () => { };
         protected Action VerifyStandaloneOrLockHeld(string methodName, bool readOnly)
         {
             if (!Edb.I.Config.Verify)
