@@ -84,13 +84,19 @@ namespace Edb
 
         public async Task WalkAsync(Action<BsonDocument> walker)
         {
-            var cursor = await m_Collection.FindAsync(FilterDefinition<BsonDocument>.Empty);
-            while (await cursor.MoveNextAsync())
+            try
             {
-                foreach (var doc in cursor.Current)
+                var cursor = await m_Collection.FindAsync(FilterDefinition<BsonDocument>.Empty);
+                while (await cursor.MoveNextAsync())
                 {
-                    walker(doc);
+                    foreach (var doc in cursor.Current)
+                    {
+                        walker(doc);
+                    }
                 }
+            } catch (Exception e)
+            {
+                throw new XError(m_TableName, e);
             }
         }
     }
