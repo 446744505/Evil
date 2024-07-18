@@ -5,5 +5,9 @@
         public XError(string message) : base(message)
         {
         }
+        
+        public XError(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }
