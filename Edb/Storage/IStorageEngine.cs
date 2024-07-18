@@ -1,12 +1,12 @@
 namespace Edb
 {
-    public interface IStorageEngine<TKey, TValue> where TKey : notnull
+    public interface IStorageEngine<TKey> where TKey : notnull
     {
-        Task<bool> InsertAsync(TValue value);
-        Task ReplaceAsync(TKey key, TValue value);
-        Task<TValue> FindAsync(TKey key);
+        Task<bool> InsertAsync(object value);
+        Task ReplaceAsync(TKey key, object value);
+        Task<object> FindAsync(TKey key);
         Task RemoveAsync(TKey key);
         Task<bool> ExistsAsync(TKey key);
-        Task WalkAsync(Action<TValue> walker);
+        Task WalkAsync(Action<object> walker);
     }
 }

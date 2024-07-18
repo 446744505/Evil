@@ -34,7 +34,7 @@ namespace Edb.Test
             var ok2 = await m_Storage.InsertAsync(doc);
             Assert.False(ok2);
             var pb2 = await m_Storage.FindAsync(player.PlayerId);
-            var p = BsonSerializer.Deserialize<Player>(pb2);
+            var p = BsonSerializer.Deserialize<Player>((BsonDocument)pb2);
             Assert.Equal(player.PlayerId, p.PlayerId);
             Assert.Equal(player.PlayerName, p.PlayerName);
         }
@@ -62,7 +62,7 @@ namespace Edb.Test
             List<Player> players = new();
             await m_Storage.WalkAsync((doc) =>
             {
-                var player = BsonSerializer.Deserialize<Player>(doc);
+                var player = BsonSerializer.Deserialize<Player>((BsonDocument)doc);
                 players.Add(player);
             });
             Assert.Equal(2, players.Count);

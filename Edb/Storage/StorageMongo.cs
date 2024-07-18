@@ -3,7 +3,7 @@ using MongoDB.Driver;
 
 namespace Edb
 {
-    internal class StorageMongo<TKey> : IStorageEngine<TKey, BsonDocument> where TKey : notnull
+    internal class StorageMongo<TKey> : IStorageEngine<TKey> where TKey : notnull
     {
         private readonly LoggerMongo m_Logger;
         private readonly string m_TableName;
@@ -16,11 +16,11 @@ namespace Edb
             m_Collection = logger.Database.GetCollection<BsonDocument>(tableName);
         }
 
-        public async Task<bool> InsertAsync(BsonDocument value)
+        public async Task<bool> InsertAsync(object value)
         {
             try
             {
-                await m_Collection.InsertOneAsync(value);
+                await m_Collection.InsertOneAsync((BsonDocument)value);
             }
             catch (Exception)
             {
@@ -30,12 +30,12 @@ namespace Edb
             return true;
         }
 
-        public Task ReplaceAsync(TKey key, BsonDocument value)
+        public Task ReplaceAsync(TKey key, object value)
         {
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
-                return m_Collection.ReplaceOneAsync(filter, value);
+                return m_Collection.ReplaceOneAsync(filter, (BsonDocument)value);
             }
             catch (Exception e)
             {
@@ -43,7 +43,7 @@ namespace Edb
             }
         }
 
-        public async Task<BsonDocument> FindAsync(TKey key)
+        public async Task<object> FindAsync(TKey key)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace Edb
             }
         }
 
-        public async Task WalkAsync(Action<BsonDocument> walker)
+        public async Task WalkAsync(Action<object> walker)
         {
             try
             {

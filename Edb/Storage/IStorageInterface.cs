@@ -1,8 +1,8 @@
 namespace Edb
 {
-    public interface IStorageInterface<TKey, TValue> where TKey : notnull
+    public interface IStorageInterface<TKey> where TKey : notnull
     {
-        public IStorageEngine<TKey, TValue> Engine { get; }
+        public IStorageEngine<TKey> Engine { get; }
         public long MarshalN();
         public long Marshal0();
         public long Snapshot();

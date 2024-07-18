@@ -1,6 +1,6 @@
 namespace Edb
 {
-    internal sealed class TRecord<TKey, TValue> : XBean where TKey : notnull
+    internal sealed partial class TRecord<TKey, TValue> : XBean where TKey : notnull
     {
         private const string RecordVarName = "m_Value";
 
