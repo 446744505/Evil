@@ -1,7 +1,8 @@
 
 namespace Edb
 {
-    internal class TStorage<TKey, TValue> : IStorageInterface<TKey> where TKey : notnull
+    internal class TStorage<TKey, TValue> : IStorageInterface<TKey> 
+        where TKey : notnull where TValue : class
     {
         private readonly TTable<TKey, TValue> m_Table;
         public IStorageEngine<TKey> Engine { get; }

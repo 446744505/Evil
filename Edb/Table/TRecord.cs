@@ -1,6 +1,7 @@
 namespace Edb
 {
-    internal sealed partial class TRecord<TKey, TValue> : XBean where TKey : notnull
+    internal sealed partial class TRecord<TKey, TValue> : XBean 
+        where TKey : notnull where TValue : class 
     {
         private const string RecordVarName = "m_Value";
 
@@ -8,7 +9,7 @@ namespace Edb
 
         private readonly TTable<TKey, TValue> m_Table;
         private readonly Lockey m_Lockey;
-        private TValue m_Value;
+        private TValue? m_Value;
         private State m_State;
         private long m_LastAccessTime = DateTime.Now.Nanosecond;
 
@@ -19,13 +20,14 @@ namespace Edb
 
         internal long LastAccessTime => Interlocked.Read(ref m_LastAccessTime);
         internal TKey Key => (TKey)m_Lockey.Key;
+        internal TValue? Value => m_Value;
         internal Lockey Lockey => m_Lockey;
         internal State Stat => m_State;
 
         #endregion
         
 
-        internal TRecord(TTable<TKey, TValue> table, TValue value, Lockey lockey, State state) : base(null, RecordVarName)
+        internal TRecord(TTable<TKey, TValue> table, TValue? value, Lockey lockey, State state) : base(null, RecordVarName)
         {
             m_Table = table;
             if (value != null)
@@ -46,7 +48,7 @@ namespace Edb
             m_Table.OnRecordChanged(this, notify);
         }
         
-        internal LogKey GetLogKey()
+        internal LogKey CreateLogKey()
         {
             return new LogKey(this, RecordVarName);
         }

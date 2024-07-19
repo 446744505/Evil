@@ -22,8 +22,18 @@ namespace Edb
             m_RWLock = new ReaderWriterLockSlim();
             return this;
         }
+        
+        internal bool RTryLock()
+        {
+            return m_RWLock.TryEnterReadLock(0);
+        }
+        
+        internal void RUnlock()
+        {
+            m_RWLock.ExitReadLock();
+        }
 
-        internal void RLock(int timeoutMills)
+        internal void RUpgradeableLock(int timeoutMills)
         {
             if (!m_RWLock.TryEnterUpgradeableReadLock(timeoutMills))
             {
@@ -39,7 +49,7 @@ namespace Edb
             }
         }
         
-        internal void RUnlock()
+        internal void RUpgradeableUnlock()
         {
             m_RWLock.ExitUpgradeableReadLock();
         }

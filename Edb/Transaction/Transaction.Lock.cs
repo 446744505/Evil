@@ -8,6 +8,16 @@ namespace Edb
         {
             return m_Locks.TryGetValue(lockey, out var holder) ? holder.m_Type : LockeyHolderType.None;
         }
+
+        internal Lockey? Get(Lockey lockey)
+        {
+            if (m_Locks.TryGetValue(lockey, out var holder))
+            {
+                return holder.m_Lockey;
+            }
+
+            return null;
+        }
         
         internal enum LockeyHolderType
         {
