@@ -30,5 +30,14 @@ namespace Evil.Util
             dict[key] = value;
             return hadOld;
         }
+        
+        public static void PutAll<TKey, TValue>(
+            this IDictionary<TKey, TValue> dict, IDictionary<TKey, TValue> other) where TKey : notnull
+        {
+            foreach (var (key, value) in other)
+            {
+                dict[key] = value;
+            }
+        }
     }
 }

@@ -43,7 +43,7 @@ namespace Edb
             }
         }
 
-        public async Task<object> FindAsync(TKey key)
+        public async Task<object?> FindAsync(TKey key)
         {
             try
             {

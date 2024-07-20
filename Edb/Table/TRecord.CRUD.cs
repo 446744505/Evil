@@ -71,7 +71,7 @@ namespace Edb
             }
         }
 
-        object? Find()
+        internal object? Find()
         {
             switch (m_SnapshotState)
             {

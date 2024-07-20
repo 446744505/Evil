@@ -8,6 +8,22 @@ namespace Edb
         
         public string LockName { get; set; }
 
+        #region Metrics
+
+        private long m_CountAdd;
+        private long m_CountAddMiss;
+        private long m_CountAddStorageMiss;
+        
+        private long m_CountGet;
+        private long m_CountGetMiss;
+        private long m_CountGetStorageMiss;
+        
+        private long m_CountRemove;
+        private long m_CountRemoveMiss;
+        private long m_CountRemoveStorageMiss;
+
+        #endregion
+
         protected TTable()
         {
         }
@@ -24,5 +40,6 @@ namespace Edb
         
         public abstract TKey MarshalKey(TKey key);
         public abstract object MarshalValue(TValue value);
+        public abstract TValue UnmarshalValue(object value);
     }
 }

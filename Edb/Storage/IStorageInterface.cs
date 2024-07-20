@@ -6,12 +6,12 @@ namespace Edb
         public long MarshalN();
         public long Marshal0();
         public long Snapshot();
-        public long Flush0();
+        public Task<long> Flush0Async();
         public void Cleanup();
 
-        public long Flush1()
+        public async Task<long> Flush1Async()
         {
-            var count = Flush0();
+            var count = await Flush0Async();
             Cleanup();
             return count;
         }

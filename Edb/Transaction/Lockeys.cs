@@ -51,7 +51,7 @@ namespace Edb
             private class Entry
             {
                 public WeakReference<Lockey> m_Ref;
-                public Entry m_Next;
+                public Entry? m_Next;
                 public Entry(Lockey referent, Entry next)
                 {
                     m_Ref = new WeakReference<Lockey>(referent);

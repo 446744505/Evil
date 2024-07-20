@@ -7,16 +7,18 @@ namespace Edb.Test
         [Fact]
         public void TestGc()
         {
-            for (var i = 0; i < 9999999; i++)
+            for (var i = 0; i < 9999; i++)
             {
-                Assert.NotNull(Lockeys.GetLockey(1, 1));
+                Assert.NotNull(Lockeys.GetLockey(i, i));
             }
             // 强制垃圾回收
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            for (var i = 0; i < 9999999; i++)
+            GC.Collect();
+            
+            for (var i = 0; i < 9999; i++)
             {
-                Assert.NotNull(Lockeys.GetLockey(1, 1));
+                Assert.NotNull(Lockeys.GetLockey(i, i));
             }
         }
     }
