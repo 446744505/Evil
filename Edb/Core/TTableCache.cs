@@ -3,15 +3,17 @@ namespace Edb
     public abstract class TTableCache<TKey, TValue>
         where TKey : notnull where TValue : class
     {
-        private volatile TTable<TKey, TValue> m_Table;
-        private volatile RemoveHandler<TKey, TValue> m_RemoveHandler;
-        private volatile int m_Capacity;
+        protected volatile TTable<TKey, TValue> m_Table;
+        protected volatile int m_Capacity;
+        private volatile RemoveHandler<TKey, TValue>? m_RemoveHandler;
+
+        internal virtual int Count { get; }
 
         internal TTableCache()
         {
         }
         
-        internal void Initialize(TTable<TKey, TValue> table, TableConfig config)
+        internal virtual void Initialize(TTable<TKey, TValue> table, TableConfig config)
         {
             m_Table = table;
             m_Capacity = config.CacheCapacity;
@@ -57,18 +59,46 @@ namespace Edb
 
         internal bool TryRemoveRecord(TRecord<TKey, TValue> r)
         {
-            
+            var lock0 = r.Lockey;
+            if (!lock0.WTryLock())
+                return false;
+            try
+            {
+               var storage = m_Table.Storage;
+               var key = r.Key;
+               if (storage == null)
+               {
+                   Remove(key);
+                   if (m_RemoveHandler != null)
+                   {
+                       Edb.I.ExecuteAsync(() => m_RemoveHandler.OnRemoved(key, r.Value!));
+                   }
+
+                   return true;
+               }
+
+               if (storage.IsClean(key))
+               {
+                   Remove(key);
+                   return true;
+               }
+
+               return false;
+            }
+            finally
+            {
+                lock0.WUnlock();
+            }
         }
 
         public abstract void Clear();
         public abstract void Clean();
         public abstract void Walk(Query<TKey, TValue> query);
         internal abstract ICollection<TRecord<TKey, TValue>> Values();
-        internal abstract void Size();
         internal abstract TRecord<TKey, TValue> Get(TKey key);
         internal abstract void AddNoLog(TKey key, TRecord<TKey, TValue> r);
         internal abstract void Add(TKey key, TRecord<TKey, TValue> r);
-        internal abstract TRecord<TKey, TValue> Remove(TKey key);
+        internal abstract TRecord<TKey, TValue>? Remove(TKey key);
 
         private class LogAddRemove0 : ILog
         {

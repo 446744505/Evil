@@ -64,7 +64,7 @@ namespace Edb
 
         private bool AddIfNotPresent(T item)
         {
-            m_Verify.Invoke();
+            m_Verify();
             if (m_Wrapped.Add(item))
             {
                 GetOrCreateMyLog().AfterAdd(item);
@@ -141,7 +141,7 @@ namespace Edb
 
         public void Clear()
         {
-            m_Verify.Invoke();
+            m_Verify();
             var myLog = GetOrCreateMyLog();
             foreach (var e in m_Wrapped)
                 myLog.BeforeRemove(e);
@@ -160,7 +160,7 @@ namespace Edb
 
         public bool Remove(T item)
         {
-            m_Verify.Invoke();
+            m_Verify();
             if (!m_Wrapped.Remove(item)) 
                 return false;
             

@@ -7,6 +7,8 @@ namespace Edb
         private TableConfig m_Config;
         
         public string LockName { get; set; }
+        internal TStorage<TKey, TValue>? Storage { get; set; }
+        internal TTableCache<TKey, TValue> Cache { get; set; }
 
         #region Metrics
 

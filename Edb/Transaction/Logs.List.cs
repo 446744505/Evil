@@ -156,7 +156,7 @@ namespace Edb
 
         protected override void BeforeChange()
         {
-            m_Verify.Invoke();
+            m_Verify();
             GetOrCreateMyLog().BeforeChange();
         }
         

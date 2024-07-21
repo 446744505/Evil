@@ -58,6 +58,11 @@ namespace Edb
                 throw new LockTimeoutException($"Timeout waiting for write lock on {this}");
             }
         }
+        
+        internal bool WTryLock()
+        {
+            return m_RWLock.TryEnterWriteLock(0);
+        }
 
         internal void WUnlock()
         {

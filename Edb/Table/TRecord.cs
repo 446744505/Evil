@@ -37,10 +37,11 @@ namespace Edb
             m_State = state;
         }
 
-        internal void Access()
+        internal TRecord<TKey, TValue> Access()
         {
             var now = DateTime.Now.Nanosecond;
             Interlocked.Exchange(ref m_LastAccessTime, now);
+            return this;
         }
 
         internal override void Notify(LogNotify notify)

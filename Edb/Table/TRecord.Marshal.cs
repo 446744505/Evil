@@ -17,7 +17,7 @@ namespace Edb
             try
             {
                 Marshal0();
-                action.Invoke();
+                action();
             }
             finally
             {

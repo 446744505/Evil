@@ -73,7 +73,7 @@ namespace Edb
 
         public void Clear()
         {
-            m_Verify.Invoke();
+            m_Verify();
             var myLog = GetOrCreateMyLog();
             foreach (var pair in m_Wrapped)
                 myLog.BeforeRemove(pair.Key, pair.Value);
@@ -100,7 +100,7 @@ namespace Edb
         
         public void Add(TKey key, TValue value)
         {
-            m_Verify.Invoke();
+            m_Verify();
             if (key == null || value == null)
                 throw new NullReferenceException();
             var hadOrigin = m_Wrapped.TryGetValue(key, out var origin);
@@ -118,8 +118,8 @@ namespace Edb
 
         public bool Remove(TKey key)
         {
-            m_Verify.Invoke();
-            if (m_Wrapped.RemoveAndReturnValue(key, out var value))
+            m_Verify();
+            if (m_Wrapped.Remove(key, out var value))
             {
                 GetOrCreateMyLog().AfterRemove(key, value!);
                 return true;
@@ -137,7 +137,7 @@ namespace Edb
             get => m_Wrapped[key];
             set
             {
-                m_Verify.Invoke();
+                m_Verify();
                 if (key == null || value == null)
                     throw new NullReferenceException();
                 Logs.Link(value, m_LogKey.XBean, m_LogKey.VarName);
@@ -266,7 +266,7 @@ namespace Edb
             {
                 if (m_Added.Remove(key))
                     return;
-                m_Replaced.RemoveAndReturnValue(key, out var v);
+                m_Replaced.Remove(key, out var v);
                 m_Removed[key] = v == null ? value : v;
             }
 
@@ -274,7 +274,7 @@ namespace Edb
             {
                 if (m_Added.Contains(key))
                     return;
-                if (m_Removed.RemoveAndReturnValue(key, out var v))
+                if (m_Removed.Remove(key, out var v))
                 {
                     m_Replaced[key] = v!;
                     return;

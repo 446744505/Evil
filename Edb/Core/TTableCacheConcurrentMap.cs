@@ -1,8 +1,138 @@
+using System.Collections.Concurrent;
+
 namespace Edb
 {
     public class TTableCacheConcurrentMap<TKey, TValue> : TTableCache<TKey, TValue>
         where TKey : notnull where TValue : class
     {
-    
+        private readonly ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Cache = new();
+        private Action m_CleanWorker = null!;
+        private bool m_Cleaning;
+
+        internal override int Count => m_Cache.Count;
+
+        internal override void Initialize(TTable<TKey, TValue> table, TableConfig config)
+        {
+            base.Initialize(table, config);
+            m_CleanWorker = () =>
+            {
+                if (SetCleaning())
+                {
+                    CleanNow();
+                    ResetCleaning();
+                }
+            };
+            var delay = 3600 * 1000;
+            var initDelay = Edb.I.Random.Next(delay);
+            Edb.I.Tick(m_CleanWorker, initDelay, delay);
+        }
+
+        private bool SetCleaning()
+        {
+            lock (this)
+            {
+                if (m_Cleaning)
+                {
+                    return false;
+                }
+
+                m_Cleaning = true;
+                return true;
+            }
+        }
+        
+        private void ResetCleaning()
+        {
+            lock (this)
+            {
+                m_Cleaning = false;
+            }
+        }
+
+        private void CleanNow()
+        {
+            if (m_Capacity <= 0)
+                return;
+            if (Count <= m_Capacity)
+                return;
+            var sorted = new PriorityQueue<AccessTimeRecord<TKey, TValue>, long>();
+            foreach (var r in m_Cache.Values)
+            {
+                sorted.Enqueue(new AccessTimeRecord<TKey, TValue>(r), r.LastAccessTime);
+            }
+
+            for (var clenaN = Count - m_Capacity + 255; clenaN > 0;)
+            {
+                var ar = sorted.Dequeue();
+                if (ar.m_AccessTime != ar.m_Record.LastAccessTime)
+                    continue;
+                if (TryRemoveRecord(ar.m_Record))
+                    clenaN--;
+            }
+        }
+
+        public override void Clear()
+        {
+            if (m_Table.PersistenceType != ITable.Persistence.Memory)
+                throw new NotSupportedException();
+            m_Cache.Clear();
+        }
+
+        public override void Clean()
+        {
+            m_CleanWorker();
+        }
+
+        public override void Walk(Query<TKey, TValue> query)
+        {
+            Walk0(m_Cache.Values, query);
+        }
+
+        internal override ICollection<TRecord<TKey, TValue>> Values()
+        {
+            return m_Cache.Values;
+        }
+
+        internal override TRecord<TKey, TValue> Get(TKey key)
+        {
+            return m_Cache.TryGetValue(key, out var r) ? r.Access() : null!;
+        }
+
+        internal override void AddNoLog(TKey key, TRecord<TKey, TValue> r)
+        {
+            if (!m_Cache.TryAdd(key, r))
+                throw new XError("cache.AddNoLog duplicate record");
+        }
+
+        internal override void Add(TKey key, TRecord<TKey, TValue> r)
+        {
+            if (!m_Cache.TryAdd(key, r))
+                throw new XError("cache.Add duplicate record");
+            LogAddRemove(key, r);
+        }
+
+        internal override TRecord<TKey, TValue>? Remove(TKey key)
+        {
+            m_Cache.Remove(key, out var r);
+            return r;
+        }
+        
+        private struct AccessTimeRecord<TKey, TValue> : IComparable<AccessTimeRecord<TKey, TValue>>
+            where TKey : notnull where TValue : class
+        {
+            internal readonly long m_AccessTime;
+            internal readonly TRecord<TKey, TValue> m_Record;
+
+            public AccessTimeRecord(TRecord<TKey, TValue> record)
+            {
+                m_Record = record;
+                m_AccessTime = record.LastAccessTime;
+            }
+            
+            public int CompareTo(AccessTimeRecord<TKey, TValue> other)
+            {
+                return m_AccessTime < other.m_AccessTime ? -1 : m_AccessTime > other.m_AccessTime ? 1 : 0;
+            }
+        }
     }
 }

@@ -72,10 +72,10 @@ namespace Edb.Test
             
             var logMap = xBean.Map;
             var originCount = logMap.Count;
-            var success = logMap.RemoveAndReturnValue(1, out var value);
+            var success = logMap.Remove(1, out var value);
             Assert.True(success);
             Assert.Equal(1, value);
-            Assert.False(logMap.RemoveAndReturnValue(1, out value));
+            Assert.False(logMap.Remove(1, out value));
             Assert.Equal(originCount - 1, logMap.Count);
             Assert.DoesNotContain(1, logMap);
         }
