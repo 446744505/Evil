@@ -19,7 +19,7 @@ namespace Edb
             m_Capacity = config.CacheCapacity;
         }
         
-        static TTableCache<TKey, TValue> NewInstance(TTable<TKey, TValue> table, TableConfig config)
+        internal static TTableCache<TKey, TValue> NewInstance(TTable<TKey, TValue> table, TableConfig config)
         {
             var cache = new TTableCacheConcurrentMap<TKey, TValue>();
             cache.Initialize(table, config);

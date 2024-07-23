@@ -1,6 +1,6 @@
 namespace Edb
 {
-    internal interface ILoggerEngine : IDisposable
+    public interface ILoggerEngine : IDisposable
     {
         public void Checkpoint();
         public void Backup(string path, bool increment);

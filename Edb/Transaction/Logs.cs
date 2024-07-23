@@ -26,7 +26,7 @@ namespace Edb
         }
     }
 
-    internal sealed class LogObject : INote, ILog
+    internal struct LogObject : INote, ILog
     {
         private readonly LogKey m_LogKey;
         private readonly object m_Origin;

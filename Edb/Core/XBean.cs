@@ -42,12 +42,12 @@
             m_Parent?.Notify(notify.Push(new LogKey(m_Parent, m_VarName)));
         }
 
-        private TRecord<object,object>? GetRecord()
+        private ITRecord? GetRecord()
         {
             var self = this;
             do
             {
-                if (self is TRecord<object,object> record)
+                if (self is ITRecord record)
                     return record;
                 self = self.m_Parent;
             } while (self != null);
@@ -65,9 +65,8 @@
                 return DoNothing;
             var record = GetRecord();
             if (record == null)
-                // TODO 这里因为泛型问题，永远会返回null，还要想办法解决
                 return DoNothing;
-            switch (transaction.GetLockeyHolderType(record.Lockey))
+            switch (transaction.GetLockeyHolderType(record.Lockey()))
             {
                 case Transaction.LockeyHolderType.Write:
                     return DoNothing;

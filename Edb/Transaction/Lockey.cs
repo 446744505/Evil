@@ -28,6 +28,14 @@ namespace Edb
             return m_RWLock.TryEnterReadLock(0);
         }
         
+        internal void RTryLock(int timeoutMills)
+        {
+            if (!m_RWLock.TryEnterReadLock(timeoutMills))
+            {
+                throw new LockTimeoutException($"Timeout waiting for read lock on {this}");
+            }
+        }
+        
         internal void RLock()
         {
             m_RWLock.EnterReadLock();
@@ -38,30 +46,17 @@ namespace Edb
             m_RWLock.ExitReadLock();
         }
 
-        internal void RUpgradeableLock(int timeoutMills)
+        internal bool WTryLock()
         {
-            if (!m_RWLock.TryEnterUpgradeableReadLock(timeoutMills))
-            {
-                throw new LockTimeoutException($"Timeout waiting for read lock on {this}");
-            }
+            return m_RWLock.TryEnterWriteLock(0);
         }
         
-        internal void RUpgradeableUnlock()
-        {
-            m_RWLock.ExitUpgradeableReadLock();
-        }
-
-        internal void WLock(int timeoutMills)
+        internal void WTryLock(int timeoutMills)
         {
             if (!m_RWLock.TryEnterWriteLock(timeoutMills))
             {
                 throw new LockTimeoutException($"Timeout waiting for write lock on {this}");
             }
-        }
-        
-        internal bool WTryLock()
-        {
-            return m_RWLock.TryEnterWriteLock(0);
         }
 
         internal void WUnlock()

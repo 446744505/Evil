@@ -1,6 +1,11 @@
 namespace Edb
 {
-    internal sealed partial class TRecord<TKey, TValue> : XBean 
+    internal interface ITRecord
+    {
+        internal Lockey Lockey();
+    }
+
+    internal sealed partial class TRecord<TKey, TValue> : XBean, ITRecord
         where TKey : notnull where TValue : class 
     {
         private const string RecordVarName = "m_Value";
@@ -57,6 +62,11 @@ namespace Edb
         public override string ToString()
         {
             return $"{m_Table.Name},{m_Lockey},{m_State}";
+        }
+
+        Lockey ITRecord.Lockey()
+        {
+            return m_Lockey;
         }
 
         internal enum State

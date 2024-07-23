@@ -10,5 +10,7 @@ namespace Edb
         
         public string Name { get; }
         public Persistence PersistenceType { get; }
+
+        void LogNofify();
     }
 }

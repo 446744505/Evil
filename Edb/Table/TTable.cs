@@ -1,6 +1,6 @@
 namespace Edb
 {
-    public abstract class TTable<TKey, TValue> : BaseTable<TKey> 
+    public abstract class TTable<TKey, TValue> : BaseTable
         where TKey : notnull where TValue : class
     {
         private int m_LockId;
@@ -28,6 +28,22 @@ namespace Edb
 
         protected TTable()
         {
+        }
+        
+        internal IStorageInterface<TKey>? Open(TableConfig config, ILoggerEngine logger)
+        {
+            if (Storage != null)
+                throw new XError($"table {Name} already open");
+            m_Config = config;
+            LockName = config.Lock ?? Name;
+            Cache = TTableCache<TKey, TValue>.NewInstance(this, config);
+            Storage = config.IsMemory ? null : new TStorage<TKey, TValue>(this, logger);
+            return Storage;
+        }
+
+        public override void LogNofify()
+        {
+            
         }
 
         internal void OnRecordChanged(TRecord<TKey, TValue> r, LogNotify ln)

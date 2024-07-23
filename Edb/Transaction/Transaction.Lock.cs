@@ -18,6 +18,36 @@ namespace Edb
 
             return null;
         }
+
+        internal void RAddLockey(Lockey lockey)
+        {
+            if (m_Locks.ContainsKey(lockey))
+                return;
+            lockey.RTryLock(Edb.I.Config.LockTimeoutMills);
+            m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Read);
+        }
+
+        internal void WAddLockey(Lockey lockey)
+        {
+            if (!m_Locks.TryGetValue(lockey, out var holder))
+            {
+                lockey.WTryLock(Edb.I.Config.LockTimeoutMills);
+                m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Write);
+            } else if (holder.m_Type == LockeyHolderType.Read)
+            {
+                holder.m_Lockey.RUnlock();
+                try
+                {
+                    holder.m_Lockey.WTryLock(Edb.I.Config.LockTimeoutMills);
+                }
+                catch (LockTimeoutException)
+                {
+                    m_Locks.Remove(lockey);
+                    throw;
+                }
+                holder.m_Type = LockeyHolderType.Write;
+            }
+        }
         
         internal enum LockeyHolderType
         {
