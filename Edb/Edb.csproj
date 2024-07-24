@@ -5,11 +5,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>11</LangVersion>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Deque" Version="1.0.1" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0-release-24373-02" />
       <PackageReference Include="MongoDB.Driver" Version="2.27.0" />
       <PackageReference Include="xunit" Version="2.9.0" />
     </ItemGroup>

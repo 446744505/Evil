@@ -10,6 +10,9 @@ namespace Edb
         /// 事务里获取锁的超时时间
         /// </summary>
         public int LockTimeoutMills { get; set; } = 5000;
+        public int RetryTimes { get; set; } = 3;
+        public int RetryDelay { get; set; } = 100;
+        public bool RetrySerial { get; set; } = false;
     }
     
     public enum EngineType

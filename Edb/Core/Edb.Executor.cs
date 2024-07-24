@@ -16,6 +16,24 @@ namespace Edb
             m_Tasks.Add(task);
             return task;
         }
+        
+        public void Delay(Action cb, int delay)
+        {
+            CheckDisposed();
+            var timer = new Timer(_ =>
+            {
+                Interlocked.Increment(ref m_RunningTimerCount);
+                try
+                {
+                    cb();
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref m_RunningTimerCount);
+                }
+            }, null, delay, -1);
+            m_Timers.Add(timer);
+        }
 
         public void Tick(Action cb, int dueTime, int period)
         {

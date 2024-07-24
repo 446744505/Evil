@@ -93,7 +93,7 @@ namespace Edb
             m_LastCommitActions.Add(action);
         }
 
-        internal void Perform(Procedure p)
+        internal void Perform<TP>(ProcedureImpl<TP> p) where TP : IProcedure
         {
             if (p.IsolationLevel == IsolationLevel.Level3)
                 IsolationLock.EnterWriteLock();
@@ -183,7 +183,7 @@ namespace Edb
             m_CachedTRecords.Clear();
         }
 
-        private void LogNotify(Procedure p)
+        private void LogNotify<TP>(ProcedureImpl<TP> p) where TP : IProcedure
         {
             try
             {

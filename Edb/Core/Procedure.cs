@@ -1,28 +1,62 @@
 namespace Edb
 {
-    public abstract class Procedure
+    public interface Procedure : IProcedure
     {
-        private volatile bool m_Success;
-        private volatile Exception m_Exception;
-        public string Name => GetType().Name;
-        internal IsolationLevel IsolationLevel { get; }
+        public bool Process();
         
-        internal bool Success
+        public void Execute()
         {
-            get => m_Success;
-            set => m_Success = value;
+            Execute(this);
+        }
+        
+        public IResult Call()
+        {
+            return Call(this);
+        }
+        
+        public Task Submit()
+        {
+            return Submit(this);
         }
 
-        internal Exception Exception
+        static void Execute<TP>(TP p) where TP : IProcedure
         {
-            get => m_Exception;
-            set => m_Exception = value;
+            ProcedureImpl<TP>.Execute(p, null);
+        }
+        
+        static void Execute<TP>(TP p, IDone<TP>? done) where TP : IProcedure
+        {
+            ProcedureImpl<TP>.Execute(p, done);
+        }
+        
+        static void Execute<TP>(TP p, Action<TP,IResult> done) where TP : IProcedure
+        {
+            ProcedureImpl<TP>.Execute(p, new Done<TP>(done));
+        }
+        
+        static IResult Call<TP>(TP p) where TP : IProcedure
+        {
+            return ProcedureImpl<TP>.Call(p);
+        }
+        
+        static Task<IResult> Submit<TP>(TP p) where TP : IProcedure
+        {
+            return ProcedureImpl<TP>.Submit(p);
         }
 
-        internal bool Call()
+        private struct Done<TP> : IDone<TP> where TP : IProcedure
         {
-            
-        }
+            private readonly Action<TP, IResult> m_Done;
 
+            public Done(Action<TP, IResult> done)
+            {
+                m_Done = done;
+            }
+
+            public void DoDone(TP p, IResult r)
+            {
+                m_Done(p, r);
+            }
+        }
     }
 }
