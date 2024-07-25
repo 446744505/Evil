@@ -1,10 +1,12 @@
+using MongoDB.Bson;
+
 namespace Edb
 {
     internal partial class TRecord<TKey, TValue> 
         where TKey : notnull where TValue : class 
     {
         private TKey m_SnapshotKey;
-        private object? m_SnapshotValue;
+        private BsonDocument? m_SnapshotValue;
         private State? m_SnapshotState;
 
         internal bool TryMarshalN(Action action)
@@ -32,7 +34,7 @@ namespace Edb
             return m_Table.MarshalKey(Key);
         }
         
-        private object MarshalValue()
+        private BsonDocument MarshalValue()
         {
             return m_Table.MarshalValue(m_Value!);
         }

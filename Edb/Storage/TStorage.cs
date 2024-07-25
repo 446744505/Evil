@@ -1,6 +1,7 @@
 
 using System.Collections.Concurrent;
 using Evil.Util;
+using MongoDB.Bson;
 
 namespace Edb
 {
@@ -141,7 +142,7 @@ namespace Edb
 
         internal async Task<TValue?> Find(TKey key, TTable<TKey, TValue> table)
         {
-            object? value;
+            BsonDocument? value;
             m_SnapshotLock.EnterReadLock();
             try
             {

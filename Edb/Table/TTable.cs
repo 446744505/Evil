@@ -1,6 +1,8 @@
+using MongoDB.Bson;
+
 namespace Edb
 {
-    public abstract class TTable<TKey, TValue> : BaseTable
+    public abstract partial class TTable<TKey, TValue> : BaseTable
         where TKey : notnull where TValue : class
     {
         private int m_LockId;
@@ -45,6 +47,13 @@ namespace Edb
         {
             
         }
+        
+        private void OnRecordChanged(TRecord<TKey, TValue> r)
+        {
+            if (r.Stat == TRecord<TKey, TValue>.State.Remove)
+                Cache.Remove(r.Key);
+            Storage?.OnRecordChanged(r);
+        }
 
         internal void OnRecordChanged(TRecord<TKey, TValue> r, LogNotify ln)
         {
@@ -55,9 +64,15 @@ namespace Edb
         {
             
         }
-        
+
+        public override void Dispose()
+        {
+            Storage = null;
+        }
+
+        protected abstract TValue NewValue();
         public abstract TKey MarshalKey(TKey key);
-        public abstract object MarshalValue(TValue value);
-        public abstract TValue UnmarshalValue(object value);
+        public abstract BsonDocument MarshalValue(TValue value);
+        public abstract TValue UnmarshalValue(BsonDocument value);
     }
 }

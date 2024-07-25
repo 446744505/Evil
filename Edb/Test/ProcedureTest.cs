@@ -83,6 +83,29 @@ namespace Edb.Test
             Assert.True(r.IsSuccess);
             Assert.Equal(list.Count, 1);
         }
+
+        [Fact]
+        public async void TestFunc()
+        {
+            Edb.I.Start();
+            var r1 = await Procedure.Submit(() => true);
+            Assert.True(r1.IsSuccess);
+            var num = 0;
+            var r2 = Procedure.Call(() =>
+            {
+                num++;
+                return true;
+            });
+            Assert.True(r2.IsSuccess);
+            Assert.Equal(1, num);
+            Procedure.Execute(() =>
+            {
+                num++;
+                return true;
+            });
+            await Task.Delay(500);
+            Assert.Equal(2, num);
+        }
         
         private class PNomal : Procedure
         {

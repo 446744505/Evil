@@ -1,3 +1,5 @@
+using MongoDB.Bson;
+
 namespace Edb
 {
     internal partial class TRecord<TKey, TValue> : XBean
@@ -71,7 +73,7 @@ namespace Edb
             }
         }
 
-        internal object? Find()
+        internal BsonDocument? Find()
         {
             switch (m_SnapshotState)
             {

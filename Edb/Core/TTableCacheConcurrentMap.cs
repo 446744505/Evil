@@ -93,9 +93,9 @@ namespace Edb
             return m_Cache.Values;
         }
 
-        internal override TRecord<TKey, TValue> Get(TKey key)
+        internal override TRecord<TKey, TValue>? Get(TKey key)
         {
-            return m_Cache.TryGetValue(key, out var r) ? r.Access() : null!;
+            return m_Cache.TryGetValue(key, out var r) ? r.Access() : null;
         }
 
         internal override void AddNoLog(TKey key, TRecord<TKey, TValue> r)

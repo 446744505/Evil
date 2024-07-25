@@ -16,7 +16,7 @@ namespace Edb
             m_Collection = logger.Database.GetCollection<BsonDocument>(tableName);
         }
 
-        public async Task<bool> InsertAsync(object value)
+        public async Task<bool> InsertAsync(BsonDocument value)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace Edb
             return true;
         }
 
-        public Task ReplaceAsync(TKey key, object value)
+        public Task ReplaceAsync(TKey key, BsonDocument value)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace Edb
             }
         }
 
-        public async Task<object?> FindAsync(TKey key)
+        public async Task<BsonDocument?> FindAsync(TKey key)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace Edb
             }
         }
 
-        public async Task WalkAsync(Action<object> walker)
+        public async Task WalkAsync(Action<BsonDocument> walker)
         {
             try
             {

@@ -95,7 +95,7 @@ namespace Edb
         public abstract void Clean();
         public abstract void Walk(Query<TKey, TValue> query);
         internal abstract ICollection<TRecord<TKey, TValue>> Values();
-        internal abstract TRecord<TKey, TValue> Get(TKey key);
+        internal abstract TRecord<TKey, TValue>? Get(TKey key);
         internal abstract void AddNoLog(TKey key, TRecord<TKey, TValue> r);
         internal abstract void Add(TKey key, TRecord<TKey, TValue> r);
         internal abstract TRecord<TKey, TValue>? Remove(TKey key);
