@@ -25,51 +25,39 @@ namespace Edb
             return this;
         }
         
-        internal async Task<bool> RTryLock()
+        internal async Task<IDisposable?> RTryLock()
         {
-            // 用1ms模拟尝试获取锁
-            try {
-                await RLock(1);
-                return true;
-            } catch (LockTimeoutException) {
-                return false;
-            }
+            return await m_RWLock.RTryLockAsync();
         }
         
-        internal async Task RLock(int timeoutMills)
+        internal async Task<IDisposable> RLock(int timeoutMills)
         {
-            await m_RWLock.RLockAsync(timeoutMills);
+            return await m_RWLock.RLockAsync(timeoutMills);
         }
         
-        internal async Task RLock()
+        internal async Task<IDisposable> RLock()
         {
-            await m_RWLock.RLockAsync();
+            return await m_RWLock.RLockAsync();
         }
         
-        internal void RUnlock()
+        internal void RUnlock(IDisposable release)
         {
-            m_RWLock.RUnlock();
+            m_RWLock.RUnlock(release);
         }
 
-        internal async Task<bool> WTryLock()
+        internal async Task<IDisposable?> WTryLock()
         {
-            // 用1ms模拟尝试获取锁
-            try {
-                await WLock(1);
-                return true;
-            } catch (LockTimeoutException) {
-                return false;
-            }
+            return await m_RWLock.WTryLockAsync();
         }
         
-        internal async Task WLock(int timeoutMills)
+        internal async Task<IDisposable> WLock(int timeoutMills)
         {
-            await m_RWLock.WLockAsync(timeoutMills);
+            return await m_RWLock.WLockAsync(timeoutMills);
         }
 
-        internal void WUnlock()
+        internal void WUnlock(IDisposable release)
         {
-            m_RWLock.WUnlock();
+            m_RWLock.WUnlock(release);
         }
         
         public int CompareTo(Lockey? other)

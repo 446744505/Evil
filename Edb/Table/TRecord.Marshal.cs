@@ -11,11 +11,9 @@ namespace Edb
 
         internal async Task<bool> TryMarshalN(Action action)
         {
-            var locked = await m_Lockey.RTryLock();
-            if (!locked)
-            {
+            var release = await m_Lockey.RTryLock();
+            if (release == null)
                 return false;
-            }
 
             try
             {
@@ -24,7 +22,7 @@ namespace Edb
             }
             finally
             {
-                m_Lockey.RUnlock();
+                m_Lockey.RUnlock(release);
             }
 
             return true;

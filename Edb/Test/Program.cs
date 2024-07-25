@@ -1,4 +1,6 @@
 
+using Evil.Util;
+
 namespace Edb.Test
 {
     public static class Program
@@ -7,7 +9,7 @@ namespace Edb.Test
         {
             var edbTest = new EdbTest();
             await edbTest.TestAdd();
-            // await edbTest.TestUpdate();
+            await edbTest.TestUpdate();
         }
     }
 }

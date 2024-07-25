@@ -6,24 +6,22 @@ namespace Evil.Util
     {
         private readonly AsyncReaderWriterLock m_Lock = new();
 
-        private IDisposable m_Release;
-        
-        public async Task RLockAsync()
+        public async Task<IDisposable> RLockAsync()
         {
-            m_Release = await m_Lock.ReaderLockAsync();
+            return await m_Lock.ReaderLockAsync();
         }
         
-        public void RLock()
+        public IDisposable RLock()
         {
-            m_Release = m_Lock.ReaderLock();
+            return m_Lock.ReaderLock();
         }
         
-        public async Task RLockAsync(int timeoutMills)
+        public async Task<IDisposable> RLockAsync(int timeoutMills)
         {
             var cts = new CancellationTokenSource(timeoutMills);
             try
             {
-                m_Release = await m_Lock.ReaderLockAsync(cts.Token);
+                return await m_Lock.ReaderLockAsync(cts.Token);
             } catch (TaskCanceledException)
             {
                 throw new LockTimeoutException();
@@ -34,12 +32,12 @@ namespace Evil.Util
             }
         }
         
-        public void RLock(int timeoutMills)
+        public IDisposable RLock(int timeoutMills)
         {
             var cts = new CancellationTokenSource(timeoutMills);
             try
             {
-                m_Release = m_Lock.ReaderLock(cts.Token);
+                return m_Lock.ReaderLock(cts.Token);
             } catch (TaskCanceledException)
             {
                 throw new LockTimeoutException();
@@ -50,27 +48,37 @@ namespace Evil.Util
             }
         }
         
-        public void RUnlock()
+        public async Task<IDisposable?> RTryLockAsync()
         {
-            m_Release.Dispose();
+            // 再用10ms尝试获取锁
+            try {
+                return await RLockAsync(10);
+            } catch (LockTimeoutException) {
+                return null;
+            }
         }
         
-        public async Task WLockAsync()
+        public void RUnlock(IDisposable release)
         {
-            m_Release = await m_Lock.WriterLockAsync();
+            release.Dispose();
         }
         
-        public void WLock()
+        public async Task<IDisposable> WLockAsync()
         {
-            m_Release = m_Lock.WriterLock();
+            return await m_Lock.WriterLockAsync();
         }
         
-        public async Task WLockAsync(int timeoutMills)
+        public IDisposable WLock()
+        {
+            return m_Lock.WriterLock();
+        }
+        
+        public async Task<IDisposable> WLockAsync(int timeoutMills)
         {
             var cts = new CancellationTokenSource(timeoutMills);
             try
             {
-                m_Release = await m_Lock.WriterLockAsync(cts.Token);
+                return await m_Lock.WriterLockAsync(cts.Token);
             }
             catch (TaskCanceledException)
             {
@@ -82,12 +90,12 @@ namespace Evil.Util
             }
         }
         
-        public void WLock(int timeoutMills)
+        public IDisposable WLock(int timeoutMills)
         {
             var cts = new CancellationTokenSource(timeoutMills);
             try
             {
-                m_Release = m_Lock.WriterLock(cts.Token);
+                return m_Lock.WriterLock(cts.Token);
             } catch (TaskCanceledException)
             {
                 throw new LockTimeoutException();
@@ -97,10 +105,20 @@ namespace Evil.Util
                 cts.Dispose();
             }
         }
-
-        public void WUnlock()
+        
+        public async Task<IDisposable?> WTryLockAsync()
         {
-            m_Release.Dispose();
+            // 再用10ms尝试获取锁
+            try {
+                return await WLockAsync(10);
+            } catch (LockTimeoutException) {
+                return null;
+            }
+        }
+
+        public void WUnlock(IDisposable release)
+        {
+            release.Dispose();
         }
     }
     

@@ -60,7 +60,7 @@ namespace Edb
             if (rCached != null)
                 return rCached.Value;
             var cacheLockey = Lockeys.GetLockey(-m_LockId, key);
-            await cacheLockey.WLock(Edb.I.Config.LockTimeoutMills);
+            var release = await cacheLockey.WLock(Edb.I.Config.LockTimeoutMills);
             try
             {
                 var r = Cache.Get(key);
@@ -81,7 +81,7 @@ namespace Edb
             }
             finally
             {
-                cacheLockey.WUnlock();
+                cacheLockey.WUnlock(release);
             }
         }
 

@@ -36,7 +36,7 @@ namespace Edb
             foreach (var r in records)
             {
                 var lock0 = r.Lockey;
-                await lock0.RLock();
+                var release = await lock0.RLock();
                 try 
                 {
                     var value = r.Value;
@@ -47,7 +47,7 @@ namespace Edb
                 }
                 finally
                 {
-                    lock0.RUnlock();
+                    lock0.RUnlock(release);
                 }
             }
         }
@@ -60,8 +60,8 @@ namespace Edb
         internal async Task<bool> TryRemoveRecord(TRecord<TKey, TValue> r)
         {
             var lock0 = r.Lockey;
-            var locked = await lock0.WTryLock();
-            if (!locked)
+            var release = await lock0.WTryLock();
+            if (release == null)
                 return false;
             try
             {
@@ -88,7 +88,7 @@ namespace Edb
             }
             finally
             {
-                lock0.WUnlock();
+                lock0.WUnlock(release);
             }
         }
 

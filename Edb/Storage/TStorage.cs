@@ -124,7 +124,7 @@ namespace Edb
         public async Task Cleanup()
         {
             ConcurrentDictionary<TKey, TRecord<TKey, TValue>> tmp;
-            await m_SnapshotLock.WLockAsync();
+            var release = await m_SnapshotLock.WLockAsync();
             try
             {
                 tmp = m_Snapshot;
@@ -132,7 +132,7 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.WUnlock();
+                m_SnapshotLock.WUnlock(release);
             }
             foreach (var r in tmp.Values)
             {
@@ -143,7 +143,7 @@ namespace Edb
         internal async Task<TValue?> Find(TKey key, TTable<TKey, TValue> table)
         {
             BsonDocument? value;
-            await m_SnapshotLock.RLockAsync();
+            var release = await m_SnapshotLock.RLockAsync();
             try
             {
                 if (m_Snapshot.TryGetValue(key, out var r))
@@ -159,7 +159,7 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.RUnlock();
+                m_SnapshotLock.RUnlock(release);
             }
 
             if (value == null)
@@ -174,7 +174,7 @@ namespace Edb
 
         internal async Task<bool> Exist(TKey key, TTable<TKey, TValue> table)
         {
-            await m_SnapshotLock.RLockAsync();
+            var release = await m_SnapshotLock.RLockAsync();
             try
             {
                 if (m_Snapshot.TryGetValue(key, out var r))
@@ -184,7 +184,7 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.RUnlock();
+                m_SnapshotLock.RUnlock(release);
             }
             return await Engine.ExistsAsync(key);
         }

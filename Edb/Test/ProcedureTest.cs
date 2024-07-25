@@ -79,9 +79,9 @@ namespace Edb.Test
             var p = new PRetrySuccess(list, lockey);
             new Thread(async _ =>
             {
-                await lockey.RLock();
+                var release = await lockey.RLock();
                 Thread.Sleep(1000);
-                lockey.RUnlock();
+                lockey.RUnlock(release);
             }).Start();
             var r = await Procedure.Submit(p);
             Assert.True(r.IsSuccess);

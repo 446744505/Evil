@@ -18,8 +18,8 @@ namespace Edb
 
         #region Static
 
-        private static readonly ThreadLocal<Transaction?> ThreadLocal = new();
-        private static readonly ThreadLocal<bool> Isolation = new();
+        private static readonly AsyncLocal<Transaction?> ThreadLocal = new();
+        private static readonly AsyncLocal<bool> Isolation = new();
         private static readonly LockAsync IsolationLock = new();
         internal static Transaction? Current => ThreadLocal.Value;
         public static IsolationLevel IsolationLevel => Isolation.Value ? IsolationLevel.Level3 : IsolationLevel.Level2;
@@ -32,7 +32,7 @@ namespace Edb
 
         private static long TotalCount;
         private static long TotalFalse;
-        private static long totalException;
+        private static long TotalException;
 
         #endregion
         
@@ -95,15 +95,16 @@ namespace Edb
 
         internal async Task Perform<TP>(ProcedureImpl<TP> p) where TP : IProcedure
         {
+            IDisposable isolationRelease = null!;
             if (p.IsolationLevel == IsolationLevel.Level3)
-                await IsolationLock.WLockAsync();
+                isolationRelease = await IsolationLock.WLockAsync();
             else 
-                await IsolationLock.RLockAsync();
+                isolationRelease = await IsolationLock.RLockAsync();
             try
             {
                 Interlocked.Increment(ref TotalCount);
                 var flushLock = Edb.I.Tables.FlushLock;
-                await flushLock.RLockAsync();
+                var flushRelease = await flushLock.RLockAsync();
                 try
                 {
                     if (await p.Call())
@@ -129,23 +130,23 @@ namespace Edb
                 {
                     m_LastCommitActions.Clear();
                     Finish();
-                    flushLock.RUnlock();
+                    flushLock.RUnlock(flushRelease);
                 }
             }
             catch (Exception e)
             {
                 p.Exception = e;
                 p.Success = false;
-                Interlocked.Increment(ref totalException);
+                Interlocked.Increment(ref TotalException);
                 Log.I.Error(e);
                 throw;
             }
             finally
             {
                 if (p.IsolationLevel == IsolationLevel.Level3)
-                    IsolationLock.WUnlock();
+                    IsolationLock.WUnlock(isolationRelease);
                 else
-                    IsolationLock.RUnlock();
+                    IsolationLock.RUnlock(isolationRelease);
             }
         }
 
