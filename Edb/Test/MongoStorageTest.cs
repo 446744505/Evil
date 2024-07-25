@@ -62,7 +62,7 @@ namespace Edb.Test
             List<Player> players = new();
             await m_Storage.WalkAsync((doc) =>
             {
-                var player = BsonSerializer.Deserialize<Player>((BsonDocument)doc);
+                var player = BsonSerializer.Deserialize<Player>(doc);
                 players.Add(player);
             });
             Assert.Equal(2, players.Count);

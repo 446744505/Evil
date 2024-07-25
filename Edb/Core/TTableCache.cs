@@ -31,12 +31,12 @@ namespace Edb
             m_RemoveHandler = handler;
         }
 
-        internal void Walk0(ICollection<TRecord<TKey, TValue>> records, Query<TKey, TValue> query)
+        internal async void Walk0(ICollection<TRecord<TKey, TValue>> records, Query<TKey, TValue> query)
         {
             foreach (var r in records)
             {
                 var lock0 = r.Lockey;
-                lock0.RLock();
+                await lock0.RLock();
                 try 
                 {
                     var value = r.Value;
@@ -57,10 +57,11 @@ namespace Edb
             Transaction.CurrentSavepoint.Add(r.CreateLogKey(), new LogAddRemove0(this, key, r));
         }
 
-        internal bool TryRemoveRecord(TRecord<TKey, TValue> r)
+        internal async Task<bool> TryRemoveRecord(TRecord<TKey, TValue> r)
         {
             var lock0 = r.Lockey;
-            if (!lock0.WTryLock())
+            var locked = await lock0.WTryLock();
+            if (!locked)
                 return false;
             try
             {

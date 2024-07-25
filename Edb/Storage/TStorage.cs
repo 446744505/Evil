@@ -9,7 +9,7 @@ namespace Edb
         where TKey : notnull where TValue : class
     {
         private readonly TTable<TKey, TValue> m_Table;
-        private readonly ReaderWriterLockSlim m_SnapshotLock = new();
+        private readonly LockAsync m_SnapshotLock = new();
         private readonly ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Changed = new();
         private ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Marshal = new();
         private ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Snapshot = new();
@@ -58,13 +58,13 @@ namespace Edb
             return !m_Changed.ContainsKey(key) && !m_Marshal.ContainsKey(key);
         }
 
-        public long MarshalN()
+        public async Task<long> MarshalN()
         {
             long tryFail = 0;
             List<TKey> removeKeys = new();
             foreach (var r in m_Changed.Values)
             {
-                if (r.TryMarshalN(() => { }))
+                if (await r.TryMarshalN(() => m_Marshal[r.Key] = r))
                 {
                     removeKeys.Add(r.Key);
                 }
@@ -121,10 +121,10 @@ namespace Edb
             return flushed;
         }
 
-        public void Cleanup()
+        public async Task Cleanup()
         {
             ConcurrentDictionary<TKey, TRecord<TKey, TValue>> tmp;
-            m_SnapshotLock.EnterWriteLock();
+            await m_SnapshotLock.WLockAsync();
             try
             {
                 tmp = m_Snapshot;
@@ -132,7 +132,7 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.ExitWriteLock();
+                m_SnapshotLock.WUnlock();
             }
             foreach (var r in tmp.Values)
             {
@@ -143,7 +143,7 @@ namespace Edb
         internal async Task<TValue?> Find(TKey key, TTable<TKey, TValue> table)
         {
             BsonDocument? value;
-            m_SnapshotLock.EnterReadLock();
+            await m_SnapshotLock.RLockAsync();
             try
             {
                 if (m_Snapshot.TryGetValue(key, out var r))
@@ -159,7 +159,7 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.ExitReadLock();
+                m_SnapshotLock.RUnlock();
             }
 
             if (value == null)
@@ -174,7 +174,7 @@ namespace Edb
 
         internal async Task<bool> Exist(TKey key, TTable<TKey, TValue> table)
         {
-            m_SnapshotLock.EnterReadLock();
+            await m_SnapshotLock.RLockAsync();
             try
             {
                 if (m_Snapshot.TryGetValue(key, out var r))
@@ -184,7 +184,7 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.ExitReadLock();
+                m_SnapshotLock.RUnlock();
             }
             return await Engine.ExistsAsync(key);
         }

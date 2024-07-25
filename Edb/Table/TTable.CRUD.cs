@@ -18,7 +18,7 @@ namespace Edb
                 return r.Add(value);
             
             Interlocked.Increment(ref m_CountAddMiss);
-            if (await Exist0(key))
+            if (await Exist0Async(key))
             {
                 Interlocked.Increment(ref m_CountAddStorageMiss);
                 return false;
@@ -40,34 +40,34 @@ namespace Edb
                 return r.Remove();
             
             Interlocked.Increment(ref m_CountRemoveMiss);
-            var exist = await Exist0(key);
+            var exist = await Exist0Async(key);
             if (!exist)
                 Interlocked.Increment(ref m_CountRemoveStorageMiss);
             Cache.Add(key, new TRecord<TKey, TValue>(this, null, lockey, exist ? TRecord<TKey, TValue>.State.InDbRemove : TRecord<TKey, TValue>.State.Remove));
             return exist;
         }
 
-        protected async Task<TValue?> Get(TKey key, bool wLock)
+        protected async Task<TValue?> GetAsync(TKey key, bool wLock)
         {
             var transaction = Transaction.Current;
             var lockey = Lockeys.GetLockey(m_LockId, key);
             if (wLock)
-                transaction!.WAddLockey(lockey);
+                await transaction!.WAddLockey(lockey);
             else
-                transaction!.RAddLockey(lockey);
+                await transaction!.RAddLockey(lockey);
             Interlocked.Increment(ref m_CountGet);
             var rCached = transaction.GetCacheTRecord(this, key);
             if (rCached != null)
                 return rCached.Value;
             var cacheLockey = Lockeys.GetLockey(-m_LockId, key);
-            cacheLockey.WTryLock(Edb.I.Config.LockTimeoutMills);
+            await cacheLockey.WLock(Edb.I.Config.LockTimeoutMills);
             try
             {
                 var r = Cache.Get(key);
                 if (r == null)
                 {
                     Interlocked.Increment(ref m_CountGetMiss);
-                    var value = await Find0(key);
+                    var value = await Find0Async(key);
                     if (value == null)
                     {
                         Interlocked.Increment(ref m_CountGetStorageMiss);
@@ -85,7 +85,7 @@ namespace Edb
             }
         }
 
-        public Task Walk(Action<TValue> cb)
+        public Task WalkAsync(Action<TValue> cb)
         {
             if (Storage == null)
                 throw new NotSupportedException($"walk on memory table {m_Config.Name}, use TTableCache.Walk instead");
@@ -102,12 +102,12 @@ namespace Edb
             });
         }
         
-        private Task<bool> Exist0(TKey key)
+        private Task<bool> Exist0Async(TKey key)
         {
             return Storage == null ? Task.FromResult(false) : Storage.Exist(key, this);
         }
 
-        private Task<TValue?> Find0(TKey key)
+        private Task<TValue?> Find0Async(TKey key)
         {
             return Storage == null ? Task.FromResult<TValue?>(null) : Storage.Find(key, this);
         }

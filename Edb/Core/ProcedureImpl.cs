@@ -34,14 +34,14 @@ namespace Edb
             IsolationLevel = Transaction.IsolationLevel;
         }
 
-        internal bool Call()
+        internal async Task<bool> Call()
         {
             var savepoint = Transaction.Savepoint();
             try
             {
                 if (m_Process is Procedure procedure)
                 {
-                    if (procedure.Process())
+                    if (await procedure.Process())
                     {
                         m_Exception = null;
                         m_Success = true;
@@ -50,7 +50,6 @@ namespace Edb
                 }
                 else
                 {
-                    // TODO Function类型
                     throw new NotSupportedException(Name);
                 }
             }
@@ -70,7 +69,7 @@ namespace Edb
             return false;
         }
 
-        internal static IProcedure.IResult Call(TP p)
+        internal static async Task<IProcedure.IResult> Call(TP p)
         {
             var impl = new ProcedureImpl<TP>(p);
             if (Transaction.Current == null)
@@ -88,7 +87,7 @@ namespace Edb
                         if (retry == impl.RetryTimes && impl.RetrySerial)
                             impl.IsolationLevel = IsolationLevel.Level3;
 
-                        Task.Delay(impl.CalcDelay());
+                        _ = Task.Delay(impl.CalcDelay());
                     }
                 }
                 finally
@@ -98,7 +97,7 @@ namespace Edb
             }
             else
             {
-                impl.Call();
+                await impl.Call();
             }
 
             return impl.Result;
@@ -113,7 +112,7 @@ namespace Edb
             return pt.PTask;
         }
 
-        internal static void Execute(TP p, IProcedure.IDone<TP>? done)
+        internal static void Execute(TP p, Action<TP,IProcedure.IResult>? done)
         {
             new ProcedureTask(new ProcedureImpl<TP>(p), done).Launch();
         }

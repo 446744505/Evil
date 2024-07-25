@@ -7,11 +7,6 @@ namespace Edb
         public virtual bool RetrySerial => false;
         public string Name => GetType().Name;
 
-        public interface IDone<TP> where TP : IProcedure
-        {
-            void DoDone(TP p, IResult r);
-        }
-
         public interface IResult
         {
             bool IsSuccess { get; }

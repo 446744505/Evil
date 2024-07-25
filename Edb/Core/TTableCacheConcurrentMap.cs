@@ -49,7 +49,7 @@ namespace Edb
             }
         }
 
-        private void CleanNow()
+        private async void CleanNow()
         {
             if (m_Capacity <= 0)
                 return;
@@ -66,7 +66,8 @@ namespace Edb
                 var ar = sorted.Dequeue();
                 if (ar.m_AccessTime != ar.m_Record.LastAccessTime)
                     continue;
-                if (TryRemoveRecord(ar.m_Record))
+                var removed = await TryRemoveRecord(ar.m_Record);
+                if (removed)
                     clenaN--;
             }
         }

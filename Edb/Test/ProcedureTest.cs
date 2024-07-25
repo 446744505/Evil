@@ -1,14 +1,18 @@
+using Evil.Util;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Edb.Test
 {
     public class ProcedureTest
     {
+        private void Init()
+        {
+            Edb.I.Start(new Config(), new List<BaseTable>());
+        }
         [Fact]
         public async void TestNomal()
         {
-            Edb.I.Start();
+            Init();
             
             var pTrue = new PNomal(true);
             var r1 = await Procedure.Submit(pTrue);
@@ -21,7 +25,7 @@ namespace Edb.Test
         [Fact]
         public async void TestExecute()
         {
-            Edb.I.Start();
+            Init();
             var list = new List<int>();
             var p = new PExecute(list);
             Procedure.Execute(p);
@@ -33,13 +37,13 @@ namespace Edb.Test
         }
 
         [Fact]
-        public async void TestRetryFail()
+        public async Task TestRetryFail()
         {
-            Edb.I.Start();
+            Init();
             Edb.I.Config.LockTimeoutMills = 1000;
             var list = new List<int>();
             var lockey = Lockeys.GetLockey(1, 1);
-            lockey.RLock();
+            await lockey.RLock();
             var p = new PRetryFail(list, lockey);
             var r = await Procedure.Submit(p);
             Assert.False(r.IsSuccess);
@@ -50,13 +54,13 @@ namespace Edb.Test
 
 
         [Fact]
-        public void TestRetryFail1()
+        public async void TestRetryFail1()
         {
-            Edb.I.Start();
+            Init();
             Edb.I.Config.LockTimeoutMills = 1000;
             var list = new List<int>();
             var lockey = Lockeys.GetLockey(1, 1);
-            lockey.RLock();
+            await lockey.RLock();
             var p = new PRetryFail(list, lockey);
             Exception? exception = null;
             Procedure.Execute(p, (_, r) => { exception = r.Exception; });
@@ -66,16 +70,16 @@ namespace Edb.Test
         }
 
         [Fact]
-        public async void TestRetrySuccess()
+        public async Task TestRetrySuccess()
         {
-            Edb.I.Start();
+            Init();
             Edb.I.Config.LockTimeoutMills = 1000;
             var list = new List<int>();
             var lockey = Lockeys.GetLockey(1, 1);
             var p = new PRetrySuccess(list, lockey);
-            new Thread(_ =>
+            new Thread(async _ =>
             {
-                lockey.RLock();
+                await lockey.RLock();
                 Thread.Sleep(1000);
                 lockey.RUnlock();
             }).Start();
@@ -87,11 +91,11 @@ namespace Edb.Test
         [Fact]
         public async void TestFunc()
         {
-            Edb.I.Start();
-            var r1 = await Procedure.Submit(() => true);
+            Init();
+            var r1 = await Procedure.Submit( () => true);
             Assert.True(r1.IsSuccess);
             var num = 0;
-            var r2 = Procedure.Call(() =>
+            var r2 = await Procedure.Call(() =>
             {
                 num++;
                 return true;
@@ -116,7 +120,7 @@ namespace Edb.Test
                 m_R = r;
             }
 
-            public bool Process()
+            public async Task<bool> Process()
             {
                 return m_R;
             }
@@ -131,7 +135,7 @@ namespace Edb.Test
                 m_List = list;
             }
 
-            public bool Process()
+            public async Task<bool> Process()
             {
                 Task.Delay(1000).Wait();
                 m_List.Add(1);
@@ -150,9 +154,9 @@ namespace Edb.Test
                 m_Lockey = lockey;
             }
 
-            public bool Process()
+            public async Task<bool> Process()
             {
-                m_Lockey.WTryLock(Edb.I.Config.LockTimeoutMills);
+                await m_Lockey.WLock(Edb.I.Config.LockTimeoutMills);
                 m_List.Add(1);
                 return true;
             }
@@ -169,9 +173,9 @@ namespace Edb.Test
                 m_Lockey = lockey;
             }
 
-            public bool Process()
+            public async Task<bool> Process()
             {
-                m_Lockey.WTryLock(Edb.I.Config.LockTimeoutMills);
+                await m_Lockey.WLock(Edb.I.Config.LockTimeoutMills);
                 m_List.Add(1);
                 return true;
             }

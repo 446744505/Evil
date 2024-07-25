@@ -9,9 +9,10 @@ namespace Edb
         private BsonDocument? m_SnapshotValue;
         private State? m_SnapshotState;
 
-        internal bool TryMarshalN(Action action)
+        internal async Task<bool> TryMarshalN(Action action)
         {
-            if (!m_Lockey.RTryLock())
+            var locked = await m_Lockey.RTryLock();
+            if (!locked)
             {
                 return false;
             }

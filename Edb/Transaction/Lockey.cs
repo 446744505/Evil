@@ -1,4 +1,6 @@
 ﻿
+using Evil.Util;
+
 namespace Edb
 {
     internal sealed class Lockey : IComparable<Lockey>
@@ -6,7 +8,7 @@ namespace Edb
         private readonly int m_Index;
         private readonly object m_Key;
         private readonly int m_HashCode;
-        private volatile ReaderWriterLockSlim m_RWLock = null!;
+        private volatile LockAsync m_RWLock = null!;
         
         internal object Key => m_Key;
         
@@ -19,49 +21,55 @@ namespace Edb
 
         internal Lockey Alloc()
         {
-            m_RWLock = new ReaderWriterLockSlim();
+            m_RWLock = new LockAsync();
             return this;
         }
         
-        internal bool RTryLock()
+        internal async Task<bool> RTryLock()
         {
-            return m_RWLock.TryEnterReadLock(0);
-        }
-        
-        internal void RTryLock(int timeoutMills)
-        {
-            if (!m_RWLock.TryEnterReadLock(timeoutMills))
-            {
-                throw new LockTimeoutException($"Timeout waiting for read lock on {this}");
+            // 用1ms模拟尝试获取锁
+            try {
+                await RLock(1);
+                return true;
+            } catch (LockTimeoutException) {
+                return false;
             }
         }
         
-        internal void RLock()
+        internal async Task RLock(int timeoutMills)
         {
-            m_RWLock.EnterReadLock();
+            await m_RWLock.RLockAsync(timeoutMills);
+        }
+        
+        internal async Task RLock()
+        {
+            await m_RWLock.RLockAsync();
         }
         
         internal void RUnlock()
         {
-            m_RWLock.ExitReadLock();
+            m_RWLock.RUnlock();
         }
 
-        internal bool WTryLock()
+        internal async Task<bool> WTryLock()
         {
-            return m_RWLock.TryEnterWriteLock(0);
+            // 用1ms模拟尝试获取锁
+            try {
+                await WLock(1);
+                return true;
+            } catch (LockTimeoutException) {
+                return false;
+            }
         }
         
-        internal void WTryLock(int timeoutMills)
+        internal async Task WLock(int timeoutMills)
         {
-            if (!m_RWLock.TryEnterWriteLock(timeoutMills))
-            {
-                throw new LockTimeoutException($"Timeout waiting for write lock on {this}");
-            }
+            await m_RWLock.WLockAsync(timeoutMills);
         }
 
         internal void WUnlock()
         {
-            m_RWLock.ExitWriteLock();
+            m_RWLock.WUnlock();
         }
         
         public int CompareTo(Lockey? other)

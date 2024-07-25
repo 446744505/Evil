@@ -5,10 +5,8 @@ namespace Edb
     public abstract partial class TTable<TKey, TValue> : BaseTable
         where TKey : notnull where TValue : class
     {
-        private int m_LockId;
         private TableConfig m_Config;
         
-        public string LockName { get; set; }
         internal TStorage<TKey, TValue>? Storage { get; set; }
         internal TTableCache<TKey, TValue> Cache { get; set; }
 
@@ -32,7 +30,7 @@ namespace Edb
         {
         }
         
-        internal IStorageInterface<TKey>? Open(TableConfig config, ILoggerEngine logger)
+        internal override IStorage? Open(TableConfig config, ILoggerEngine logger)
         {
             if (Storage != null)
                 throw new XError($"table {Name} already open");

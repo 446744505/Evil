@@ -1,3 +1,5 @@
+using Evil.Util;
+
 namespace Edb
 {
     public partial class Transaction
@@ -19,26 +21,26 @@ namespace Edb
             return null;
         }
 
-        internal void RAddLockey(Lockey lockey)
+        internal async Task RAddLockey(Lockey lockey)
         {
             if (m_Locks.ContainsKey(lockey))
                 return;
-            lockey.RTryLock(Edb.I.Config.LockTimeoutMills);
+            await lockey.RLock(Edb.I.Config.LockTimeoutMills);
             m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Read);
         }
 
-        internal void WAddLockey(Lockey lockey)
+        internal async Task WAddLockey(Lockey lockey)
         {
             if (!m_Locks.TryGetValue(lockey, out var holder))
             {
-                lockey.WTryLock(Edb.I.Config.LockTimeoutMills);
+                await lockey.WLock(Edb.I.Config.LockTimeoutMills);
                 m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Write);
             } else if (holder.m_Type == LockeyHolderType.Read)
             {
                 holder.m_Lockey.RUnlock();
                 try
                 {
-                    holder.m_Lockey.WTryLock(Edb.I.Config.LockTimeoutMills);
+                    await holder.m_Lockey.WLock(Edb.I.Config.LockTimeoutMills);
                 }
                 catch (LockTimeoutException)
                 {

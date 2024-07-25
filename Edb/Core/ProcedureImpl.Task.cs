@@ -8,12 +8,12 @@ namespace Edb
         {
             private volatile TaskCompletionSource<IProcedure.IResult>? m_CompletionSource;
             private readonly ProcedureImpl<TP> m_Procedure;
-            private readonly IProcedure.IDone<TP>? m_Done;
+            private readonly Action<TP,IProcedure.IResult>? m_Done;
             private volatile int m_Retry;
             
             internal Task<IProcedure.IResult> PTask => m_CompletionSource!.Task;
 
-            public ProcedureTask(ProcedureImpl<TP> procedure, IProcedure.IDone<TP>? done = null)
+            public ProcedureTask(ProcedureImpl<TP> procedure, Action<TP,IProcedure.IResult>? done = null)
             {
                 m_Procedure = procedure;
                 m_Done = done;
@@ -41,20 +41,20 @@ namespace Edb
                     return;
                 try
                 {
-                    m_Done.DoDone(m_Procedure.Process, m_Procedure.Result);     
+                    m_Done(m_Procedure.Process, m_Procedure.Result);     
                 } catch (Exception e)
                 {
                     Log.I.Error(e);
                 }
             }
 
-            private void Start()
+            private async void Start()
             {
                 try
                 {
                     try
                     {
-                        Transaction.Create().Perform(m_Procedure);
+                        await Transaction.Create().Perform(m_Procedure);
                     }
                     finally
                     {

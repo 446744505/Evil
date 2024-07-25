@@ -20,7 +20,7 @@ namespace Edb
 
         private static readonly ThreadLocal<Transaction?> ThreadLocal = new();
         private static readonly ThreadLocal<bool> Isolation = new();
-        private static readonly ReaderWriterLockSlim IsolationLock = new();
+        private static readonly LockAsync IsolationLock = new();
         internal static Transaction? Current => ThreadLocal.Value;
         public static IsolationLevel IsolationLevel => Isolation.Value ? IsolationLevel.Level3 : IsolationLevel.Level2;
         public static bool IsActive => Current != null;
@@ -93,20 +93,20 @@ namespace Edb
             m_LastCommitActions.Add(action);
         }
 
-        internal void Perform<TP>(ProcedureImpl<TP> p) where TP : IProcedure
+        internal async Task Perform<TP>(ProcedureImpl<TP> p) where TP : IProcedure
         {
             if (p.IsolationLevel == IsolationLevel.Level3)
-                IsolationLock.EnterWriteLock();
+                await IsolationLock.WLockAsync();
             else 
-                IsolationLock.EnterReadLock();
+                await IsolationLock.RLockAsync();
             try
             {
                 Interlocked.Increment(ref TotalCount);
                 var flushLock = Edb.I.Tables.FlushLock;
-                flushLock.EnterReadLock();
+                await flushLock.RLockAsync();
                 try
                 {
-                    if (p.Call())
+                    if (await p.Call())
                     {
                         if (_real_commit_(p.Name) > 0)
                         {
@@ -129,7 +129,7 @@ namespace Edb
                 {
                     m_LastCommitActions.Clear();
                     Finish();
-                    flushLock.ExitReadLock();
+                    flushLock.RUnlock();
                 }
             }
             catch (Exception e)
@@ -143,9 +143,9 @@ namespace Edb
             finally
             {
                 if (p.IsolationLevel == IsolationLevel.Level3)
-                    IsolationLock.ExitWriteLock();
+                    IsolationLock.WUnlock();
                 else
-                    IsolationLock.ExitReadLock();
+                    IsolationLock.RUnlock();
             }
         }
 

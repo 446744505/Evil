@@ -2,14 +2,14 @@ namespace Edb
 {
     public interface Procedure : IProcedure
     {
-        public bool Process();
+        public Task<bool> Process();
         
         public void Execute()
         {
             Execute(this);
         }
         
-        public IResult Call()
+        public Task<IResult> Call()
         {
             return Call(this);
         }
@@ -19,14 +19,9 @@ namespace Edb
             return Submit(this);
         }
 
-        static void Execute<TP>(TP p, IDone<TP>? done = null) where TP : IProcedure
+        static void Execute<TP>(TP p, Action<TP,IResult>? done = null) where TP : IProcedure
         {
             ProcedureImpl<TP>.Execute(p, done);
-        }
-        
-        static void Execute<TP>(TP p, Action<TP,IResult> done) where TP : IProcedure
-        {
-            ProcedureImpl<TP>.Execute(p, new DoneInner<TP>(done));
         }
         
         static void Execute(Func<bool> p)
@@ -34,12 +29,12 @@ namespace Edb
             Execute(new ProcedureInner(p));
         }
         
-        static IResult Call<TP>(TP p) where TP : IProcedure
+        static Task<IResult> Call<TP>(TP p) where TP : IProcedure
         {
             return ProcedureImpl<TP>.Call(p);
         }
         
-        static IResult Call(Func<bool> p)
+        static Task<IResult> Call(Func<bool> p)
         {
             return Call(new ProcedureInner(p));
         }
@@ -53,22 +48,12 @@ namespace Edb
         {
             return Submit(new ProcedureInner(p));
         }
-
-        private struct DoneInner<TP> : IDone<TP> where TP : IProcedure
-        {
-            private readonly Action<TP, IResult> m_Done;
-
-            public DoneInner(Action<TP, IResult> done)
-            {
-                m_Done = done;
-            }
-
-            public void DoDone(TP p, IResult r)
-            {
-                m_Done(p, r);
-            }
-        }
         
+        static Task<IResult> Submit(Func<Task<bool>> p)
+        {
+            return Submit(new ProcedureInnerAsync(p));
+        }
+
         private struct ProcedureInner : Procedure
         {
             private readonly Func<bool> m_Func;
@@ -78,9 +63,24 @@ namespace Edb
                 m_Func = func;
             }
 
-            public bool Process()
+            public async Task<bool> Process()
             {
                 return m_Func();
+            }
+        }
+        
+        private struct ProcedureInnerAsync : Procedure
+        {
+            private readonly Func<Task<bool>> m_Func;
+
+            public ProcedureInnerAsync(Func<Task<bool>> func)
+            {
+                m_Func = func;
+            }
+
+            public async Task<bool> Process()
+            {
+                return await m_Func();
             }
         }
     }
