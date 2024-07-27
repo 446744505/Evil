@@ -12,13 +12,17 @@ namespace Edb
         /// </summary>
         public int LockTimeoutMills { get; set; } = 5000;
         public int RetryTimes { get; set; } = 3;
-        public int RetryDelay { get; set; } = 100;
+        public int RetryDelay { get; set; } = 200;
         public bool RetrySerial { get; set; } = false;
-        
-        public TableConfig? GetTable(string name)
+        public int MarshalPeriod { get; set; } = -1;
+        public int CheckpointPeriod { get; set; } = 60000;
+        public int MarshalN { get; set; } = 1;
+        public int SnapshotFatalTime { get; set; } = 200;
+
+        public TableConfig GetTable(string name)
         {
             m_TableConfigs.TryGetValue(name, out var config);
-            return config;
+            return config!;
         }
 
         public void AddTable(TableConfig config)

@@ -5,7 +5,7 @@ namespace Edb
     internal partial class TRecord<TKey, TValue> 
         where TKey : notnull where TValue : class 
     {
-        private TKey m_SnapshotKey;
+        private TKey? m_SnapshotKey;
         private BsonDocument? m_SnapshotValue;
         private State? m_SnapshotState;
 
@@ -78,14 +78,14 @@ namespace Edb
             {
                 case State.InDbAdd:
                 case State.InDbGet:
-                    await storage.Engine.ReplaceAsync(m_SnapshotKey, m_SnapshotValue!);
+                    await storage.Engine.ReplaceAsync(m_SnapshotKey!, m_SnapshotValue!);
                     return true;
                 case State.Add:
                     if (!await storage.Engine.InsertAsync(m_SnapshotValue!))
                         throw new XError("insert fail");
                     return true;
                 case State.InDbRemove:
-                    await storage.Engine.RemoveAsync(m_SnapshotKey);
+                    await storage.Engine.RemoveAsync(m_SnapshotKey!);
                     return true;
                 case State.Remove:
                     break;
@@ -96,7 +96,7 @@ namespace Edb
 
         internal void Clear()
         {
-            m_SnapshotKey = default!;
+            m_SnapshotKey = default;
             m_SnapshotValue = null;
             m_SnapshotState = null;
         }

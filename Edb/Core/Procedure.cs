@@ -63,9 +63,9 @@ namespace Edb
                 m_Func = func;
             }
 
-            public async Task<bool> Process()
+            public Task<bool> Process()
             {
-                return m_Func();
+                return Task.FromResult(m_Func());
             }
         }
         

@@ -13,7 +13,7 @@ namespace Edb
                 sp.Add(key, new LogObject(key));
         }
 
-        internal static void Link(object? bean, XBean? parent, string? varName, bool log = true)
+        internal static void Link(object? bean, XBean? parent, string varName, bool log = true)
         {
             switch (bean)
             {
@@ -29,7 +29,7 @@ namespace Edb
     internal struct LogObject : INote, ILog
     {
         private readonly LogKey m_LogKey;
-        private readonly object m_Origin;
+        private readonly object? m_Origin;
         
         internal LogObject(LogKey logKey)
         {
@@ -49,7 +49,7 @@ namespace Edb
 
         public override string? ToString()
         {
-            return m_Origin.ToString();
+            return m_Origin?.ToString();
         }
     }
 }

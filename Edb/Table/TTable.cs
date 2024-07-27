@@ -1,3 +1,4 @@
+using Evil.Util;
 using MongoDB.Bson;
 
 namespace Edb
@@ -5,10 +6,15 @@ namespace Edb
     public abstract partial class TTable<TKey, TValue> : BaseTable
         where TKey : notnull where TValue : class
     {
-        private TableConfig m_Config;
-        
+        private TableConfig m_Config = null!;
+        private readonly ListenerMap m_ListenerMap = new();
+        private readonly AsyncLocal<LogRecord<TKey, TValue>?> m_LogRecord = new();
+
         internal TStorage<TKey, TValue>? Storage { get; set; }
-        internal TTableCache<TKey, TValue> Cache { get; set; }
+        internal TTableCache<TKey, TValue> Cache { get; set; } = null!;
+        private LogRecord<TKey, TValue> LogRecord => m_LogRecord.Value ??= new LogRecord<TKey, TValue>(this);
+        public bool HasListener => m_ListenerMap.HasListener();
+        public override ITable.Persistence PersistenceType => m_Config.IsMemory ? ITable.Persistence.Memory : ITable.Persistence.Db;
 
         #region Metrics
 
@@ -41,9 +47,21 @@ namespace Edb
             return Storage;
         }
 
+        public Action AddListener(IListener l, string name = "")
+        {
+            return m_ListenerMap.Add(name, l);
+        }
+
         public override void LogNofify()
         {
-            
+            try
+            {
+                LogRecord.LogNotify(m_ListenerMap);
+            } catch (Exception e)
+            {
+                m_LogRecord.Value = null;
+                Log.I.Error(e);
+            }
         }
         
         private void OnRecordChanged(TRecord<TKey, TValue> r)
@@ -55,12 +73,14 @@ namespace Edb
 
         internal void OnRecordChanged(TRecord<TKey, TValue> r, LogNotify ln)
         {
-            
+            LogRecord.OnChanged(r, ln);
+            Transaction.Current!.AddLastCommitAction(()=>OnRecordChanged(r));
         }
         
         internal void OnRecordChanged(TRecord<TKey, TValue> r, bool cc, TRecord<TKey, TValue>.State ss)
         {
-            
+            LogRecord.OnChanged(r, cc, ss);
+            Transaction.Current!.AddLastCommitAction(()=>OnRecordChanged(r));
         }
 
         public override void Dispose()
@@ -68,7 +88,7 @@ namespace Edb
             Storage = null;
         }
 
-        protected abstract TValue NewValue();
+        public abstract TValue? NewValue();
         public abstract TKey MarshalKey(TKey key);
         public abstract BsonDocument MarshalValue(TValue value);
         public abstract TValue UnmarshalValue(BsonDocument value);

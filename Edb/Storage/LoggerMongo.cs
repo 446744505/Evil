@@ -19,7 +19,7 @@ namespace Edb
 
         public void Checkpoint()
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Backup(string path, bool increment)

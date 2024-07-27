@@ -63,7 +63,10 @@ namespace Edb
 
             for (var clenaN = Count - m_Capacity + 255; clenaN > 0;)
             {
-                var ar = sorted.Dequeue();
+                if (!sorted.TryDequeue(out var ar, out _))
+                {
+                    break;
+                }
                 if (ar.m_AccessTime != ar.m_Record.LastAccessTime)
                     continue;
                 var removed = await TryRemoveRecord(ar.m_Record);
@@ -118,19 +121,19 @@ namespace Edb
             return r;
         }
         
-        private struct AccessTimeRecord<TKey, TValue> : IComparable<AccessTimeRecord<TKey, TValue>>
-            where TKey : notnull where TValue : class
+        private struct AccessTimeRecord<TK, TV> : IComparable<AccessTimeRecord<TK, TV>>
+            where TK : notnull where TV : class
         {
             internal readonly long m_AccessTime;
-            internal readonly TRecord<TKey, TValue> m_Record;
+            internal readonly TRecord<TK, TV> m_Record;
 
-            public AccessTimeRecord(TRecord<TKey, TValue> record)
+            public AccessTimeRecord(TRecord<TK, TV> record)
             {
                 m_Record = record;
                 m_AccessTime = record.LastAccessTime;
             }
             
-            public int CompareTo(AccessTimeRecord<TKey, TValue> other)
+            public int CompareTo(AccessTimeRecord<TK, TV> other)
             {
                 return m_AccessTime < other.m_AccessTime ? -1 : m_AccessTime > other.m_AccessTime ? 1 : 0;
             }

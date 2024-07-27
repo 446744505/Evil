@@ -7,7 +7,7 @@ namespace Edb
     {
         private void Remove0()
         {
-            Logs.Link(m_Value, null, null);
+            Logs.Link(m_Value, null, null!);
             Transaction.CurrentSavepoint.AddIfAbsent(CreateLogKey(), new LogAddRemove<TKey, TValue>(this));
             m_Value = null;
         }
@@ -89,13 +89,13 @@ namespace Edb
             }
         }
 
-        private class LogAddRemove<TKey, TValue> : ILog where TKey : notnull where TValue : class
+        private class LogAddRemove<TK, TV> : ILog where TK : notnull where TV : class
         {
-            private readonly TRecord<TKey, TValue> m_Record;
-            private readonly TValue? m_SavedValue;
-            private readonly TRecord<TKey, TValue>.State m_SavedState;
+            private readonly TRecord<TK, TV> m_Record;
+            private readonly TV? m_SavedValue;
+            private readonly TRecord<TK, TV>.State m_SavedState;
             
-            public LogAddRemove(TRecord<TKey, TValue> record)
+            public LogAddRemove(TRecord<TK, TV> record)
             {
                 m_Record = record;
                 m_SavedValue = record.Value;

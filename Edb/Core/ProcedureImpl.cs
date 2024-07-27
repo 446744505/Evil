@@ -79,7 +79,7 @@ namespace Edb
                     Transaction.Create();
                     for (var retry = 0;;)
                     {
-                        if (Perform(impl))
+                        if (await Perform(impl))
                             break;
                         retry++;
                         if (retry > impl.RetryTimes)
@@ -119,14 +119,14 @@ namespace Edb
 
         internal int CalcDelay()
         {
-            return Edb.I.Random.Next(RetryDelay);
+            return Edb.I.Random.Next(RetryDelay>>1, RetryDelay<<1);
         }
 
-        private static bool Perform(ProcedureImpl<TP> p)
+        private static async Task<bool> Perform(ProcedureImpl<TP> p)
         {
             try
             {
-                Transaction.Current!.Perform(p);
+                await Transaction.Current!.Perform(p);
             }
             catch (LockTimeoutException)
             {

@@ -208,20 +208,20 @@ namespace Edb
             }
         }
 
-        private class NoteMap<TKey, TValue> : INote where TKey : notnull
+        private class NoteMap<TK, TV> : INote where TK : notnull
         {
-            private readonly HashSet<TKey> m_Added = new();
-            private readonly Dictionary<TKey, TValue> m_Removed = new();
-            private readonly Dictionary<TKey, TValue> m_Replaced = new();
-            private List<TValue>? m_Changed;
-            private Dictionary<TKey, TValue>? m_ObjRef;
-            private Dictionary<TKey, TValue>? m_ChangedMap;
+            private readonly HashSet<TK> m_Added = new();
+            private readonly Dictionary<TK, TV> m_Removed = new();
+            private readonly Dictionary<TK, TV> m_Replaced = new();
+            private List<TV>? m_Changed;
+            private Dictionary<TK, TV>? m_ObjRef;
+            private Dictionary<TK, TV>? m_ChangedMap;
 
-            internal HashSet<TKey> Added => m_Added;
-            internal Dictionary<TKey, TValue> Replaced => m_Replaced;
-            public Dictionary<TKey, TValue> Removed => m_Removed;
+            internal HashSet<TK> Added => m_Added;
+            internal Dictionary<TK, TV> Replaced => m_Replaced;
+            public Dictionary<TK, TV> Removed => m_Removed;
             protected bool IsMapChanged => m_Added.Count > 0 || m_Removed.Count > 0 || m_Replaced.Count > 0;
-            public Dictionary<TKey, TValue> Changed {
+            public Dictionary<TK, TV> Changed {
                 get
                 {
                     if (m_ChangedMap != null)
@@ -236,7 +236,7 @@ namespace Edb
                     if (m_Changed == null) 
                         return m_ChangedMap;
                     
-                    var set = new HashSet<TValue>(new ReferenceEqualityComparer<TValue>());
+                    var set = new HashSet<TV>(new ReferenceEqualityComparer<TV>());
                     foreach (var v in m_Changed)
                         set.Add(v);
                     m_ObjRef!.Where(pair => set.Contains(pair.Value)).ToList().ForEach(pair => m_ChangedMap[pair.Key] = pair.Value);
@@ -245,15 +245,15 @@ namespace Edb
                 }
             }
 
-            protected void SetChanged(List<TValue> changed, object objRef)
+            protected void SetChanged(List<TV> changed, object objRef)
             {
                 m_Changed = changed;
-                m_ObjRef = (Dictionary<TKey, TValue>)objRef;
+                m_ObjRef = (Dictionary<TK, TV>)objRef;
             }
 
             void Merge(INote note)
             {
-                var other = (NoteMap<TKey, TValue>)note;
+                var other = (NoteMap<TK, TV>)note;
                 foreach (var k in other.m_Added)
                     LogPut(k, default, false);
                 foreach (var pair in other.m_Removed)
@@ -262,7 +262,7 @@ namespace Edb
                     LogPut(pair.Key, pair.Value, true);
             }
 
-            protected void LogRemove(TKey key, TValue value)
+            protected void LogRemove(TK key, TV value)
             {
                 if (m_Added.Remove(key))
                     return;
@@ -270,7 +270,7 @@ namespace Edb
                 m_Removed[key] = v == null ? value : v;
             }
 
-            protected void LogPut(TKey key, TValue? origin, bool hadOrigin)
+            protected void LogPut(TK key, TV? origin, bool hadOrigin)
             {
                 if (m_Added.Contains(key))
                     return;

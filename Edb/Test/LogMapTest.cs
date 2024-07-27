@@ -114,7 +114,7 @@ namespace Edb.Test
         private class XBeanTest : XBean
         {
             private Dictionary<int, int> m_Map = new();
-            public XBeanTest() : base(null, null)
+            public XBeanTest() : base(null, null!)
             {
                 Map.Add(1, 1);
                 Map.Add(2, 2);

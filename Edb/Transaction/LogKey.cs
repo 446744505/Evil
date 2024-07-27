@@ -3,16 +3,16 @@
     internal sealed class LogKey : IComparable<LogKey>
     {
         private readonly XBean m_XBean;
-        private readonly string? m_VarName;
+        private readonly string m_VarName;
         
         internal XBean XBean => m_XBean;
-        internal string? VarName => m_VarName;
+        internal string VarName => m_VarName;
         internal object? Value {
             get => XBeanInfo.GetValue(m_XBean, m_VarName!);
             set => XBeanInfo.SetValue(m_XBean, m_VarName!, value);
         }
 
-        internal LogKey(XBean xBean, string? varName)
+        internal LogKey(XBean xBean, string varName)
         {
             m_XBean = xBean;
             m_VarName = varName;

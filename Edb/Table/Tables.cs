@@ -9,6 +9,7 @@ namespace Edb
         private readonly List<IStorage> m_Storages = new();
         
         internal LockAsync FlushLock => m_FlushLock;
+        internal List<IStorage> Storages => m_Storages;
         internal ILoggerEngine? Logger { get; set; }
 
         internal void Open(Config config)

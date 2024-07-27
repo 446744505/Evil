@@ -3,7 +3,7 @@ namespace Edb
     public abstract class TTableCache<TKey, TValue>
         where TKey : notnull where TValue : class
     {
-        protected volatile TTable<TKey, TValue> m_Table;
+        protected volatile TTable<TKey, TValue> m_Table = null!;
         protected volatile int m_Capacity;
         private volatile RemoveHandler<TKey, TValue>? m_RemoveHandler;
 
@@ -72,7 +72,7 @@ namespace Edb
                    Remove(key);
                    if (m_RemoveHandler != null)
                    {
-                       Edb.I.ExecuteAsync(() => m_RemoveHandler.OnRemoved(key, r.Value!));
+                       _ = Edb.I.ExecuteAsync(() => m_RemoveHandler.OnRemoved(key, r.Value!));
                    }
 
                    return true;

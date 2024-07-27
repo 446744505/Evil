@@ -11,7 +11,7 @@ namespace Edb
                 throw new NullReferenceException("value is null");
 
             var lockey = Lockeys.GetLockey(m_LockId, key);
-            Transaction.Current!.WAddLockey(lockey);
+            await Transaction.Current!.WAddLockey(lockey);
             Interlocked.Decrement(ref m_CountAdd);
             var r = Cache.Get(key);
             if (r != null)
@@ -32,7 +32,7 @@ namespace Edb
         {
             var transaction = Transaction.Current;
             var lockey = Lockeys.GetLockey(m_LockId, key);
-            transaction!.WAddLockey(lockey);
+            await transaction!.WAddLockey(lockey);
             transaction.RemoveCacheTRecord(this, key);
             Interlocked.Increment(ref m_CountRemove);
             var r = Cache.Get(key);

@@ -16,7 +16,7 @@ namespace Edb
         private readonly Lockey m_Lockey;
         private TValue? m_Value;
         private State m_State;
-        private long m_LastAccessTime = DateTime.Now.Nanosecond;
+        private long m_LastAccessTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
         #endregion
 
@@ -44,7 +44,7 @@ namespace Edb
 
         internal TRecord<TKey, TValue> Access()
         {
-            var now = DateTime.Now.Nanosecond;
+            var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             Interlocked.Exchange(ref m_LastAccessTime, now);
             return this;
         }

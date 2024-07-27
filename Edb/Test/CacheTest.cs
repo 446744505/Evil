@@ -5,83 +5,52 @@ using Xunit;
 
 namespace Edb.Test
 {
-    public class EdbTest
+    public class CacheTest
     {
-        private void Init()
+        private async Task Init()
         {
             var config = new Config();
             config.AddTable(new TableConfig()
             {
                 Name = "Player",
                 Lock = "Player",
-                CacheCapacity = 10,
-                IsMemory = false,
+                CacheCapacity = 1,
+                IsMemory = true,
             });
             var tables = new List<BaseTable>();
             tables.Add(new TPlayer());
-            Edb.I.Start(config, tables);
+            await Edb.I.Start(config, tables);
         }
         
         [Fact]
-        public async Task TestAdd()
+        public async Task Test()
         {
-            Init();
+            await Init();
 
             var table = Edb.I.Tables.Get<long, Player>("Player");
-            var player = new Player()
+            var player1 = new Player()
             {
                 PlayerId = 1,
                 PlayerName = "Alice"
             };
-            TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            var player2 = new Player()
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
-                return true;
-            });
-            await Procedure.Submit(async () =>
-            {
-                var ok = await tp.Insert(player);
-                Assert.True(ok);
-                var p = await tp.Select(player.PlayerId);
-                Assert.NotNull(p);
-                Assert.Equal(player.PlayerId, p.PlayerId);
-                Assert.Equal(player.PlayerName, p.PlayerName);
-                return true;
-            });
-        }
-        
-        [Fact]
-        public async Task TestUpdate()
-        {
-            Init();
-
-            var table = Edb.I.Tables.Get<long, Player>("Player");
-            var player = new Player()
-            {
-                PlayerId = 1,
-                PlayerName = "Alice"
+                PlayerId = 2,
+                PlayerName = "Bob"
             };
             TPlayer tp = (TPlayer)table;
             await Procedure.Submit( async () =>
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
+                await tp.Insert(player1);
+                Assert.NotNull(await tp.Select(player1.PlayerId));
+                await tp.Insert(player2);
+                Assert.NotNull(await tp.Select(player2.PlayerId));
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit( async () =>
             {
-                var ok = await tp.Insert(player);
-                Assert.True(ok);
-                var up = await tp.Update(player.PlayerId);
-                Assert.NotNull(up);
-                up.PlayerName = "Bob";
-                var p = await tp.Select(player.PlayerId);
-                Assert.NotNull(p);
-                Assert.Equal(player.PlayerId, p.PlayerId);
-                Assert.Equal("Bob", p.PlayerName);
-                
+                tp.Cache.Clean();
+                Assert.Null(await tp.Select(player1.PlayerId));
                 return true;
             });
         }
@@ -97,7 +66,7 @@ namespace Edb.Test
         {
             public override string Name => "Player";
 
-            protected override Player NewValue()
+            public override Player NewValue()
             {
                 return new Player();
             }

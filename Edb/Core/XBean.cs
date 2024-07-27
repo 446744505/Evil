@@ -5,17 +5,17 @@
         private static long _objId = 0;
 
         private XBean? m_Parent;
-        private string? m_VarName;
+        private string m_VarName;
         
         internal long ObjId { get; } = Interlocked.Increment(ref _objId);
 
-        protected XBean(XBean? parent, string? varName)
+        protected XBean(XBean? parent, string varName)
         {
             m_Parent = parent;
             m_VarName = varName;
         }
 
-        internal void Link(XBean? parent, string? varName, bool log)
+        internal void Link(XBean? parent, string varName, bool log)
         {
             if (parent != null)
             {
@@ -88,7 +88,7 @@
         {
             private readonly XBean m_XBean;
             private readonly XBean? m_Parent;
-            private readonly string? m_VarName;
+            private readonly string m_VarName;
 
             public LogParent(XBean xBean)
             {

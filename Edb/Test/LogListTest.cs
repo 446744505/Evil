@@ -101,7 +101,7 @@ namespace Edb.Test
         private class XBeanTest : XBean
         {
             private List<int> m_List = new();
-            public XBeanTest() : base(null, null)
+            public XBeanTest() : base(null, null!)
             {
                 List.Add(1);
                 List.Add(2);
