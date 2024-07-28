@@ -1,18 +1,21 @@
 ﻿using System.Collections.Generic;
 using Attributes;
 
-namespace Logic.Player
+namespace Player
 {
-    [Protocol(Node.Client | Node.Game)]
+    [XTable(Node.Game, 500)]
     public class Player
     {
-        [ProtocolField(1)]
+        [XColumn(true)]
         private long playerId;
-        [ProtocolField(2)]
+        
+        [XColumn]
         private string playerName;
-        [ProtocolField(3)]
+        
+        [XColumn]
         private int level;
-        [ProtocolField(4)]
+        
+        [XColumn]
         private Dictionary<long, Hero.Hero> heroes;
     }
 }

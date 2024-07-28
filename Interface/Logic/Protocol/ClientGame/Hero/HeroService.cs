@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Attributes;
 
-namespace Logic.Hero
+namespace Hero
 {
      [ClientToServer]
      public interface HeroService
@@ -18,7 +18,7 @@ namespace Logic.Hero
           /// 获取所有英雄信息
           /// </summary>
           /// <returns></returns>
-          public List<Hero> ListHeroes();
+          public Heroes ListHeroes();
           /// <summary>
           /// 英雄升星
           /// </summary>

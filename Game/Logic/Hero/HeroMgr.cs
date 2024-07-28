@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Evil.Util;
 
-namespace Logic.Hero
+namespace Hero
 {
     public class HeroMgr : Singleton<HeroMgr>
     {

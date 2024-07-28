@@ -10,5 +10,9 @@
         /// 协议类型附加的命名空间
         /// </summary>
         public const string ProtoNamespace = "Proto";
+        /// <summary>
+        /// db类型附加的命名空间
+        /// </summary>
+        public const string EdbNamespace = "Edb";
     }
 }

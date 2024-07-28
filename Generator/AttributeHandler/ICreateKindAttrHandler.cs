@@ -18,7 +18,7 @@ namespace Generator.AttributeHandler
         private TypeContext m_TypeContext = null!;
         private AttributeSyntax m_Attr = null!;
 
-        public ICreateFieldFactory<FieldKind> CreateFieldFactory { get; set; }
+        public ICreateFieldFactory<FieldKind> CreateFieldFactory { get; set; } = new DefaultCreateFieldFactory();
         /// <summary>
         /// 附加的命名空间后缀
         /// </summary>

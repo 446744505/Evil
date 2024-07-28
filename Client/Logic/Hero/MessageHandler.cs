@@ -1,6 +1,6 @@
 ﻿using Evil.Util;
 
-namespace Logic.Hero.Proto
+namespace Hero.Proto
 {
     public partial class HeroStarNtf
     {

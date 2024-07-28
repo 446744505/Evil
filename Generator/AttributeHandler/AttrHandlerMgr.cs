@@ -14,6 +14,9 @@ namespace Generator.AttributeHandler
                 Attributes.ClientToServer => new ClientToServerAttrHandler(tc, attr),
                 Attributes.Protocol => new ProtocolAttrHandler(tc, attr),
                 Attributes.ProtocolField => new ProtocolFieldAttrHandler(),
+                Attributes.XTable => new XTableAttrHandler(tc, attr),
+                Attributes.XBean => new XBeanAttrHandler(tc, attr),
+                Attributes.XColumn => new XColumnAttrHandler(),
                 _ => throw new NullReferenceException($"特性 {attrName} 没有对应的处理器")
             };
         }

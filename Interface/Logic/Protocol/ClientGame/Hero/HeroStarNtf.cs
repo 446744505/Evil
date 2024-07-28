@@ -1,6 +1,6 @@
 using Attributes;
 
-namespace Logic.Hero
+namespace Hero
 {
     /// <summary>
     /// 升星返回

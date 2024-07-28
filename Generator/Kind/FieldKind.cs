@@ -9,7 +9,7 @@ namespace Generator.Kind
         
         public string Name { get; }
         public IType Type { get; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
         
         #endregion
         

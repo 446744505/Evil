@@ -1,7 +1,7 @@
 ﻿using Evil.Util;
-using Logic.Hero.Proto;
+using Hero.Proto;
 
-namespace Client.Logic.Hero;
+namespace Client.Hero;
 
 public class HeroMgr : Singleton<HeroMgr>
 {

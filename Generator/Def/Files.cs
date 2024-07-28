@@ -21,6 +21,10 @@ namespace Generator
         /// </summary>
         public const string MessagePath = "Message";
         /// <summary>
+        /// 生成的edb文件的目录
+        /// </summary>
+        public const string EdbPath = "Edb";
+        /// <summary>
         /// Interface项目里存在所有Attribute的目录
         /// </summary>
         public const string AttributesDir = "Attributes";
