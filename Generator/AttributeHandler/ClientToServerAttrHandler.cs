@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Generator.Context;
 using Generator.Exception;
+using Generator.Factory;
 using Generator.Kind;
 using Generator.Proto;
 using Generator.Type;
@@ -26,6 +27,8 @@ namespace Generator.AttributeHandler
     }
     public class ClientToServerAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
     {
+        private ICreateNamespaceFactory m_CreateNamespaceFactory = new ProtoCreateNamespaceFactory();
+        private ICreateIdentiferFactory m_CreateIdentiferFactory = new ProtoCreateIdentiferFactory();
         private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler;
         public ClientToServerAttrHandler(TypeContext tc, AttributeSyntax attr) : base(tc, attr)
         {
@@ -70,7 +73,7 @@ namespace Generator.AttributeHandler
             HashSet<string> fieldIndex = new();
             // 每个方法创建一个请求协议
             var reqClassKind = new ReqClassKind(new ClassType().Parse(method),
-                TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName))
+                TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName, m_CreateNamespaceFactory))
             {
                 Comment = AnalysisUtil.GetComment(m)
             };
@@ -87,8 +90,9 @@ namespace Generator.AttributeHandler
                 returnType.Accept(fullNameVisitor);
                 if (protoAckVisitor.SyntaxResult != null)
                 {
-                    var ackClassKind = new ClassType().Parse(protoAckVisitor.SyntaxResult)
-                        .CreateKind(TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName));
+                    var ackClassType = new ClassType().Parse(protoAckVisitor.SyntaxResult);
+                    var ackClassKind = m_CreateIdentiferFactory.CreateIdentifer(ackClassType, 
+                        TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName, m_CreateNamespaceFactory));
                     ackClassKind.Comment = reqClassKind.Comment;
                     TypeContext.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name);
                     // 字段名永远是data

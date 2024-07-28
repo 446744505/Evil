@@ -18,7 +18,7 @@ namespace Generator.Context
 
         public ClassDeclarationSyntax? NewClassSyntax { get; set; }
 
-        public BaseIdentiferKind? ClassKind { get; set; }
+        public BaseIdentiferKind? IdentiferKind { get; set; }
 
         #endregion
 

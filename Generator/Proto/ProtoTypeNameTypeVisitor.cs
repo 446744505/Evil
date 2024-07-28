@@ -1,4 +1,5 @@
 ﻿
+using Generator.Context;
 using Generator.Proto;
 using Generator.Type;
 
@@ -9,9 +10,9 @@ namespace Generator.Visitor
     /// </summary>
     public class ProtoTypeNameTypeVisitor : ITypeVisitor
     {
-        private readonly ProtoContext m_Pc;
+        private readonly GeneratorContext m_Pc;
         public string Result { get; set; }
-        public ProtoTypeNameTypeVisitor(ProtoContext pc)
+        public ProtoTypeNameTypeVisitor(GeneratorContext pc)
         {
             m_Pc = pc;
         }

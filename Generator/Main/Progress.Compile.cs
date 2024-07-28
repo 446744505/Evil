@@ -1,4 +1,5 @@
 ﻿using Generator.Context;
+using Generator.Kind;
 
 namespace Generator
 {
@@ -9,7 +10,7 @@ namespace Generator
             CompileContext context = new();
             context.IdentiferFind = name =>
             {
-                return m_Gc.FindIdentiferKind(name);
+                return m_Gc.FindIdentiferKind<NamespaceKind>(name);
             };
             foreach (var fc in m_Gc.FileContexts)
             {

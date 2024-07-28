@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Generator.Context;
 using Generator.Kind;
 using Generator.Type;
 using Generator.Util;
@@ -8,7 +9,7 @@ namespace Generator.Proto
 {
     public class ProtoImportTypeVisitor : ITypeVisitor
     {
-        private readonly ProtoContext m_Pc;
+        private readonly GeneratorContext m_Pc;
         private readonly List<string> m_Imports = new();
         public IReadOnlyList<string> Imports => m_Imports;
         
@@ -27,7 +28,7 @@ namespace Generator.Proto
                 AddImport(import);
             }
         }
-        public ProtoImportTypeVisitor(ProtoContext pc)
+        public ProtoImportTypeVisitor(GeneratorContext pc)
         {
             m_Pc = pc;
         }

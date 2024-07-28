@@ -5,11 +5,11 @@ namespace Generator.Context
 {
     public partial class GloableContext
     {
-        public BaseIdentiferKind FindIdentiferKind(string name)
+        public BaseIdentiferKind FindIdentiferKind<T>(string name) where T : NamespaceKind
         {
             foreach (var fc in FileContexts)
             {
-                foreach (var namespaceKind in fc.NamespaceKinds)
+                foreach (var namespaceKind in fc.FindNamespaceKinds<T>())
                 {
                     foreach (var classKind in namespaceKind.Children())
                     {

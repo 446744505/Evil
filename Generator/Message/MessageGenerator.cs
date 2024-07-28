@@ -7,36 +7,25 @@ using Generator.Util;
 
 namespace Generator.Message
 {
-    public class MessageGenerator
+    public class MessageGenerator : BaseGenerator<ProtoNamespaceKind>
     {
-        private readonly GloableContext m_Gc;
-
-        public MessageGenerator(GloableContext gc)
+        public MessageGenerator(GloableContext gc) : 
+            base(gc, new GeneratorContext(), Files.MessagePath)
         {
-            m_Gc = gc;
         }
-
-        public void GenerateMessage()
+        protected override void Generate0()
         {
-            // 清空并创建文件夹
-            var messagePath = Path.Combine(m_Gc.OutPath, Files.MessagePath);
-            if (Directory.Exists(messagePath))
-            {
-                Directory.Delete(messagePath, true);
-            }
-
-            Directory.CreateDirectory(messagePath);
             var registerBody = new Writer();
             // 遍历所有message，每个message生成一个cs文件
-            foreach (var messageName in m_Gc.ProtocolMessageNames)
+            foreach (var messageName in Gc.ProtocolMessageNames)
             {
-                var kind = m_Gc.FindIdentiferKind(messageName);
-                var registerLine = CreateMessageFile(kind, messagePath);
+                var kind = Gc.FindIdentiferKind<ProtoNamespaceKind>(messageName);
+                var registerLine = CreateMessageFile(kind);
                 registerBody.WriteLine(registerLine);
             }
 
             // 生成MessageRegister.cs
-            var registerPath = Path.Combine(messagePath, $"{Files.MessageRegister}{Files.CodeFileSuffix}");
+            var registerPath = Path.Combine(OutPath, $"{Files.MessageRegister}{Files.CodeFileSuffix}");
             var registerCode = $@"
 namespace NetWork
 {{
@@ -52,9 +41,9 @@ namespace NetWork
             File.WriteAllText(registerPath, registerCode);
         }
 
-        private string CreateMessageFile(BaseIdentiferKind kind, string messagePath)
+        private string CreateMessageFile(BaseIdentiferKind kind)
         {
-            var filePath = Path.Combine(messagePath, $"{kind.Name}{Files.CodeFileSuffix}");
+            var filePath = Path.Combine(OutPath, $"{kind.Name}{Files.CodeFileSuffix}");
             var namespaceName = $"{kind.NamespaceName()}";
             var messageId = MessageIdGenerator.CalMessageId(kind.Name);
             var parent = "NetWork.Message";
@@ -73,7 +62,7 @@ namespace {namespaceName}
 }}
               ";
             File.WriteAllText(filePath, code);
-            m_Gc.Log($"生成文件: {filePath}");
+            Gc.Log($"生成文件: {filePath}");
             return $"processor.Register({messageId}, () => new {namespaceName}.{kind.Name}());";
         }
     }

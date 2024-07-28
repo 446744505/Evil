@@ -1,6 +1,5 @@
 ﻿using Generator.Context;
 using Generator.Kind;
-using Generator.Util;
 using Generator.Visitor;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -30,7 +29,6 @@ namespace Generator.Type
         }
 
         public abstract IType Compile(CompileContext ctx);
-        public abstract BaseIdentiferKind CreateKind(IKind parent);
         public abstract void Accept(ITypeVisitor visitor);
     }
 }

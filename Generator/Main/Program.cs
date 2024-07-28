@@ -1,5 +1,6 @@
 ﻿
 using Generator.Context;
+using Generator.Edb;
 using Generator.Message;
 using Generator.Proto;
 using Microsoft.CodeAnalysis.MSBuild;
@@ -44,10 +45,13 @@ namespace Generator
 
                 // 生成proto文件
                 var pg = new ProtoGenerator(gc);
-                pg.GenerateProto(gc);
+                pg.Generate();
                 // 生成message文件
                 var mg = new MessageGenerator(gc);
-                mg.GenerateMessage();
+                mg.Generate();
+                // 生成xtable文件
+                var xtg = new XTableGenerator(gc);
+                xtg.Generate();
             } catch (System.Exception e)
             {
                 gc.Exception(e);

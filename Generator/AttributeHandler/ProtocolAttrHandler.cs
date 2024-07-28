@@ -20,6 +20,8 @@ namespace Generator.AttributeHandler
         {
             m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler()
             {
+                CreateNamespaceFactory = new ProtoCreateNamespaceFactory(),
+                CreateIdentiferFactory = new ProtoCreateIdentiferFactory(),
                 CreateFieldFactory = new ProtoCreateFieldFactory(),
                 NameSpaceSuffix = Namespaces.ProtoNamespace
             };
@@ -67,6 +69,8 @@ namespace Generator.AttributeHandler
                 TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName);
             }
         }
+
+        public ICreateNamespaceFactory CreateNamespaceFactory => m_CreateKindAttrHandler.CreateNamespaceFactory;
 
         public void InitKind(TypeContext tc, AttributeSyntax attr)
         {

@@ -18,11 +18,6 @@ namespace Generator.Type
         {
             return this;
         }
-
-        public override BaseIdentiferKind CreateKind(IKind parent)
-        {
-            return new ClassKind(this, parent);
-        }
         
         public override void Accept(ITypeVisitor visitor)
         {

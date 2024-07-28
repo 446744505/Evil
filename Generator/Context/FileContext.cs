@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Generator.Factory;
 using Generator.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -53,15 +54,20 @@ namespace Generator.Context
             TypeContexts.Add(tc);
         }
         
-        public Kind.NamespaceKind GetOrCreateNamespaceKind(string name)
+        public Kind.NamespaceKind GetOrCreateNamespaceKind(string name, ICreateNamespaceFactory factory)
         {
             if (m_NamespaceKinds.TryGetValue(name, out var ns))
             {
                 return ns;
             }
-            ns = new Kind.NamespaceKind(name);
+            ns = factory.CreateNamespace(name);
             m_NamespaceKinds.Add(name, ns);
             return ns;
+        }
+        
+        public List<T> FindNamespaceKinds<T>() where T : Kind.NamespaceKind
+        {
+            return m_NamespaceKinds.Values.OfType<T>().ToList();
         }
         
         public IMethodSymbol? GetDeclaredSymbol(MethodDeclarationSyntax method)

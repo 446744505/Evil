@@ -21,9 +21,13 @@ namespace Generator
         /// </summary>
         public const string MessagePath = "Message";
         /// <summary>
-        /// 生成的edb文件的目录
+        /// 生成的edb table文件的目录
         /// </summary>
-        public const string EdbPath = "Edb";
+        public const string XTablePath = "XTable";
+        /// <summary>
+        /// 生成的xbean文件的目录
+        /// </summary>
+        public const string XBeanPath = "XBean";
         /// <summary>
         /// Interface项目里存在所有Attribute的目录
         /// </summary>

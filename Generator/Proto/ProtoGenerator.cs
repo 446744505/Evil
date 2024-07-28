@@ -8,54 +8,25 @@ using Google.Protobuf.Reflection;
 
 namespace Generator.Proto
 {
-    public class ProtoGenerator
+    public class ProtoGenerator : BaseGenerator<ProtoNamespaceKind>
     {
-        private readonly GloableContext m_Gc;
 
-        public ProtoGenerator(GloableContext gc)
+        public ProtoGenerator(GloableContext gc) : base(gc, new GeneratorContext(), Files.ProtoPath)
         {
-            m_Gc = gc;
         }
-
+        
         /// <summary>
         /// 生成所有.proto文件和对应的C#文件
         /// </summary>
         /// <param name="gc"></param>
-        public void GenerateProto(GloableContext gc)
+        protected override void Generate0()
         {
-            var context = new ProtoContext();
-            context.IdentiferFind = name =>
-            {
-                return m_Gc.FindIdentiferKind(name);
-            };
-            // 清空并创建文件夹
-            var protoPath = Path.Combine(m_Gc.OutPath, Files.ProtoPath);
-            if (Directory.Exists(protoPath))
-            {
-                Directory.Delete(protoPath, true);
-            }
-            Directory.CreateDirectory(protoPath);
+            var context = Context;
             
-            // 从context中获取所有的namespace和class
-            Dictionary<string, List<BaseIdentiferKind>> namespaceClassKinds = new();
-            foreach (var fc in gc.FileContexts)
-            {
-                foreach (var namespaceKind in fc.NamespaceKinds)
-                {
-                    if (namespaceClassKinds.TryGetValue(namespaceKind.Name, out var classKinds))
-                    {
-                        classKinds.AddRange(namespaceKind.Children());
-                    }
-                    else
-                    {
-                        namespaceClassKinds.Add(namespaceKind.Name, namespaceKind.Children());
-                    }
-                }
-            }
             // 遍历所有namespace，每个namespace生成一个proto文件
             var fileSet = new FileDescriptorSet();
-            fileSet.AddImportPath(Path.Combine(m_Gc.OutPath, Files.ProtoPath));
-            foreach (var namespaceClassKind in namespaceClassKinds)
+            fileSet.AddImportPath(OutPath);
+            foreach (var namespaceClassKind in NamespaceClassKinds())
             {
                 var namespaceName = namespaceClassKind.Key;
                 var identiferKinds = namespaceClassKind.Value;
@@ -80,12 +51,13 @@ namespace Generator.Proto
             var generator = new ProtoCodeGenerator();
             foreach (var codeFile in generator.Generate(fileSet))
             {
-                File.WriteAllText(Path.Combine(m_Gc.OutPath, Files.ProtoPath, codeFile.Name), codeFile.Text);
-                m_Gc.Log("生成文件:" + codeFile);
+                File.WriteAllText(Path.Combine(Gc.OutPath, Files.ProtoPath, codeFile.Name), codeFile.Text);
+                Gc.Log("生成文件:" + codeFile);
             }
         }
 
-        private void MakeImport(Writer writer, List<BaseIdentiferKind> identiferKinds, string namespaceName, ProtoContext context)
+        private void MakeImport(Writer writer, List<BaseIdentiferKind> identiferKinds, 
+            string namespaceName, GeneratorContext context)
         {
             List<string> importList = new();
             var self = ProtoUtil.CalProtoFileNameByNamespace(namespaceName);
@@ -115,7 +87,7 @@ namespace Generator.Proto
             }
         }
 
-        private void MakeMessage(Writer writer, BaseIdentiferKind identiferKind, ProtoContext ctx)
+        private void MakeMessage(Writer writer, BaseIdentiferKind identiferKind, GeneratorContext ctx)
         {
             // 注释
             if (!string.IsNullOrWhiteSpace(identiferKind.Comment))
@@ -143,9 +115,9 @@ namespace Generator.Proto
         private string CreateFile(Writer writer, string namespaceName)
         {
             var fileName = ProtoUtil.CalProtoFileNameByNamespace(namespaceName);
-            var outPath = Path.Combine(m_Gc.OutPath, Files.ProtoPath, fileName);
+            var outPath = Path.Combine(Gc.OutPath, Files.ProtoPath, fileName);
             File.WriteAllText(outPath, writer.ToString());
-            m_Gc.Log($"生成文件:{outPath}");
+            Gc.Log($"生成文件:{outPath}");
             return fileName;
         }
     }

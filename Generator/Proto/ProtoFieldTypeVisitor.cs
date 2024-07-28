@@ -1,4 +1,5 @@
-﻿using Generator.Kind;
+﻿using Generator.Context;
+using Generator.Kind;
 using Generator.Proto;
 using Generator.Type;
 
@@ -10,13 +11,13 @@ namespace Generator.Visitor
     public class ProtoFieldTypeVisitor : ITypeVisitor
     {
         private readonly ProtoFieldKind m_Field;
-        private readonly ProtoContext m_Pc;
+        private readonly GeneratorContext m_Pc;
         public string FieldName => m_Field.Name;
         public int FieldIndex => m_Field.Index;
         
         public string Result { get; set; }
         
-        public ProtoFieldTypeVisitor(FieldKind field, ProtoContext pc)
+        public ProtoFieldTypeVisitor(FieldKind field, GeneratorContext pc)
         {
             m_Pc = pc;
             m_Field = (ProtoFieldKind) field;

@@ -173,7 +173,23 @@ namespace Generator.Util
                 val = string.Empty;
                 return false;
             }
-            val = argList.Arguments[index].Expression.ToString();
+            var exp = argList.Arguments[index].Expression;
+            if (exp is LiteralExpressionSyntax literal)
+            {
+                val = literal.Token.ValueText;
+            }
+            else if (exp is IdentifierNameSyntax identifier)
+            {
+                val = identifier.Identifier.Text;
+            }
+            else if (exp is TypeOfExpressionSyntax typeOf)
+            {
+                val = typeOf.Type.ToString();
+            }
+            else
+            {
+                val = exp.ToString();
+            }
             return true;
         }
         

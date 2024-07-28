@@ -9,6 +9,7 @@ namespace Generator.AttributeHandler
 {
     public interface ICreateKindAttrHandler
     {
+        public ICreateNamespaceFactory CreateNamespaceFactory { get; }
         void InitKind(TypeContext tc, AttributeSyntax attr);
         FieldKind NewField(NewFieldContext ctx);
     }
@@ -18,6 +19,8 @@ namespace Generator.AttributeHandler
         private TypeContext m_TypeContext = null!;
         private AttributeSyntax m_Attr = null!;
 
+        public ICreateNamespaceFactory CreateNamespaceFactory { get; set; } = new DefaultCreateNamespaceFactory();
+        public ICreateIdentiferFactory CreateIdentiferFactory { get; set; } = new DefaultCreateIdentiferFactory();
         public ICreateFieldFactory<FieldKind> CreateFieldFactory { get; set; } = new DefaultCreateFieldFactory();
         /// <summary>
         /// 附加的命名空间后缀
@@ -34,15 +37,15 @@ namespace Generator.AttributeHandler
             {
                 nameSpace += "." + NameSpaceSuffix;
             }
-            var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(nameSpace);
-            tc.ClassKind = identiferType.CreateKind(namespaceKind);
-            tc.ClassKind.Comment = AnalysisUtil.GetComment(tc.OldTypeSyntax);
+            var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(nameSpace, CreateNamespaceFactory);
+            tc.IdentiferKind = CreateIdentiferFactory.CreateIdentifer(identiferType, namespaceKind);
+            tc.IdentiferKind.Comment = AnalysisUtil.GetComment(tc.OldTypeSyntax);
         }
 
         public FieldKind NewField(NewFieldContext ctx)
         {
-            var field = CreateFieldFactory.CreateField(ctx, m_TypeContext.ClassKind!);
-            m_TypeContext.ClassKind!.AddField(field);
+            var field = CreateFieldFactory.CreateField(ctx, m_TypeContext.IdentiferKind!);
+            m_TypeContext.IdentiferKind!.AddField(field);
             return field;
         }
     }
