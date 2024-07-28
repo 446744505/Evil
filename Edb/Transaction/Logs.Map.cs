@@ -207,8 +207,9 @@ namespace Edb
                     Logs.Link(origin, null, null);
             }
         }
-
-        private class NoteMap<TK, TV> : INote where TK : notnull
+    }
+    
+    public class NoteMap<TK, TV> : INote where TK : notnull
         {
             private readonly HashSet<TK> m_Added = new();
             private readonly Dictionary<TK, TV> m_Removed = new();
@@ -245,13 +246,13 @@ namespace Edb
                 }
             }
 
-            protected void SetChanged(List<TV> changed, object objRef)
+            internal void SetChanged(List<TV> changed, object objRef)
             {
                 m_Changed = changed;
                 m_ObjRef = (Dictionary<TK, TV>)objRef;
             }
 
-            void Merge(INote note)
+            internal void Merge(INote note)
             {
                 var other = (NoteMap<TK, TV>)note;
                 foreach (var k in other.m_Added)
@@ -303,5 +304,4 @@ namespace Edb
                 return $"added={m_Added} removed={m_Removed} replaced={m_Replaced} changed={m_Changed}";
             }
         }
-    }
 }

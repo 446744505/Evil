@@ -38,17 +38,17 @@ namespace Edb
             return this;
         }
 
-        private MyLog GetOrCreateMyLog()
+        private MyLog<T> GetOrCreateMyLog()
         {
             var sp = Transaction.CurrentSavepoint;
             var log = sp.Get(m_LogKey);
             if (log != null) 
-                return (MyLog)log;
+                return (MyLog<T>)log;
             
-            log = new MyLog(this);
+            log = new MyLog<T>(this);
             sp.Add(m_LogKey, log);
 
-            return (MyLog)log;
+            return (MyLog<T>)log;
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -174,7 +174,7 @@ namespace Edb
             return m_Wrapped.GetHashCode();
         }
 
-        private class MyLog : NoteSet, ILog
+        private class MyLog<T> : NoteSet<T>, ILog
         {
             private readonly LogSet<T> m_LogSet;
 
@@ -220,55 +220,55 @@ namespace Edb
                 LogAdd(item);
             }
         }
+    }
+    
+    public class NoteSet<T> : INote
+    {
+        private readonly HashSet<T> m_Added = new();
+        private readonly HashSet<T> m_Removed = new();
+        private readonly HashSet<T> m_Eldest = new();
+            
+        protected ISet<T> Added => m_Added;
+        protected ISet<T> Removed => m_Removed;
+        protected ISet<T> Eldest => m_Eldest;
+        protected bool IsSetChanged => m_Added.Count > 0 || m_Removed.Count > 0;
 
-        private class NoteSet : INote
+        internal void Merge(INote note)
         {
-            private readonly HashSet<T> m_Added = new();
-            private readonly HashSet<T> m_Removed = new();
-            private readonly HashSet<T> m_Eldest = new();
+            var other = (NoteSet<T>)note;
+            foreach (var e in other.m_Added)
+                LogAdd(e);
+            foreach (var e in other.m_Removed)
+                LogRemove(e);
+        }
             
-            protected ISet<T> Added => m_Added;
-            protected ISet<T> Removed => m_Removed;
-            protected ISet<T> Eldest => m_Eldest;
-            protected bool IsSetChanged => m_Added.Count > 0 || m_Removed.Count > 0;
-
-            void Merge(INote note)
-            {
-                var other = (NoteSet)note;
-                foreach (var e in other.m_Added)
-                    LogAdd(e);
-                foreach (var e in other.m_Removed)
-                    LogRemove(e);
-            }
-            
-            protected void LogAdd(T item)
-            {
-                if (m_Removed.Remove(item))
-                    return;
+        protected void LogAdd(T item)
+        {
+            if (m_Removed.Remove(item))
+                return;
                 
-                m_Added.Add(item);
-            }
+            m_Added.Add(item);
+        }
             
-            protected void LogRemove(T item)
-            {
-                if (m_Added.Remove(item))
-                    return;
+        protected void LogRemove(T item)
+        {
+            if (m_Added.Remove(item))
+                return;
                 
-                m_Removed.Add(item);
-                m_Eldest.Add(item);
-            }
+            m_Removed.Add(item);
+            m_Eldest.Add(item);
+        }
 
-            protected void Clear()
-            {
-                m_Added.Clear();
-                m_Removed.Clear();
-                m_Eldest.Clear();
-            }
+        protected void Clear()
+        {
+            m_Added.Clear();
+            m_Removed.Clear();
+            m_Eldest.Clear();
+        }
 
-            public override string ToString()
-            {
-                return $"added={m_Added} removed={m_Removed}";
-            }
+        public override string ToString()
+        {
+            return $"added={m_Added} removed={m_Removed}";
         }
     }
 }

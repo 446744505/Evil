@@ -25,6 +25,15 @@ namespace Evil.Util
             m_Logger.Error(log);
         }
         
+        public void Error(string log, Exception e)
+        {
+            m_Logger.Error($"{log}{e.Message}{e.StackTrace}");
+            if (e.InnerException != null)
+            {
+                Error(e.InnerException);
+            }
+        }
+        
         public void Debug(string log)
         {
             m_Logger.Debug(log);
@@ -44,6 +53,15 @@ namespace Evil.Util
             }
         }
         
+        public void Warn(string log, Exception e)
+        {
+            m_Logger.Warn($"{log}{e.Message}{e.StackTrace}");
+            if (e.InnerException != null)
+            {
+                Warn(e.InnerException);
+            }
+        }
+        
         public void Fatal(string log)
         {
             m_Logger.Fatal(log);
@@ -52,6 +70,15 @@ namespace Evil.Util
         public void Fatal(Exception e)
         {
             m_Logger.Fatal($"{e.Message}{e.StackTrace}");
+            if (e.InnerException != null)
+            {
+                Fatal(e.InnerException);
+            }
+        }
+        
+        public void Fatal(string log, Exception e)
+        {
+            m_Logger.Fatal($"{log}{e.Message}{e.StackTrace}");
             if (e.InnerException != null)
             {
                 Fatal(e.InnerException);

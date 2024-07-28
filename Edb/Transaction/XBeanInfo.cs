@@ -37,5 +37,10 @@ namespace Edb
         {
             GetFieldsMap(xBean)[varName].SetValue(xBean, value);
         }
+        
+        internal static ICollection<FieldInfo> GetFields(XBean xBean)
+        {
+            return GetFieldsMap(xBean).Values;
+        }
     }
 }

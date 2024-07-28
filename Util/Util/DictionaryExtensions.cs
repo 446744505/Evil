@@ -18,5 +18,25 @@ namespace Evil.Util
                 dict[key] = value;
             }
         }
+        
+        public static TValue ComputeIfAbsent<TKey, TValue>(
+            this IDictionary<TKey, TValue> dict, TKey key, Func<TKey, TValue> f) where TKey : notnull
+        {
+            if (dict.TryGetValue(key, out var value))
+                return value;
+            value = f(key);
+            dict[key] = value;
+            return value;
+        }
+        
+        public static TValue? ComputeIfPresent<TKey, TValue>(
+            this IDictionary<TKey, TValue> dict, TKey key, Func<TKey, TValue, TValue> f) where TKey : notnull
+        {
+            if (!dict.TryGetValue(key, out var value))
+                return default;
+            value = f(key, value);
+            dict[key] = value;
+            return value;
+        }
     }
 }

@@ -33,7 +33,7 @@ namespace Edb
                 if (storage != null)
                     m_Storages.Add(storage);
                 
-                table.LockId = lockIds.GetValueOrDefault(table.LockName, ++idAlloc);
+                table.LockId = lockIds.ComputeIfAbsent(table.LockName, _ => ++idAlloc);
             }
         }
         

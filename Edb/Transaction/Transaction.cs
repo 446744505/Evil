@@ -213,7 +213,7 @@ namespace Edb
             m_LogNotifyTables.Clear();
         }
 
-        private void _rollback(int savepoint)
+        internal void _rollback(int savepoint)
         {
             if (savepoint < 1 || savepoint > m_Savepoints.Count)
                 throw new XError($"edb: invalid savepoint {savepoint} @ {m_Savepoints.Count}");

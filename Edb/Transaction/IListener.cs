@@ -10,7 +10,7 @@ namespace Edb
         {
         }
         
-        public void OnChanged(object key, object val, string fullVarName, INote note)
+        public void OnChanged(object key, object val, string fullVarName, INote? note)
         {
         }
     }

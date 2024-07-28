@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Evil.Util;
 
 namespace Edb
 {
@@ -27,7 +28,8 @@ namespace Edb
                 Transaction.Current!.RecordLogNotifyTTable(m_Table);
             }
             
-            return m_HasListener.Value ? m_Changed.GetValueOrDefault(r.Key, new LogR<TKey, TValue>(r, m_Seed.Copy())) : null;
+            return m_HasListener.Value ? m_Changed.ComputeIfAbsent(r.Key, 
+                _ => new LogR<TKey, TValue>(r, m_Seed.Copy())) : null;
         }
 
         internal void LogNotify(ListenerMap listenerMap)
@@ -36,7 +38,7 @@ namespace Edb
             {
                 var k = pair.Key;
                 var lr = pair.Value;
-                lr.m_Listenable.LogNotify(k, lr.m_Record.Value, lr.RecordState, listenerMap);
+                lr.m_Listenable.LogNotify<TKey, TValue>(k, lr.m_Record.Value!, lr.RecordState, listenerMap);
                 m_Changed.Clear();
                 m_HasListener = null;
             }
@@ -48,7 +50,7 @@ namespace Edb
             if (lr != null)
             {
                 ln.Pop();
-                lr.m_Listenable.SetChanged(ln);
+                lr.m_Listenable.SetChanged<TKey, TValue>(ln);
             }
         }
 

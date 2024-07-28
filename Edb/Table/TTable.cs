@@ -74,13 +74,13 @@ namespace Edb
         internal void OnRecordChanged(TRecord<TKey, TValue> r, LogNotify ln)
         {
             LogRecord.OnChanged(r, ln);
-            Transaction.Current!.AddLastCommitAction(()=>OnRecordChanged(r));
+            Transaction.Current!.AddLastCommitAction(() => OnRecordChanged(r));
         }
         
         internal void OnRecordChanged(TRecord<TKey, TValue> r, bool cc, TRecord<TKey, TValue>.State ss)
         {
             LogRecord.OnChanged(r, cc, ss);
-            Transaction.Current!.AddLastCommitAction(()=>OnRecordChanged(r));
+            Transaction.Current!.AddLastCommitAction(() => OnRecordChanged(r));
         }
 
         public override void Dispose()
