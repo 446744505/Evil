@@ -37,6 +37,9 @@ namespace Generator.Edb
         {
             var fieldsLine = new Writer(true, 2);
             var getterLine = new Writer(true, 2);
+            var constructorLine = new Writer(true, 3);
+            var copyConstructorLine = new Writer(true, 3);
+            var copyFromLine = new Writer(true, 3);
             foreach (var fieldKind in beanKind.Children())
             {
                 // 字段定义
@@ -44,6 +47,20 @@ namespace Generator.Edb
                 fieldKind.Type.Accept(defineVisitor);
                 fieldsLine.WriteLine($"private {defineVisitor.Result} {fieldKind.Name};");
                 
+                // 构造函数生成
+                var constructorVisitor = new EdbDefaultValueTypeVisitor((XBeanFieldKind)fieldKind);
+                fieldKind.Type.Accept(constructorVisitor);
+                if (!string.IsNullOrEmpty(constructorVisitor.Result))
+                    constructorLine.WriteLine($"{fieldKind.Name} = {constructorVisitor.Result};");
+                
+                // 复制构造函数生成
+                var copyConstructorVisitor = new CopyConstructorTypeVisitor((XBeanFieldKind)fieldKind, copyConstructorLine);
+                fieldKind.Type.Accept(copyConstructorVisitor);
+                
+                // 复制函数生成
+                var copyFromVisitor = new CopyFromTypeVisitor((XBeanFieldKind)fieldKind, copyFromLine);
+                fieldKind.Type.Accept(copyFromVisitor);
+
                 // getter 生成
                 if (beanKind.IdFieldName == fieldKind.Name) // bson id特性生成
                     getterLine.WriteLine("[MongoDB.Bson.Serialization.Attributes.BsonId]");
@@ -61,8 +78,9 @@ namespace XBean
     {{
         {fieldsLine}
 
-        protected {beanKind.Name}(Edb.XBean? _xp_, string _vn_) : base(_xp_, _vn_)
+        public {beanKind.Name}(Edb.XBean? _xp_, string _vn_) : base(_xp_, _vn_)
         {{
+            {constructorLine}
         }}
 
         public {beanKind.Name}() : this(null, null!)
@@ -73,15 +91,17 @@ namespace XBean
         {{
         }}
 
-        protected {beanKind.Name}({beanKind.Name} _o_, Edb.XBean? _xp_, string _vn_) : base(_xp_, _vn_)
+        public {beanKind.Name}({beanKind.Name} _o_, Edb.XBean? _xp_, string _vn_) : base(_xp_, _vn_)
         {{
             _o_.VerifyStandaloneOrLockHeld(""_o_.{beanKind.Name}"", true);
+            {copyConstructorLine}
         }}
 
         public void CopyFrom({beanKind.Name} _o_)
         {{
             _o_.VerifyStandaloneOrLockHeld(""CopyFrom{beanKind.Name}"", true);
             VerifyStandaloneOrLockHeld(""CopyTo{beanKind.Name}"", false);
+            {copyFromLine}
         }}
         
         {getterLine}

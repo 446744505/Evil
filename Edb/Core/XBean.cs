@@ -2,6 +2,8 @@
 {
     public class XBean
     {
+        public static readonly Action DoNothing = () => { };
+        
         private static long _objId = 0;
 
         private XBean? m_Parent;
@@ -55,7 +57,6 @@
             return null;
         }
         
-        protected static readonly Action DoNothing = () => { };
         protected Action VerifyStandaloneOrLockHeld(string methodName, bool readOnly)
         {
             if (!Edb.I.Config.Verify)
