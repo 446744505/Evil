@@ -99,7 +99,7 @@ namespace Generator.Proto
             {
                 var fieldVisitor = new ProtoFieldTypeVisitor(field, ctx);
                 field.Type.Accept(fieldVisitor);
-                writer.WriteLine(4, fieldVisitor.Result);
+                writer.WriteLine(1, fieldVisitor.Result);
             }
             writer.WriteLine("}");
         }

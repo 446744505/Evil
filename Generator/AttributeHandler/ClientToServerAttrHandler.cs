@@ -29,6 +29,7 @@ namespace Generator.AttributeHandler
     {
         private ICreateNamespaceFactory m_CreateNamespaceFactory = new ProtoCreateNamespaceFactory();
         private ICreateIdentiferFactory m_CreateIdentiferFactory = new ProtoCreateIdentiferFactory();
+        private ICreateFieldFactory<ProtoFieldKind> m_CreateFieldFactory = new ProtoCreateFieldFactory();
         private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler;
         public ClientToServerAttrHandler(TypeContext tc, AttributeSyntax attr) : base(tc, attr)
         {
@@ -77,6 +78,7 @@ namespace Generator.AttributeHandler
             {
                 Comment = AnalysisUtil.GetComment(m)
             };
+            
             TypeContext.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name);
             var sendBody = new Writer();
             const string reqName = "req";
@@ -96,7 +98,8 @@ namespace Generator.AttributeHandler
                     ackClassKind.Comment = reqClassKind.Comment;
                     TypeContext.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name);
                     // 字段名永远是data
-                    var field = new ProtoFieldKind(Fields.MessageAckFieldName, protoAckVisitor.TypeResult!, ackClassKind);
+                    var field = m_CreateFieldFactory.CreateField(
+                        new NewFieldContext(Fields.MessageAckFieldName, protoAckVisitor.TypeResult!), ackClassKind);
                     field.Index = 1; // index永远是1
                     reqClassKind.AddField(field);
                     reqClassKind.AckFullName = ackClassKind.FullName();
@@ -152,7 +155,7 @@ namespace Generator.AttributeHandler
                     .WithType(p.Type);
                 method = method.AddParameterListParameters(param);
                 // 添加协议字段
-                var field = new ProtoFieldKind(p.Identifier.Text, TypeBuilder.I.ParseType(p.Type!), reqClassKind);
+                var field = m_CreateFieldFactory.CreateField(new NewFieldContext(p.Identifier.Text, TypeBuilder.I.ParseType(p.Type!)), reqClassKind);
                 field.Index = int.Parse(index);
                 reqClassKind.AddField(field);
                 // 添加方法体赋值

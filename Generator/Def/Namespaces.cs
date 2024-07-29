@@ -7,12 +7,16 @@
         /// </summary>
         public const string AttributesNamespace = "Attributes";
         /// <summary>
-        /// 协议类型附加的命名空间
+        /// 协议的命名空间
         /// </summary>
         public const string ProtoNamespace = "Proto";
         /// <summary>
-        /// db类型附加的命名空间
+        /// XTable的命名空间
         /// </summary>
-        public const string EdbNamespace = "Edb";
+        public const string XTableNamespace = "XTable";
+        /// <summary>
+        /// XBean的命名空间
+        /// </summary>
+        public const string XBeanNamespace = "XBean";
     }
 }

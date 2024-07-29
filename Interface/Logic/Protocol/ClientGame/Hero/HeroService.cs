@@ -16,7 +16,7 @@ namespace Hero
           /// 获取所有英雄信息
           /// </summary>
           /// <returns></returns>
-          public Heroes ListHeroes();
+          public PlayerHero ListHeroes();
           /// <summary>
           /// 英雄升星
           /// </summary>

@@ -120,10 +120,12 @@ namespace Edb.Test
         
         public class Player
         {
+            private long playerId;
+            private string playerName;
             [BsonId]
-            public long PlayerId { get; set; }
+            public long PlayerId { get => playerId; set => playerId = value; }
 
-            public string PlayerName { get; set; } = null!;
+            public string PlayerName { get => playerName; set => playerName = value; }
         }
 
         public class TPlayer : TTable<long, Player>

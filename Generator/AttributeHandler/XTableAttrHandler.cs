@@ -4,6 +4,7 @@ using Generator.Edb;
 using Generator.Exception;
 using Generator.Factory;
 using Generator.Kind;
+using Generator.Type;
 using Generator.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -12,11 +13,15 @@ namespace Generator.AttributeHandler
     public class XTableAttrHandler : BaseTypeAttrHandler, ICreateKindAttrHandler
     {
         private readonly ICreateKindAttrHandler m_CreateKindAttrHandler;
+        private readonly ICreateNamespaceFactory m_XBeanCreateNamespaceFactory = new XBeanCreateNamespaceFactory();
+        private readonly ICreateIdentiferFactory m_XBeanCreateIdentiferFactory = new XBeanCreateIdentiferFactory();
+        private readonly ICreateFieldFactory<XBeanFieldKind> m_XBeanCreateFieldFactory = new XBeanCreateFieldFactory();
+        
         public XTableAttrHandler(TypeContext typeContext, AttributeSyntax attr) : base(typeContext, attr)
         {
             m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler()
             {
-                ForceNamespace = Namespaces.EdbNamespace,
+                ForceNamespace = Namespaces.XTableNamespace,
                 CreateNamespaceFactory = new XTableCreateNamespaceFactory(),
                 CreateIdentiferFactory = new XTableCreateIdentiferFactory(),
                 CreateFieldFactory = new XTableCreateFieldFactory()
@@ -52,6 +57,10 @@ namespace Generator.AttributeHandler
             {
                 isMemory = bool.Parse(memoryStr);
             }
+            
+            // 给table创建一个XBean
+            var xBean = m_XBeanCreateIdentiferFactory.CreateIdentifer(new ClassType(TypeContext.OldClassName),
+                TypeContext.FileContext.GetOrCreateNamespaceKind(Namespaces.XBeanNamespace, m_XBeanCreateNamespaceFactory));
 
             var idFieldName = string.Empty;
             var fields = TypeContext.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
@@ -75,14 +84,20 @@ namespace Generator.AttributeHandler
                         idFieldName = fieldName;
                     }
                 }
-                var ctx = NewFieldContext.Parse(f);
-                NewField(ctx);
+                
+                // 给xtable加字段
+                NewField(NewFieldContext.Parse(f));
+                // 给xbean加字段
+                xBean.AddField(m_XBeanCreateFieldFactory.CreateField(NewFieldContext.Parse(f), xBean));
             }
             if (string.IsNullOrEmpty(idFieldName))
             {
                 throw new AttributeException($"表{TypeContext.OldClassName}没有id字段");
             }
             
+            var tableBean = (XBeanClassKind)xBean;
+            tableBean.IdFieldName = idFieldName;
+
             var tableKind = TypeContext.IdentiferKind as XTableClassKind;
             tableKind!.Capacity = capacity;
             tableKind.LockName = lockName;

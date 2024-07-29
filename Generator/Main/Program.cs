@@ -52,6 +52,9 @@ namespace Generator
                 // 生成xtable文件
                 var xtg = new XTableGenerator(gc);
                 xtg.Generate();
+                // 生成xbean文件
+                var xbg = new XBeanGenerator(gc);
+                xbg.Generate();
             } catch (System.Exception e)
             {
                 gc.Exception(e);

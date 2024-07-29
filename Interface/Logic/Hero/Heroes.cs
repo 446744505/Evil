@@ -5,7 +5,7 @@ namespace Hero
 {
     [Protocol(Node.Client | Node.Game)]
     [XTable(Node.Game, 500, typeof(Player.Player))]
-    public class Heroes
+    public class PlayerHero
     {
         [XColumn(true)] 
         private long playerId;
