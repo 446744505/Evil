@@ -11,6 +11,7 @@ namespace Edb
         }
         
         public virtual string Name => null!;
+        public virtual TableConfig Config { get; set; } = null!;
         public virtual ITable.Persistence PersistenceType => ITable.Persistence.Db;
         public abstract void LogNofify();
         internal abstract IStorage? Open(TableConfig config, ILoggerEngine logger);

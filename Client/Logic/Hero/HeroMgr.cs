@@ -1,18 +1,19 @@
 ﻿using Evil.Util;
-using Hero.Proto;
+using Proto;
 
-namespace Client.Hero;
-
-public class HeroMgr : Singleton<HeroMgr>
+namespace Client.Hero
 {
-    private readonly HeroService m_HeroService = new();
-
-    public async void Test()
+    public class HeroMgr : Singleton<HeroMgr>
     {
-        var newHero = await m_HeroService.AddHero(1);
-        Log.I.Debug($"new hero: {newHero.heroId}");
-        var hero = await m_HeroService.GetHero(newHero.heroId);
-        Log.I.Debug($"get hero: {hero.heroId}");
-        m_HeroService.HeroStar(newHero.heroId);
+        private readonly HeroService m_HeroService = new();
+
+        public async void Test()
+        {
+            var newHero = await m_HeroService.AddHero(1);
+            Log.I.Debug($"new hero: {newHero.heroId}");
+            var hero = await m_HeroService.GetHero(newHero.heroId);
+            Log.I.Debug($"get hero: {hero.heroId}");
+            m_HeroService.HeroStar(newHero.heroId);
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace Generator.AttributeHandler
         {
             m_CreateKindAttrHandler = new DefaultCreateKindAttrHandler()
             {
-                NameSpaceSuffix = Namespaces.EdbNamespace,
+                ForceNamespace = Namespaces.EdbNamespace,
                 CreateNamespaceFactory = new XTableCreateNamespaceFactory(),
                 CreateIdentiferFactory = new XTableCreateIdentiferFactory(),
                 CreateFieldFactory = new XTableCreateFieldFactory()
@@ -75,6 +75,8 @@ namespace Generator.AttributeHandler
                         idFieldName = fieldName;
                     }
                 }
+                var ctx = NewFieldContext.Parse(f);
+                NewField(ctx);
             }
             if (string.IsNullOrEmpty(idFieldName))
             {
@@ -85,6 +87,7 @@ namespace Generator.AttributeHandler
             tableKind!.Capacity = capacity;
             tableKind.LockName = lockName;
             tableKind.IsMemory = isMemory;
+            tableKind.IdFieldName = idFieldName;
         }
 
         public ICreateNamespaceFactory CreateNamespaceFactory => m_CreateKindAttrHandler.CreateNamespaceFactory;

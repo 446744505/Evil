@@ -20,7 +20,7 @@ namespace Generator.AttributeHandler
         {
             var tc = m_TypeContext;
             // namespace添加Proto
-            tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName($"{tc.OldNameSpaceName}.{Namespaces.ProtoNamespace}"))
+            tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName($"{Namespaces.ProtoNamespace}"))
                 .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
             tc.NewNamespaceSyntax = tc.NewNamespaceSyntax.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Client.NetWork")));
         }

@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Edb\Edb.csproj" />
       <ProjectReference Include="..\NetWork\NetWork.csproj" />
     </ItemGroup>
 

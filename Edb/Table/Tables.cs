@@ -29,7 +29,7 @@ namespace Edb
             var idAlloc = 0;
             foreach (var table in m_Tables.Values)
             {
-                var storage = table.Open(config.GetTable(table.Name), Logger);
+                var storage = table.Open(table.Config, Logger);
                 if (storage != null)
                     m_Storages.Add(storage);
                 

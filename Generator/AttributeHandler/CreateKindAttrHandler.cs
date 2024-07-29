@@ -25,17 +25,22 @@ namespace Generator.AttributeHandler
         /// <summary>
         /// 附加的命名空间后缀
         /// </summary>
-        public string NameSpaceSuffix { get; set; } = "";
+        public string NamespaceSuffix { get; set; } = "";
+        public string ForceNamespace { get; set; } = "";
 
         public void InitKind(TypeContext tc, AttributeSyntax attr)
         {
             m_TypeContext = tc;
             m_Attr = attr;
             var identiferType = TypeBuilder.I.ParseType(tc.OldTypeSyntax);
-            var nameSpace = tc.OldNameSpaceName;
-            if (!string.IsNullOrEmpty(NameSpaceSuffix))
+            var nameSpace = ForceNamespace;
+            if (string.IsNullOrEmpty(nameSpace))
             {
-                nameSpace += "." + NameSpaceSuffix;
+                nameSpace = tc.OldNameSpaceName;
+                if (!string.IsNullOrEmpty(NamespaceSuffix))
+                {
+                    nameSpace += "." + NamespaceSuffix;
+                }
             }
             var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(nameSpace, CreateNamespaceFactory);
             tc.IdentiferKind = CreateIdentiferFactory.CreateIdentifer(identiferType, namespaceKind);

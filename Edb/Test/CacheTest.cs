@@ -9,17 +9,9 @@ namespace Edb.Test
     {
         private async Task Init()
         {
-            var config = new Config();
-            config.AddTable(new TableConfig()
-            {
-                Name = "Player",
-                Lock = "Player",
-                CacheCapacity = 1,
-                IsMemory = true,
-            });
             var tables = new List<BaseTable>();
             tables.Add(new TPlayer());
-            await Edb.I.Start(config, tables);
+            await Edb.I.Start(new Config(), tables);
         }
         
         [Fact]
@@ -65,6 +57,13 @@ namespace Edb.Test
         public class TPlayer : TTable<long, Player>
         {
             public override string Name => "Player";
+            public override TableConfig Config => new()
+            {
+                Name = "Player",
+                Lock = "Player",
+                CacheCapacity = 1,
+                IsMemory = true,
+            };
 
             public override Player NewValue()
             {

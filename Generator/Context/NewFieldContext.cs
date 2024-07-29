@@ -6,14 +6,10 @@ namespace Generator.Context
 {
     public class NewFieldContext
     {
-        #region MyRegion
-
         public string Name { get; }
         public IType Type { get; }
         public string? Comment { get; set; }
 
-        #endregion
-        
         public NewFieldContext(string name, IType type)
         {
             Type = type;

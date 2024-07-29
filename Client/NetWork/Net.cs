@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Client.Hero;
 using Evil.Util;
 using NetWork;
+using Proto;
 
 namespace Client.NetWork
 {

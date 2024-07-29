@@ -27,7 +27,9 @@ namespace Generator.Message
             // 生成MessageRegister.cs
             var registerPath = Path.Combine(OutPath, $"{Files.MessageRegister}{Files.CodeFileSuffix}");
             var registerCode = $@"
-namespace NetWork
+using NetWork;
+
+namespace {Namespaces.ProtoNamespace}
 {{
     public class MessageRegister : IMessageRegister
     {{
@@ -38,6 +40,7 @@ namespace NetWork
     }}
 }}
 ";
+            Gc.Log($"生成文件: {registerPath}");
             File.WriteAllText(registerPath, registerCode);
         }
 

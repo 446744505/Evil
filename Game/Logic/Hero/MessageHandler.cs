@@ -1,4 +1,6 @@
-namespace Hero.Proto
+using Hero;
+
+namespace Proto
 {
     public partial class AddHero
     {

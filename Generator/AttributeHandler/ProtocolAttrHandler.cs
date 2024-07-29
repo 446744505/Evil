@@ -23,7 +23,7 @@ namespace Generator.AttributeHandler
                 CreateNamespaceFactory = new ProtoCreateNamespaceFactory(),
                 CreateIdentiferFactory = new ProtoCreateIdentiferFactory(),
                 CreateFieldFactory = new ProtoCreateFieldFactory(),
-                NameSpaceSuffix = Namespaces.ProtoNamespace
+                ForceNamespace = Namespaces.ProtoNamespace
             };
             AnalysisUtil.HadAttrArgument(attr, AttributeFields.ProtocolNodes, out var nodes);
             NeedParse = TypeContext.FileContext.GloableContext.IsNodeAt(nodes);

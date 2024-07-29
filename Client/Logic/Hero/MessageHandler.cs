@@ -1,6 +1,6 @@
 ﻿using Evil.Util;
 
-namespace Hero.Proto
+namespace Proto
 {
     public partial class HeroStarNtf
     {
