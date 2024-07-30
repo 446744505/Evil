@@ -30,9 +30,9 @@
                     throw new XManagedError("not managed");
             }
 
-            if (!log) return;
+            if (log)
+                Transaction.CurrentSavepoint.AddIfAbsent(new LogKey(this, "m_Parent"), new LogParent(this));
             
-            Transaction.CurrentSavepoint.AddIfAbsent(new LogKey(this, "m_Parent"), new LogParent(this));
             m_Parent = parent;
             m_VarName = varName;
         }
