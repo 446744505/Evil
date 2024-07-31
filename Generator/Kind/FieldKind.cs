@@ -8,7 +8,7 @@ namespace Generator.Kind
         #region 属性
         
         public string Name { get; }
-        public IType Type { get; }
+        public IType Type { get; private set; }
         public string? Comment { get; set; }
         
         #endregion
@@ -21,7 +21,7 @@ namespace Generator.Kind
 
         protected override void Compile0(CompileContext ctx)
         {
-            Type.Compile(ctx);
+            Type = Type.Compile(ctx);
         }
     }
 }

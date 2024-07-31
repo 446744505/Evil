@@ -19,8 +19,8 @@ namespace Hero
         [XColumn]
         private List<HeroSkill> skills; // 技能
         
-        // [ProtocolField(4)]
-        // [XColumn]
-        // private Properties properties; // 属性
+        [ProtocolField(4)]
+        [XColumn]
+        private Properties properties; // 属性
     }
 }

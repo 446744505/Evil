@@ -29,7 +29,7 @@ namespace Generator.Visitor
 
         private void BaseVisit()
         {
-            m_Writer.WriteLine("Edb.Logs.LogObject(this, \"{FieldName}\");");
+            m_Writer.WriteLine($"Edb.Logs.LogObject(this, \"{FieldName}\");");
             m_Writer.WriteLine($"{FieldName} = _o_.{FieldName};");
         }
         

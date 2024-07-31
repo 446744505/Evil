@@ -11,7 +11,7 @@ namespace Generator.AttributeHandler
         {
             return attrName switch
             {
-                Attributes.ClientToServer => new ClientToServerAttrHandler(tc, attr),
+                Attributes.Service => new ServiceAttrHandler(tc, attr),
                 Attributes.Protocol => new ProtocolAttrHandler(tc, attr),
                 Attributes.ProtocolField => new ProtocolFieldAttrHandler(),
                 Attributes.XTable => new XTableAttrHandler(tc, attr),

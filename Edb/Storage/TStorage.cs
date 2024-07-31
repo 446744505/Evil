@@ -110,7 +110,7 @@ namespace Edb
             return snapshot;
         }
 
-        public async Task<long> Flush0Async()
+        public async Task<long> FlushAsync()
         {
             var flushed = m_Snapshot.Count;
             foreach (var r in m_Snapshot.Values)

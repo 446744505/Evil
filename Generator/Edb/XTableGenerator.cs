@@ -41,6 +41,11 @@ namespace Generator.Edb
 
         private void GenerateTables(List<string> tables)
         {
+            if (tables.Count == 0)
+            {
+                return;
+            }
+            
             var instanceLine = new Writer(true, 3);
             var newInstanceLine = new Writer(true, 2);
             foreach (var table in tables)
@@ -58,11 +63,11 @@ namespace XTable
 {{
     public static class Tables
     {{
+        {newInstanceLine}
         public static readonly List<BaseTable> All = new()
         {{
             {instanceLine}
         }};
-        {newInstanceLine}
     }}
 }}
 ";
@@ -119,7 +124,7 @@ namespace Table
             return BsonSerializer.Deserialize<{valueFullName}>(value);
         }}
 
-        public async Task<{valueFullName}?> Select({idFullName} key)
+        public async Task<{valueFullName}> Select({idFullName} key)
         {{
             return await GetAsync(key, false);
         }}
@@ -134,7 +139,7 @@ namespace Table
             return await RemoveAsync(key);
         }}
 
-        public async Task<{valueFullName}?> Update({idFullName} key)
+        public async Task<{valueFullName}> Update({idFullName} key)
         {{
             return await GetAsync(key, true);
         }}
@@ -145,7 +150,7 @@ namespace XTable
 {{
     public static class {tableKind.Name}
     {{
-        public static async Task<{valueFullName}?> Select({idFullName} key)
+        public static async Task<{valueFullName}> Select({idFullName} key)
         {{
             return await Tables.{tableKind.Name}.Select(key);
         }}
@@ -160,7 +165,7 @@ namespace XTable
             return await Tables.{tableKind.Name}.Delete(key);
         }}
 
-        public static async Task<{valueFullName}?> Update({idFullName} key)
+        public static async Task<{valueFullName}> Update({idFullName} key)
         {{
             return await Tables.{tableKind.Name}.Update(key);
         }}

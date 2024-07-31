@@ -5,12 +5,14 @@ namespace Edb
 {
     internal class StorageMongo<TKey> : IStorageEngine<TKey> where TKey : notnull
     {
+        private readonly bool m_Transaction;
         private readonly LoggerMongo m_Logger;
         private readonly string m_TableName;
         private readonly IMongoCollection<BsonDocument> m_Collection;
 
         public StorageMongo(LoggerMongo logger, string tableName)
         {
+            m_Transaction = logger.Transaction;
             m_Logger = logger;
             m_TableName = tableName;
             m_Collection = logger.Database.GetCollection<BsonDocument>(tableName);
@@ -20,7 +22,10 @@ namespace Edb
         {
             try
             {
-                await m_Collection.InsertOneAsync((BsonDocument)value);
+                if (m_Transaction)
+                    await m_Collection.InsertOneAsync(m_Logger.Session, value);
+                else
+                    await m_Collection.InsertOneAsync(value);
             }
             catch (Exception)
             {
@@ -30,12 +35,15 @@ namespace Edb
             return true;
         }
 
-        public Task ReplaceAsync(TKey key, BsonDocument value)
+        public async Task ReplaceAsync(TKey key, BsonDocument value)
         {
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
-                return m_Collection.ReplaceOneAsync(filter, (BsonDocument)value);
+                if (m_Transaction)
+                    await m_Collection.ReplaceOneAsync(m_Logger.Session, filter, value);
+                else
+                    await m_Collection.ReplaceOneAsync(filter, value);
             }
             catch (Exception e)
             {
@@ -56,12 +64,15 @@ namespace Edb
             }
         }
 
-        public Task RemoveAsync(TKey key)
+        public async Task RemoveAsync(TKey key)
         {
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
-                return m_Collection.DeleteOneAsync(filter);
+                if (m_Transaction)
+                    await m_Collection.DeleteOneAsync(m_Logger.Session, filter);
+                else
+                    await m_Collection.DeleteOneAsync(filter);
             }
             catch (Exception e)
             {

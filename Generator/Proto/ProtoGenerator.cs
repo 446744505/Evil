@@ -35,8 +35,14 @@ namespace Generator.Proto
                 MakeImport(writer, identiferKinds, namespaceName, context);
                 foreach (var identiferKind in identiferKinds)
                 {
-                    MakeMessage(writer, identiferKind, context);
-                    writer.WriteLine();
+                    try
+                    {
+                        MakeMessage(writer, identiferKind, context);
+                        writer.WriteLine();
+                    } catch (System.Exception e)
+                    {
+                        throw new System.Exception($"生成{identiferKind.Name}失败:{e.Message}");
+                    }
                 }
                 var fileName = CreateFile(writer, namespaceName);
                 fileSet.Add(fileName);

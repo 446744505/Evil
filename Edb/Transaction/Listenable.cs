@@ -11,7 +11,13 @@ namespace Edb
                 var lb = new ListenableBean();
                 foreach (var f in XBeanInfo.GetFields(xBean))
                 {
-                    throw new NotImplementedException();
+                    var ftName = f.FieldType.Name;
+                    if (ftName.StartsWith("System.Collections.Generic.IDictionary"))
+                        lb.Add(f.Name, new ListenableMap(f.Name));
+                    else if (ftName.StartsWith("System.Collections.Generic.ISet"))
+                        lb.Add(f.Name, new ListenableSet(f.Name));
+                    else
+                        lb.Add(f.Name, new ListenableChanged(f.Name));
                 }
 
                 return lb;

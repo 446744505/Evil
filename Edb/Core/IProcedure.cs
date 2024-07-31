@@ -5,7 +5,7 @@ namespace Edb
         public virtual int RetryDelay => -1;
         public virtual int RetryTimes => -1;
         public virtual bool RetrySerial => false;
-        public string Name => GetType().Name;
+        public virtual string Name => GetType().Name;
 
         public interface IResult
         {

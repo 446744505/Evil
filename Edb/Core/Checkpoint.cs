@@ -136,14 +136,24 @@ namespace Edb
                 long countFlush = 0;
                 while (true)
                 {
-                    foreach (var storage in storages)
-                        countFlush += await storage.Flush0Async();
-                    if (countFlush > 0)
+                    var success = false;
+                    await m_Tables.Logger!.BeforeFlush();
+                    try
                     {
-                        m_Tables.Logger!.Checkpoint();
                         foreach (var storage in storages)
-                            await storage.Cleanup();
+                            countFlush += await storage.FlushAsync();
+                        success = true;
+                        if (countFlush > 0)
+                        {
+                            await m_Tables.Logger!.AfterFlush(success);
+                            foreach (var storage in storages)
+                                await storage.Cleanup();
+                        }
+                    } finally
+                    {
+                        await m_Tables.Logger!.AfterFlush(success);
                     }
+
                     break;
                 }
                 

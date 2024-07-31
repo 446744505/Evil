@@ -21,6 +21,7 @@
         {
             if (parent != null)
             {
+                // 已经有父节点，不能被重复使用，否者一个对象会被多条数据使用
                 if (m_Parent != null)
                     throw new XManagedError("ambiguous managed");
                 if (ReferenceEquals(parent, this))

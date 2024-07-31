@@ -40,31 +40,39 @@ namespace Generator.Edb
             var constructorLine = new Writer(true, 3);
             var copyConstructorLine = new Writer(true, 3);
             var copyFromLine = new Writer(true, 3);
-            foreach (var fieldKind in beanKind.Children())
+            foreach (var fk in beanKind.Children())
             {
+                var fieldKind = (XBeanFieldKind)fk;
                 // 字段定义
                 var defineVisitor = new EdbFullNameTypeVisitor();
                 fieldKind.Type.Accept(defineVisitor);
                 fieldsLine.WriteLine($"private {defineVisitor.Result} {fieldKind.Name};");
                 
                 // 构造函数生成
-                var constructorVisitor = new EdbDefaultValueTypeVisitor((XBeanFieldKind)fieldKind);
+                var constructorVisitor = new EdbDefaultValueTypeVisitor(fieldKind);
                 fieldKind.Type.Accept(constructorVisitor);
                 if (!string.IsNullOrEmpty(constructorVisitor.Result))
                     constructorLine.WriteLine($"{fieldKind.Name} = {constructorVisitor.Result};");
                 
                 // 复制构造函数生成
-                var copyConstructorVisitor = new CopyConstructorTypeVisitor((XBeanFieldKind)fieldKind, copyConstructorLine);
+                var copyConstructorVisitor = new CopyConstructorTypeVisitor(fieldKind, copyConstructorLine);
                 fieldKind.Type.Accept(copyConstructorVisitor);
                 
                 // 复制函数生成
-                var copyFromVisitor = new CopyFromTypeVisitor((XBeanFieldKind)fieldKind, copyFromLine);
+                var copyFromVisitor = new CopyFromTypeVisitor(fieldKind, copyFromLine);
                 fieldKind.Type.Accept(copyFromVisitor);
 
                 // getter 生成
                 if (beanKind.IdFieldName == fieldKind.Name) // bson id特性生成
                     getterLine.WriteLine("[MongoDB.Bson.Serialization.Attributes.BsonId]");
-                var getterVisitor = new XBeanFieldGetterTypeVisitor(beanKind, (XBeanFieldKind)fieldKind);
+                else
+                {
+                    var addBsonAttrVisitor = new XBeanFieldAddBsonAttrTypeVisitor(beanKind, fieldKind);
+                    fieldKind.Type.Accept(addBsonAttrVisitor);
+                    getterLine.WriteLine(addBsonAttrVisitor.Result);
+                }
+                    
+                var getterVisitor = new XBeanFieldGetterTypeVisitor(beanKind, fieldKind);
                 fieldKind.Type.Accept(getterVisitor);
                 getterLine.WriteLine($"{getterVisitor.Result}");
             }

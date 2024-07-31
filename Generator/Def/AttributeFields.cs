@@ -2,6 +2,11 @@ namespace Generator
 {
     public class AttributeFields
     {
+        // Service.ClientNode
+        public const int ServiceClientNode = 0;
+        // Service.ServerNode
+        public const int ServiceServerNode = 1;
+        
         // ProtocolField.index
         public const int ProtocolFieldIndex = 0;
         

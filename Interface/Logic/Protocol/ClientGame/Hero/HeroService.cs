@@ -2,7 +2,7 @@ using Attributes;
 
 namespace Hero
 {
-     [ClientToServer]
+     [Service(Node.Client, Node.Game)]
      public interface HeroService
      {
           public Hero AddHero([ProtocolField(1)]long heroId);

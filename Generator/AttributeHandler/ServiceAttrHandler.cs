@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Generator.AttributeHandler
 {
-    class ClientToServerCreateSyntaxAttrHandler : DefaultCreateSyntaxAttrHandler
+    class ServiceCreateSyntaxAttrHandler : DefaultCreateSyntaxAttrHandler
     {
         protected override void NewNamespaceSyntax()
         {
@@ -25,17 +25,18 @@ namespace Generator.AttributeHandler
             tc.NewNamespaceSyntax = tc.NewNamespaceSyntax.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Client.NetWork")));
         }
     }
-    public class ClientToServerAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
+    public class ServiceAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
     {
         private ICreateNamespaceFactory m_CreateNamespaceFactory = new ProtoCreateNamespaceFactory();
         private ICreateIdentiferFactory m_CreateIdentiferFactory = new ProtoCreateIdentiferFactory();
         private ICreateFieldFactory<ProtoFieldKind> m_CreateFieldFactory = new ProtoCreateFieldFactory();
         private readonly ICreateSyntaxAttrHandler m_CreateSyntaxAttrHandler;
-        public ClientToServerAttrHandler(TypeContext tc, AttributeSyntax attr) : base(tc, attr)
+        public ServiceAttrHandler(TypeContext tc, AttributeSyntax attr) : base(tc, attr)
         {
-            m_CreateSyntaxAttrHandler = new ClientToServerCreateSyntaxAttrHandler()
+            AnalysisUtil.HadAttrArgument(attr, AttributeFields.ServiceClientNode, out var clientNode);
+            m_CreateSyntaxAttrHandler = new ServiceCreateSyntaxAttrHandler()
             {
-                IsCreateFile = tc.FileContext.GloableContext.IsClient,
+                IsCreateFile = TypeContext.FileContext.GloableContext.IsNodeAt(clientNode),
             };
         }
         

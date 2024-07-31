@@ -31,7 +31,7 @@ namespace Generator.Visitor
         {
             var defaultValueVisitor = new EdbDefaultValueTypeVisitor(m_FieldKind, $"_o_.{FieldName}");
             type.Accept(defaultValueVisitor);
-            m_Writer.WriteLine($"{FieldName} = {defaultValueVisitor};");
+            m_Writer.WriteLine($"{FieldName} = {defaultValueVisitor.Result};");
         }
 
         public void Visit(IntType type)
