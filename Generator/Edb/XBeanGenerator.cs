@@ -113,6 +113,8 @@ namespace XBean
         }}
         
         {getterLine}
+
+{beanKind.GenToString(2)}
     }}
 }}
 ";

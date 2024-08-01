@@ -4,7 +4,7 @@ using Generator.Type;
 
 namespace Generator.Kind
 {
-    public abstract class BaseIdentiferKind : BaseKind
+    public abstract partial class BaseIdentiferKind : BaseKind
     {
         #region 字段
         
@@ -58,7 +58,7 @@ namespace Generator.Kind
                 field.Compile(ctx);
             }
         }
-        
+
         public new List<FieldKind> Children()
         {
             return m_Fields;

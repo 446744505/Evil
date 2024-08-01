@@ -6,7 +6,7 @@ namespace Proto
     {
         public override void Process()
         {
-            Log.I.Info($"hero star ntf {heroId} star:{Star}");
+            Log.I.Info($"hero star ntf {heroId} star:{star}");
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Edb;
 
@@ -28,7 +29,7 @@ namespace Proto
                             Level = 1,
                         } }
                     };
-                    
+
                     ph = new XBean.PlayerHero()
                     {
                         PlayerId = playerId,
@@ -44,22 +45,22 @@ namespace Proto
                     var hero = new Proto.Hero()
                     {
                         heroId = pair.Value.HeroId,
-                        Star = pair.Value.Star,
-                        Properties = new Proto.Properties()
+                        star = pair.Value.Star,
+                        properties = new Proto.Properties()
                         {
-                            Abs = pair.Value.Properties.Abs,
-                            Pct = pair.Value.Properties.Pct,
+                            abs = pair.Value.Properties.Abs,
+                            pct = pair.Value.Properties.Pct,
                         },
                     };
                     foreach (var skill in pair.Value.Skills)
                     {
-                        hero.Skills.Add(new Proto.HeroSkill()
+                        hero.skills.Add(new Proto.HeroSkill()
                         {
                             cfgId = skill.CfgId,
-                            Level = skill.Level,
+                            level = skill.Level,
                         });
                     }
-                    result.Heroes.Add(pair.Key, hero);
+                    result.heroes.Add(pair.Key, hero);
                 }
 
                 return true;
@@ -82,7 +83,7 @@ namespace Proto
                         result = new Proto.Hero()
                         {
                             heroId = hero.HeroId,
-                            Star = hero.Star,
+                            star = hero.Star,
                         };
                     }
                 }
@@ -109,7 +110,7 @@ namespace Proto
                         _ = Session.Send(new HeroStarNtf()
                         {
                             heroId = heroId,
-                            Star = hero.Star,
+                            star = hero.Star,
                         });
                     }
                 }

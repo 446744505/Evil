@@ -62,6 +62,8 @@ namespace {namespaceName}
     public partial class {kind.Name} : {parent}
     {{
         public override uint MessageId => {messageId};
+
+{kind.GenToString(2)}
     }}
 }}
               ";

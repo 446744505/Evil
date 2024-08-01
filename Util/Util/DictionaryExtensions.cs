@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Evil.Util
 {
     public static class DictionaryExtensions

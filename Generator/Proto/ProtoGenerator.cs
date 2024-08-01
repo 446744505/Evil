@@ -54,8 +54,12 @@ namespace Generator.Proto
         private void CreateCodeFile(FileDescriptorSet fileSet)
         {
             fileSet.Process();
+            var opts = new Dictionary<string, string>()
+            {
+                {"names", "original"}
+            };
             var generator = new ProtoCodeGenerator();
-            foreach (var codeFile in generator.Generate(fileSet))
+            foreach (var codeFile in generator.Generate(fileSet,null, opts))
             {
                 File.WriteAllText(Path.Combine(Gc.OutPath, Files.ProtoPath, codeFile.Name), codeFile.Text);
                 Gc.Log("生成文件:" + codeFile);

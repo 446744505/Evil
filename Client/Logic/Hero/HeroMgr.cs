@@ -12,9 +12,8 @@ namespace Client.Hero
             var playerId = 99;
             var heroes = await m_HeroService.ListHeroes(playerId);
             Log.I.Debug($"list heroes: {heroes}");
-            foreach (var pair in heroes.Heroes)
+            foreach (var pair in heroes.heroes)
             {
-                var h = heroes.Heroes[pair.Key];
                 var hero = await m_HeroService.GetHero(playerId, pair.Key);
                 Log.I.Debug($"get hero: {hero}");
                 m_HeroService.HeroStar(playerId, pair.Key);
