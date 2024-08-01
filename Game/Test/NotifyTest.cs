@@ -53,7 +53,7 @@ namespace Game.Test
         public async Task TestInsert()
         {
             await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-            XTable.Tables.Player.AddListener(new PlayerListener(), "playerId");
+            XTable.Tables.Player.AddListener(new PlayerListener());
             await Procedure.Submit(async () =>
             {
                 await XTable.Player.Delete(1);
@@ -74,12 +74,17 @@ namespace Game.Test
         public async Task TestUpdate()
         {
             await Init();
-            XTable.Tables.Player.AddListener(new PlayerListener(), "level");
-            XTable.Tables.Player.AddListener(new PlayerListener());
+            XTable.Tables.Player.AddListener(new PlayerListener(), "heroes");
             await Procedure.Submit(async () =>
             {
                 var p = await XTable.Player.Update(1);
                 p.Level++;
+                var h = new XBean.Hero()
+                {
+                    HeroId = 2,
+                    Star = 1,
+                };
+                p.Heroes[h.HeroId] = h;
                 return true;
             });
 

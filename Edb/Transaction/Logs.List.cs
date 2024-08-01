@@ -167,7 +167,7 @@ namespace Edb
         
         protected override void BeforeRemove(T item)
         {
-            Logs.Link(item, null, null);
+            Logs.Link(item, null, null!);
         }
         
         public LogList<T> SetVerify(Action verify)

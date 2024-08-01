@@ -190,118 +190,123 @@ namespace Edb
             
             internal void BeforeRemove(TKey key, TValue value)
             {
-                Logs.Link(value, null, null);
+                Logs.Link(value, null, null!);
                 LogRemove(key, value);
             }
             
             internal void AfterRemove(TKey key, TValue value)
             {
                 LogRemove(key, value);
-                Logs.Link(value, null, null);
+                Logs.Link(value, null, null!);
             }
             
             public void AfterPut(TKey key, TValue? origin, bool hadOrigin)
             {
                 LogPut(key, origin, hadOrigin);
                 if (origin != null)
-                    Logs.Link(origin, null, null);
+                    Logs.Link(origin, null, null!);
             }
         }
     }
+
+    public interface INoteMap : INote
+    {
+        internal void SetChanged(IList changed, object objRef);
+    }
     
-    public class NoteMap<TK, TV> : INote where TK : notnull
-        {
-            private readonly HashSet<TK> m_Added = new();
-            private readonly Dictionary<TK, TV> m_Removed = new();
-            private readonly Dictionary<TK, TV> m_Replaced = new();
-            private List<TV>? m_Changed;
-            private Dictionary<TK, TV>? m_ObjRef;
-            private Dictionary<TK, TV>? m_ChangedMap;
+    public class NoteMap<TK, TV> : INoteMap where TK : notnull
+    {
+        private readonly HashSet<TK> m_Added = new();
+        private readonly Dictionary<TK, TV> m_Removed = new();
+        private readonly Dictionary<TK, TV> m_Replaced = new();
+        private IList? m_Changed;
+        private Dictionary<TK, TV>? m_ObjRef;
+        private Dictionary<TK, TV>? m_ChangedMap;
 
-            internal HashSet<TK> Added => m_Added;
-            internal Dictionary<TK, TV> Replaced => m_Replaced;
-            public Dictionary<TK, TV> Removed => m_Removed;
-            protected bool IsMapChanged => m_Added.Count > 0 || m_Removed.Count > 0 || m_Replaced.Count > 0;
-            public Dictionary<TK, TV> Changed {
-                get
-                {
-                    if (m_ChangedMap != null)
-                        return m_ChangedMap;
-                    
-                    m_ChangedMap = m_Replaced.Keys.ToDictionary(k => k, k => m_ObjRef![k]);
-                    if (m_Changed == null && m_Added.Count == 0)
-                        return m_ChangedMap;
-                    
-                    foreach (var k in m_Added)
-                        m_ChangedMap[k] = m_ObjRef![k];
-                    if (m_Changed == null) 
-                        return m_ChangedMap;
-                    
-                    var set = new HashSet<TV>(new ReferenceEqualityComparer<TV>());
-                    foreach (var v in m_Changed)
-                        set.Add(v);
-                    m_ObjRef!.Where(pair => set.Contains(pair.Value)).ToList().ForEach(pair => m_ChangedMap[pair.Key] = pair.Value);
-
+        internal HashSet<TK> Added => m_Added;
+        internal Dictionary<TK, TV> Replaced => m_Replaced;
+        public Dictionary<TK, TV> Removed => m_Removed;
+        protected bool IsMapChanged => m_Added.Count > 0 || m_Removed.Count > 0 || m_Replaced.Count > 0;
+        public Dictionary<TK, TV> Changed {
+            get
+            {
+                if (m_ChangedMap != null)
                     return m_ChangedMap;
-                }
-            }
-
-            internal void SetChanged(List<TV> changed, object objRef)
-            {
-                m_Changed = changed;
-                m_ObjRef = (Dictionary<TK, TV>)objRef;
-            }
-
-            internal void Merge(INote note)
-            {
-                var other = (NoteMap<TK, TV>)note;
-                foreach (var k in other.m_Added)
-                    LogPut(k, default, false);
-                foreach (var pair in other.m_Removed)
-                    LogRemove(pair.Key, pair.Value);
-                foreach (var pair in other.m_Replaced)
-                    LogPut(pair.Key, pair.Value, true);
-            }
-
-            protected void LogRemove(TK key, TV value)
-            {
-                if (m_Added.Remove(key))
-                    return;
-                m_Replaced.Remove(key, out var v);
-                m_Removed[key] = v == null ? value : v;
-            }
-
-            protected void LogPut(TK key, TV? origin, bool hadOrigin)
-            {
-                if (m_Added.Contains(key))
-                    return;
-                if (m_Removed.Remove(key, out var v))
-                {
-                    m_Replaced[key] = v!;
-                    return;
-                }
-                if (m_Replaced.ContainsKey(key))
-                    return;
                 
-                if (!hadOrigin)
-                    m_Added.Add(key);
-                else 
-                    m_Replaced[key] = origin!;
-            }
+                m_ChangedMap = m_Replaced.Keys.ToDictionary(k => k, k => m_ObjRef![k]);
+                if (m_Changed == null && m_Added.Count == 0)
+                    return m_ChangedMap;
+                
+                foreach (var k in m_Added)
+                    m_ChangedMap[k] = m_ObjRef![k];
+                if (m_Changed == null) 
+                    return m_ChangedMap;
+                
+                var set = new HashSet<TV>(new ReferenceEqualityComparer<TV>());
+                foreach (var v in m_Changed)
+                    set.Add((TV)v);
+                m_ObjRef!.Where(pair => set.Contains(pair.Value)).ToList().ForEach(pair => m_ChangedMap[pair.Key] = pair.Value);
 
-            protected void Clear()
-            {
-                m_Added.Clear();
-                m_Removed.Clear();
-                m_Replaced.Clear();
-                m_Changed = null;
-                m_ObjRef = null;
-                m_ChangedMap = null;
-            }
-
-            public override string ToString()
-            {
-                return $"added={m_Added} removed={m_Removed} replaced={m_Replaced} changed={m_Changed}";
+                return m_ChangedMap;
             }
         }
+
+        public void SetChanged(IList changed, object objRef)
+        {
+            m_Changed = changed;
+            m_ObjRef = (Dictionary<TK, TV>)objRef;
+        }
+
+        internal void Merge(INote note)
+        {
+            var other = (NoteMap<TK, TV>)note;
+            foreach (var k in other.m_Added)
+                LogPut(k, default, false);
+            foreach (var pair in other.m_Removed)
+                LogRemove(pair.Key, pair.Value);
+            foreach (var pair in other.m_Replaced)
+                LogPut(pair.Key, pair.Value, true);
+        }
+
+        protected void LogRemove(TK key, TV value)
+        {
+            if (m_Added.Remove(key))
+                return;
+            m_Replaced.Remove(key, out var v);
+            m_Removed[key] = v == null ? value : v;
+        }
+
+        protected void LogPut(TK key, TV? origin, bool hadOrigin)
+        {
+            if (m_Added.Contains(key))
+                return;
+            if (m_Removed.Remove(key, out var v))
+            {
+                m_Replaced[key] = v!;
+                return;
+            }
+            if (m_Replaced.ContainsKey(key))
+                return;
+            
+            if (!hadOrigin)
+                m_Added.Add(key);
+            else 
+                m_Replaced[key] = origin!;
+        }
+
+        protected void Clear()
+        {
+            m_Added.Clear();
+            m_Removed.Clear();
+            m_Replaced.Clear();
+            m_Changed = null;
+            m_ObjRef = null;
+            m_ChangedMap = null;
+        }
+
+        public override string ToString()
+        {
+            return $"added={m_Added} removed={m_Removed} replaced={m_Replaced} changed={m_Changed}";
+        }
+    }
 }

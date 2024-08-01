@@ -174,11 +174,11 @@ namespace Edb
             return m_Wrapped.GetHashCode();
         }
 
-        private class MyLog<T> : NoteSet<T>, ILog
+        private class MyLog<TE> : NoteSet<TE>, ILog
         {
-            private readonly LogSet<T> m_LogSet;
+            private readonly LogSet<TE> m_LogSet;
 
-            public MyLog(LogSet<T> logSet)
+            public MyLog(LogSet<TE> logSet)
             {
                 m_LogSet = logSet;
             }
@@ -203,19 +203,19 @@ namespace Edb
                 Clear();
             }
 
-            public void BeforeRemove(T item)
+            public void BeforeRemove(TE item)
             {
-                Logs.Link(item, null, null);
+                Logs.Link(item, null, null!);
                 LogRemove(item);
             }
 
-            public void AfterRemove(T item)
+            public void AfterRemove(TE item)
             {
                 LogRemove(item);
-                Logs.Link(item, null, null);
+                Logs.Link(item, null, null!);
             }
 
-            public void AfterAdd(T item)
+            public void AfterAdd(TE item)
             {
                 LogAdd(item);
             }

@@ -1,6 +1,6 @@
 namespace Edb
 {
-    internal abstract class Listenable
+    internal abstract partial class Listenable
     {
         internal static readonly Listenable DefaultListenable = new ListenableChanged("");
 
@@ -12,9 +12,9 @@ namespace Edb
                 foreach (var f in XBeanInfo.GetFields(xBean))
                 {
                     var ftName = f.FieldType.Name;
-                    if (ftName.StartsWith("System.Collections.Generic.IDictionary"))
+                    if (ftName.StartsWith("IDictionary"))
                         lb.Add(f.Name, new ListenableMap(f.Name));
-                    else if (ftName.StartsWith("System.Collections.Generic.ISet"))
+                    else if (ftName.StartsWith("ISet"))
                         lb.Add(f.Name, new ListenableSet(f.Name));
                     else
                         lb.Add(f.Name, new ListenableChanged(f.Name));
@@ -34,56 +34,6 @@ namespace Edb
         internal abstract void SetChanged<TKey, TValue>(LogNotify ln) 
             where TKey : notnull where TValue : class;
 
-        private class ListenableBean : Listenable
-        {
-            private readonly Dictionary<string, Listenable> m_Vars = new();
-            private bool m_Changed;
-            
-            public void Add(string varName, Listenable listenable)
-            {
-                m_Vars[varName] = listenable;
-            }
-            
-            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
-            {
-                foreach (var l in m_Vars.Values)
-                    await l.LogNotify<TKey, TValue>(key, value, rs, listenerMap);
-
-                switch (rs)
-                {
-                    case RecordState.Added:
-                        await listenerMap.NotifyChanged("", key, value);
-                        break;
-                    case RecordState.Removed:
-                        await listenerMap.NotifyRemoved("", key, value);
-                        break;
-                    case RecordState.Changed:
-                        if (m_Changed)
-                            await listenerMap.NotifyChanged("", key, value, null); 
-                        break;
-                }
-
-                m_Changed = false;
-            }
-
-            internal override Listenable Copy()
-            {
-                var l = new ListenableBean();
-                foreach (var (key, value) in m_Vars)
-                {
-                    l.Add(key, value.Copy());
-                }
-
-                return l;
-            }
-
-            internal override void SetChanged<TKey, TValue>(LogNotify ln)
-            {
-                m_Changed = true;
-                m_Vars[ln.Pop().VarName].SetChanged<TKey, TValue>(ln);
-            }
-        }
-        
         private class ListenableChanged : Listenable
         {
             private readonly string m_VarName;
@@ -120,107 +70,6 @@ namespace Edb
             internal override void SetChanged<TKey, TValue>(LogNotify ln)
             {
                 m_Changed = true;
-            }
-        }
-        
-        private class ListenableMap : Listenable
-        {
-            private readonly string m_VarName;
-            private INote? m_Note;
-            private List<XBean>? m_Changed;
-            
-            public ListenableMap(string varName)
-            {
-                m_VarName = varName;
-            }
-            
-            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
-            {
-                switch (rs)
-                {
-                    case RecordState.Added:
-                        await listenerMap.NotifyChanged(m_VarName, key, value);
-                        break;
-                    case RecordState.Removed:
-                        await listenerMap.NotifyRemoved(m_VarName, key, value);
-                        break;
-                    case RecordState.Changed:
-                        if ((m_Note != null || m_Changed != null) && listenerMap.HasListener(m_VarName))
-                        {
-                            var nMap = m_Note == null ? new NoteMap<TKey, XBean>() : (NoteMap<TKey, XBean>)m_Note;
-                            nMap.SetChanged(m_Changed!, XBeanInfo.GetValue((XBean)value, m_VarName)!);
-                            await listenerMap.NotifyChanged(m_VarName, key, value, nMap);
-                        }
-                        break;
-                }
-                m_Note = null;
-                m_Changed = null;
-            }
-
-            internal override Listenable Copy()
-            {
-                return new ListenableMap(m_VarName);
-            }
-
-            internal override void SetChanged<TKey, TValue>(LogNotify ln)
-            {
-                if (ln.IsLast)
-                {
-                    if (m_Note == null)
-                        m_Note = ln.Note;
-                    else
-                        ((NoteMap<TKey, TValue>)m_Note).Merge(ln.Note);
-                }
-                else
-                {
-                    if (m_Changed == null)
-                        m_Changed = new List<XBean>();
-                    m_Changed.Add(ln.Pop().XBean);
-                }
-            }
-        }
-
-        private class ListenableSet : Listenable
-        {
-            private readonly string m_VarName;
-            private INote? m_Note;
-
-            public ListenableSet(string varName)
-            {
-                m_VarName = varName;
-            }
-
-            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
-            {
-                switch (rs)
-                {
-                    case RecordState.Added:
-                        await listenerMap.NotifyChanged(m_VarName, key, value);
-                        break;
-                    case RecordState.Removed:
-                        await listenerMap.NotifyRemoved(m_VarName, key, value);
-                        break;
-                    case RecordState.Changed:
-                        if (m_Note != null)
-                            await listenerMap.NotifyChanged(m_VarName, key, value, m_Note);
-                        break;
-                }
-                m_Note = null;
-            }
-
-            internal override Listenable Copy()
-            {
-                return new ListenableSet(m_VarName);
-            }
-
-            internal override void SetChanged<TKey, TValue>(LogNotify ln)
-            {
-                if (!ln.IsLast)
-                    return;
-                if (m_Note == null)
-                    m_Note = ln.Note;
-                else
-                    ((NoteSet<TValue>)m_Note).Merge(ln.Note);
             }
         }
     }
