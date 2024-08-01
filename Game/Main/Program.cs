@@ -11,32 +11,29 @@ namespace Game
     {
         public static async Task Main(string[] args)
         {
-            var test = new NotifyTest();
-            await test.TestUpdate();
-
-            // Stopper? stopper = null;
-            // try
-            // {
-            //     await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-            //     
-            //     var netConfig = new AcceptorTransportConfig();
-            //     netConfig.NetWorkFactory = new GameNetWorkFactory();
-            //     var acceptor = new AcceptorTransport(netConfig);
-            //     await acceptor.Start();
-            //     Log.I.Info("server started");
-            //     
-            //     stopper = new Stopper()
-            //         .BindSignal()
-            //         .BindCancelKey()
-            //         .Wait();
-            //     
-            //     acceptor.Dispose();
-            //     await Edb.Edb.I.DisposeAsync();
-            // }
-            // finally
-            // {
-            //     stopper?.SignalWeakUp();
-            // }
+            Stopper? stopper = null;
+            try
+            {
+                await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+                
+                var netConfig = new AcceptorTransportConfig();
+                netConfig.NetWorkFactory = new GameNetWorkFactory();
+                var acceptor = new AcceptorTransport(netConfig);
+                await acceptor.Start();
+                Log.I.Info("server started");
+                
+                stopper = new Stopper()
+                    .BindSignal()
+                    .BindCancelKey()
+                    .Wait();
+                
+                acceptor.Dispose();
+                await Edb.Edb.I.DisposeAsync();
+            }
+            finally
+            {
+                stopper?.SignalWeakUp();
+            }
         }
     }
 }

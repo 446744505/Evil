@@ -19,7 +19,7 @@ namespace Edb.Test
         {
             await Init();
 
-            var table = Edb.I.Tables.Get<long, Player>("Player");
+            var table = Edb.I.Tables!.Get<long, Player>("Player");
             var player = new Player()
             {
                 PlayerId = 1,
@@ -50,7 +50,7 @@ namespace Edb.Test
         {
             await Init();
 
-            var table = Edb.I.Tables.Get<long, Player>("Player");
+            var table = Edb.I.Tables!.Get<long, Player>("Player");
             var player = new Player()
             {
                 PlayerId = 1,
@@ -85,7 +85,7 @@ namespace Edb.Test
         {
             await Init();
 
-            var table = Edb.I.Tables.Get<long, Player>("Player");
+            var table = Edb.I.Tables!.Get<long, Player>("Player");
             var player = new Player()
             {
                 PlayerId = 1,

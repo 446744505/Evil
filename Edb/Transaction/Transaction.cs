@@ -103,7 +103,7 @@ namespace Edb
             try
             {
                 Interlocked.Increment(ref TotalCount);
-                var flushLock = Edb.I.Tables.FlushLock;
+                var flushLock = Edb.I.Tables!.FlushLock;
                 var flushRelease = await flushLock.RLockAsync();
                 try
                 {

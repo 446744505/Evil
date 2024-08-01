@@ -37,9 +37,9 @@ namespace NetWork
             }
         }
 
-        public override void Process()
+        public override async void Process()
         {
-            var result = DeRequest();
+            var result = await DeRequest();
             var rsp = new RpcResponse() { RequestId = m_RequestId };
             using (var stream = new MemoryStream())
             {
@@ -47,7 +47,7 @@ namespace NetWork
                 rsp.Data = stream.GetBuffer()[..(int)stream.Length];
             }
 
-            Session.Send(rsp);
+            _ = Session.Send(rsp);
         }
 
         public override void Encode(BinaryWriter writer)
@@ -62,7 +62,7 @@ namespace NetWork
             m_RequestId = reader.ReadInt64();
         }
 
-        public virtual T DeRequest()
+        public virtual async Task<T> DeRequest()
         {
             throw new NotImplementedException();
         }

@@ -4,13 +4,13 @@ namespace Edb
 {
     public sealed partial class Edb : Singleton<Edb>
     {
-        private volatile Tables m_Tables = null!;
+        private volatile Tables? m_Tables;
         private bool m_Running;
         private volatile Checkpoint? m_Checkpoint;
         private LockAsync m_Lock = new();
 
         public Config Config { get; set; } = null!;
-        internal Tables Tables => m_Tables;
+        internal Tables? Tables => m_Tables;
         public Random Random => m_Random.Value!;
         
         private readonly ThreadLocal<Random> m_Random = new(() => new Random());
@@ -37,7 +37,7 @@ namespace Edb
             catch (Exception e)
             {
                 Log.I.Fatal(e);
-                await DisposeAsync();
+                await DisposeAsync(true);
                 throw;
             }
             finally
@@ -59,9 +59,11 @@ namespace Edb
             }
         }
 
-        public async Task DisposeAsync()
+        public async Task DisposeAsync(bool locked = false)
         {
-            var release = await m_Lock.WLockAsync();
+            IDisposable? release = null;
+            if (!locked)
+                await m_Lock.WLockAsync();
             try
             {
                 if (!m_Running)
@@ -92,10 +94,17 @@ namespace Edb
                     await m_Checkpoint.Cleanup();
                     m_Checkpoint = null;
                 }
+
+                if (m_Tables != null)
+                {
+                    m_Tables.Dispose();
+                    m_Tables = null!;
+                }
                 m_Running = false;
             } finally
             {
-                m_Lock.WUnlock(release);
+                if (release != null)
+                    m_Lock.WUnlock(release);
             }
         }
     }

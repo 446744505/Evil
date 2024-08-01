@@ -9,11 +9,16 @@ namespace Client.Hero
 
         public async void Test()
         {
-            var newHero = await m_HeroService.AddHero(1);
-            Log.I.Debug($"new hero: {newHero.heroId}");
-            var hero = await m_HeroService.GetHero(newHero.heroId);
-            Log.I.Debug($"get hero: {hero.heroId}");
-            m_HeroService.HeroStar(newHero.heroId);
+            var playerId = 99;
+            var heroes = await m_HeroService.ListHeroes(playerId);
+            Log.I.Debug($"list heroes: {heroes}");
+            foreach (var pair in heroes.Heroes)
+            {
+                var h = heroes.Heroes[pair.Key];
+                var hero = await m_HeroService.GetHero(playerId, pair.Key);
+                Log.I.Debug($"get hero: {hero}");
+                m_HeroService.HeroStar(playerId, pair.Key);
+            }
         }
     }
 }

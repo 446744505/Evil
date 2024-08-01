@@ -15,18 +15,13 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 await XTable.Player.Delete(1);
-                var hero = new XBean.Hero()
-                {
-                    HeroId = 1,
-                    Star = 1,
-                };
+                
                 var p = new Player()
                 {
                     PlayerId = 1,
                     Level = 1,
                     PlayerName = "player1",
                 };
-                p.Heroes[hero.HeroId] = hero;
                 Assert.True(await XTable.Player.Insert(p));
 
                 await XTable.PlayerHero.Delete(1);
@@ -35,21 +30,24 @@ namespace Game.Test
                     CfgId = 1,
                     Level = 1,
                 };
-                
+                var hero = new XBean.Hero()
+                {
+                    HeroId = 1,
+                    Star = 1,
+                };
                 hero.Skills.Add(skill);
                 var ph = new PlayerHero()
                 {
                     PlayerId = 1,
                 };
-                var h2 = new XBean.Hero();
-                h2.CopyFrom(hero);
-                ph.Heroes.Add(h2);
+                
+                ph.Heroes[hero.HeroId] = hero;
                 Assert.True(await XTable.PlayerHero.Insert(ph));
 
                 return true;
             });
         }
-        
+
         [Fact]
         public async Task TestBaseCommit()
         {
@@ -66,7 +64,6 @@ namespace Game.Test
                 Assert.Equal(2, p1!.Level);
                 return true;
             });
-            
             await Edb.Edb.I.DisposeAsync();
         }
         
@@ -86,7 +83,6 @@ namespace Game.Test
                 Assert.Equal(1, p1!.Level);
                 return true;
             });
-
             await Edb.Edb.I.DisposeAsync();
         }
 
@@ -97,27 +93,23 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 var ph = await XTable.PlayerHero.Update(1);
-                ph!.Heroes[0].Star++;
-                var h = new XBean.Hero()
+                ph!.Heroes[1].Star++;
+                var skill = new XBean.HeroSkill()
                 {
-                    HeroId = 2,
-                    Star = 1,
-                    Properties =
-                    {
-                        Abs = 1,
-                        Pct = 2,
-                    }
+                    CfgId = 2,
+                    Level = 2,
                 };
-                ph.Heroes.Add(h);
+                ph.Heroes[1].Skills.Add(skill);
                 return true;
             });
             await Procedure.Submit(async () =>
             {
                 var ph = await XTable.PlayerHero.Select(1);
-                Assert.Equal(2, ph!.Heroes.Count);
-                Assert.Equal(2, ph.Heroes[0].Star);
-                Assert.Equal(1, ph.Heroes[1].Properties.Abs);
-                Assert.Equal(2, ph.Heroes[1].Properties.Pct);
+                var h = ph!.Heroes[1];
+                Assert.Equal(2, h.Skills.Count);
+                Assert.Equal(2, ph.Heroes[1].Star);
+                Assert.Equal(1, h.Skills[0].CfgId);
+                Assert.Equal(2, h.Skills[1].CfgId);
                 return true;
             });
             await Edb.Edb.I.DisposeAsync();
@@ -130,20 +122,20 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 var ph = await XTable.PlayerHero.Update(1);
-                ph!.Heroes[0].Star++;
+                ph!.Heroes[1].Star++;
                 var h = new XBean.Hero()
                 {
                     HeroId = 2,
                     Star = 1,
                 };
-                ph.Heroes.Add(h);
+                ph.Heroes[h.HeroId] = h;
                 return false;
             });
             await Procedure.Submit(async () =>
             {
                 var ph = await XTable.PlayerHero.Select(1);
                 Assert.Equal(1, ph!.Heroes.Count);
-                Assert.Equal(1, ph.Heroes[0].Star);
+                Assert.Equal(1, ph.Heroes[1].Star);
                 return true;
             });
             await Edb.Edb.I.DisposeAsync();
@@ -166,10 +158,10 @@ namespace Game.Test
                         Pct = 2,
                     }
                 };
-                ph!.Heroes.Add(h);
+                ph.Heroes[h.HeroId] = h;
                 try
                 {
-                    ph.Heroes.Add(h);
+                    ph.Heroes[h.HeroId] = h;
                 } catch (Exception e)
                 {
                     Assert.True(e is XManagedError);
@@ -193,20 +185,20 @@ namespace Game.Test
             await Init();
             await Procedure.Submit(async () =>
             {
-                var p = await XTable.Player.Update(1);
+                var ph = await XTable.PlayerHero.Update(1);
                 var h = new XBean.Hero()
                 {
                     HeroId = 2,
                     Star = 2,
                 };
-                p!.Heroes[h.HeroId] = h;
+                ph!.Heroes[h.HeroId] = h;
                 return true;
             });
             await Procedure.Submit(async () =>
             {
-                var p = await XTable.Player.Select(1);
-                Assert.Equal(2, p!.Heroes.Count);
-                Assert.Equal(2, p.Heroes[2].Star);
+                var ph = await XTable.PlayerHero.Select(1);
+                Assert.Equal(2, ph!.Heroes.Count);
+                Assert.Equal(2, ph.Heroes[2].Star);
                 return true;
             });
             await Edb.Edb.I.DisposeAsync();
@@ -218,21 +210,21 @@ namespace Game.Test
             await Init();
             await Procedure.Submit(async () =>
             {
-                var p = await XTable.Player.Update(1);
-                p.Heroes[1].Star++;
+                var ph = await XTable.PlayerHero.Update(1);
+                ph.Heroes[1].Star++;
                 var h = new XBean.Hero()
                 {
                     HeroId = 2,
                     Star = 2,
                 };
-                p.Heroes[h.HeroId] = h;
+                ph.Heroes[h.HeroId] = h;
                 return false;
             });
             await Procedure.Submit(async () =>
             {
-                var p = await XTable.Player.Select(1);
-                Assert.Equal(1, p!.Heroes.Count);
-                Assert.Equal(1, p.Heroes[1].Star);
+                var ph = await XTable.PlayerHero.Select(1);
+                Assert.Equal(1, ph!.Heroes.Count);
+                Assert.Equal(1, ph.Heroes[1].Star);
                 return true;
             });
             await Edb.Edb.I.DisposeAsync();
@@ -244,10 +236,10 @@ namespace Game.Test
             await Init();
             await Procedure.Submit(async () =>
             {
-                var p = await XTable.Player.Select(1);
+                var ph = await XTable.PlayerHero.Select(1);
                 try
                 {
-                    p.Heroes[1].Star++;
+                    ph.Heroes[1].Star++;
                 } catch (Exception e)
                 {
                     Assert.True(e is XLockLackedError);
@@ -258,8 +250,8 @@ namespace Game.Test
             });
             await Procedure.Submit(async () =>
             {
-                var p = await XTable.Player.Select(1);
-                Assert.Equal(1, p!.Heroes[1].Star);
+                var ph = await XTable.PlayerHero.Select(1);
+                Assert.Equal(1, ph!.Heroes[1].Star);
                 return true;
             });
             await Edb.Edb.I.DisposeAsync();

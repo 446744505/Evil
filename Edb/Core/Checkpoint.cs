@@ -69,7 +69,7 @@ namespace Edb
                 {
                     m_CheckpointNow = false;
                     m_NextCheckpointTime = now + checkpointPeriod;
-                    await Checkpoint0(config);
+                    await Checkpoint0(config, true);
                 }
             }
             catch (Exception e)
@@ -83,14 +83,17 @@ namespace Edb
             }
         }
 
-        private async Task Checkpoint0(Config config)
+        private async Task Checkpoint0(Config config, bool locked)
         {
             Log.I.Info("--------------- begin checkpoint ---------------");
             var storages = m_Tables.Storages;
             if (config.MarshalN < 1)
                 Log.I.Warn("marshalN disabled");
 
-            var checkRelease = await m_CheckpointLock.WLockAsync();
+            IDisposable? checkRelease = null;
+            if (!locked)
+                checkRelease = await m_CheckpointLock.WLockAsync();
+            
             try
             {
                 // marshalN
@@ -171,14 +174,15 @@ namespace Edb
             }
             finally
             {
-                m_CheckpointLock.WUnlock(checkRelease);
+                if (checkRelease != null)
+                    m_CheckpointLock.WUnlock(checkRelease);
             }
         }
 
         internal async Task Cleanup()
         {
             Log.I.Info("final checkpoint begin");
-            await Checkpoint0(Edb.I.Config);
+            await Checkpoint0(Edb.I.Config, false);
             Log.I.Info("final checkpoint end");
         }
     }

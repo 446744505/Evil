@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿
 using Attributes;
 
 namespace Player
@@ -14,8 +14,5 @@ namespace Player
         
         [XColumn]
         private int level;
-        
-        [XColumn]
-        private Dictionary<long, Hero.Hero> heroes;
     }
 }

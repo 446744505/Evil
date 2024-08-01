@@ -14,18 +14,13 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 await XTable.Player.Delete(1);
-                var hero = new XBean.Hero()
-                {
-                    HeroId = 1,
-                    Star = 1,
-                };
+                
                 var p = new Player()
                 {
                     PlayerId = 1,
                     Level = 1,
                     PlayerName = "player1",
                 };
-                p.Heroes[hero.HeroId] = hero;
                 Assert.True(await XTable.Player.Insert(p));
 
                 await XTable.PlayerHero.Delete(1);
@@ -34,15 +29,17 @@ namespace Game.Test
                     CfgId = 1,
                     Level = 1,
                 };
-                
+                var hero = new XBean.Hero()
+                {
+                    HeroId = 1,
+                    Star = 1,
+                };
                 hero.Skills.Add(skill);
                 var ph = new PlayerHero()
                 {
                     PlayerId = 1,
                 };
-                var h2 = new XBean.Hero();
-                h2.CopyFrom(hero);
-                ph.Heroes.Add(h2);
+                ph.Heroes[hero.HeroId] = hero;
                 Assert.True(await XTable.PlayerHero.Insert(ph));
 
                 return true;
@@ -78,13 +75,14 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 var p = await XTable.Player.Update(1);
+                var ph = await XTable.PlayerHero.Update(1);
                 p.Level++;
                 var h = new XBean.Hero()
                 {
                     HeroId = 2,
                     Star = 1,
                 };
-                p.Heroes[h.HeroId] = h;
+                ph.Heroes[h.HeroId] = h;
                 return true;
             });
 
@@ -100,7 +98,6 @@ namespace Game.Test
 
             public async Task OnChanged(object key, object val, string fullVarName, INote? note)
             {
-                var p = await XTable.Player.Select(long.Parse(key.ToString()!));
                 Log.I.Info($"player changed note: {key} {val} {fullVarName} {note}");
             }
 
