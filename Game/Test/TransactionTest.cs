@@ -301,8 +301,7 @@ namespace Game.Test
                 Log.I.Info("t2 end");
                 return true;
             });
-            await t1;
-            await t2;
+            await Task.WhenAll(t1, t2);
             await Edb.Edb.I.DisposeAsync();
         }
     }

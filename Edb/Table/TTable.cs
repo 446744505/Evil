@@ -52,11 +52,11 @@ namespace Edb
             return m_ListenerMap.Add(name, l);
         }
 
-        public override void LogNofify()
+        public override async Task LogNotify()
         {
             try
             {
-                LogRecord.LogNotify(m_ListenerMap);
+                await LogRecord.LogNotify(m_ListenerMap);
             } catch (Exception e)
             {
                 m_LogRecord.Value = null;

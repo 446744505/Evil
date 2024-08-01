@@ -1,4 +1,5 @@
-﻿using Client.NetWork;
+﻿using System.Threading.Tasks;
+using Client.NetWork;
 using Evil.Util;
 using NetWork.Transport;
 
@@ -6,7 +7,7 @@ namespace Client
 {
     public static class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Stopper? stopper = null;
             try
@@ -14,13 +15,14 @@ namespace Client
                 var config = new ConnectorTransportConfig();
                 config.NetWorkFactory = new ClientNetWorkFactory();
                 var connector = new ConnectorTransport(config);
-                connector.Start();
+                await connector.Start();
                 Log.I.Info("client started");
                 
                 stopper = new Stopper()
                     .BindSignal()
                     .BindCancelKey()
                     .Wait();
+                
                 connector.Dispose();
             } finally
             {

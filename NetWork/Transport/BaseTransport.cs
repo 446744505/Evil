@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Threading.Tasks;
 using NetWork.Proto;
 
 namespace NetWork.Transport
@@ -56,7 +57,7 @@ namespace NetWork.Transport
             }
         }
     
-        public abstract void Start();
+        public abstract Task Start();
 
         public virtual void RegisterExtMessages()
         {

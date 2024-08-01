@@ -111,7 +111,7 @@ namespace Edb
                     {
                         if (_real_commit_(p.Name) > 0)
                         {
-                            LogNotify(p);
+                            await LogNotify(p);
                         }
                         m_LastCommitActions.ForEach(cb => cb());
                     }
@@ -184,7 +184,7 @@ namespace Edb
             m_CachedTRecords.Clear();
         }
 
-        private void LogNotify<TP>(ProcedureImpl<TP> p) where TP : IProcedure
+        private async Task LogNotify<TP>(ProcedureImpl<TP> p) where TP : IProcedure
         {
             try
             {
@@ -195,7 +195,7 @@ namespace Edb
                     m_LogNotifyTables = new();
                     foreach (var table in curLogNotifyTables.Values)
                     {
-                        table.LogNofify();
+                        await table.LogNotify();
                     }
 
                     if (_real_commit_(p.Name) == 0)

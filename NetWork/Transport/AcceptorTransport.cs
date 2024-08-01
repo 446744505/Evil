@@ -16,7 +16,7 @@ namespace NetWork.Transport
         {
         }
 
-        public override async void Start()
+        public override async Task Start()
         {
             var bossGroup = new DispatcherEventLoopGroup();
             var workerGroup = new WorkerEventLoopGroup(bossGroup);

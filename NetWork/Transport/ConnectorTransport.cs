@@ -1,4 +1,5 @@
 using System.Net;
+using System.Threading.Tasks;
 using DotNetty.Codecs;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
@@ -15,7 +16,7 @@ namespace NetWork.Transport
         {
         }
 
-        public override async void Start()
+        public override async Task Start()
         {
             var group = new MultithreadEventLoopGroup(Config.WorkerCount);
             try

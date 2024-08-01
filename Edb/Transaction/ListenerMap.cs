@@ -58,28 +58,28 @@ namespace Edb
             return localCopy.ContainsKey(fullVarName);
         }
 
-        internal void NotifyChanged(string fullVarName, object key, object value)
+        internal async Task NotifyChanged(string fullVarName, object key, object value)
         {
-            Notify(ChangeKind.ChangedAll, fullVarName, key, value, null);
+            await Notify(ChangeKind.ChangedAll, fullVarName, key, value, null);
         }
         
-        internal void NotifyChanged(string fullVarName, object key, object value, INote? note)
+        internal async Task NotifyChanged(string fullVarName, object key, object value, INote? note)
         {
-            Notify(ChangeKind.ChangedNote, fullVarName, key, value, note);
+            await Notify(ChangeKind.ChangedNote, fullVarName, key, value, note);
         }
         
-        internal void NotifyRemoved(string fullVarName, object key, object value)
+        internal async Task NotifyRemoved(string fullVarName, object key, object value)
         {
-            Notify(ChangeKind.Removed, fullVarName, key, value, null);
+            await Notify(ChangeKind.Removed, fullVarName, key, value, null);
         }
 
-        private void Notify(ChangeKind kind, string fullVarName, object key, object value, INote? note)
+        private async Task Notify(ChangeKind kind, string fullVarName, object key, object value, INote? note)
         {
             var localCopy = m_ListenersCopy;
-            var listeners = localCopy[fullVarName];
-            if (listeners == null)
+            if (!localCopy.TryGetValue(fullVarName, out var listeners))
                 return;
-            foreach (var l in listeners)
+            
+            foreach (var l in listeners!)
             {
                 var transaction = Transaction.Current!;
                 var spBefore = transaction.CurrentSavepointId;
@@ -89,33 +89,47 @@ namespace Edb
                     switch (kind)
                     {
                         case ChangeKind.ChangedAll:
-                            l.OnChanged(key, value);
+                            await l.OnChanged(key, value);
                             break;
                         case ChangeKind.ChangedNote:
-                            l.OnChanged(key, value, fullVarName, note);
+                            await l.OnChanged(key, value, fullVarName, note);
                             break;
                         case ChangeKind.Removed:
-                            l.OnRemoved(key, value);
+                            await l.OnRemoved(key, value);
                             break;
                     }
                 }
                 catch (Exception e)
                 {
+                    /*
+                     * 回调错误处理规则。
+                     *     spBefore     spAfter     rollback      desc
+                     *     -----------------------------------------------------------
+                     * (a) 0            0           NONE          前后都没有保存点
+                     * (b) 0            >0          spBefore + 1  开始前没有，回调中创建了保存点。
+                     * (c) >0 Any       <spBefore   ERROR         错误
+                     * (d) >0 Dirty     -           spBefore      开始前的保存点发生了改变
+                     * (e) >0 Clean     >spBefore   spBefore + 1
+                     * (f) >0 Clean     =spBefore   NONE          回调没有修改操作，
+                     * 
+                     */
                     Log.I.Error($"doChanged key={key} name={fullVarName}", e);
                     var spAfter = transaction.CurrentSavepointId;
                     if (spBefore == 0)
                     {
-                        if (spAfter > 0)
+                        if (spAfter > 0) // b
                             transaction._rollback(spBefore + 1);
+                        // else a
                     }
                     else
                     {
-                        if (spAfter < spBefore)
+                        if (spAfter < spBefore) // c
                             throw new Exception("spAfter < spBefore");
-                        if (transaction.GetSavepoint(spBefore)!.IsAccessSince(spBeforeAccess))
+                        if (transaction.GetSavepoint(spBefore)!.IsAccessSince(spBeforeAccess)) // d
                             transaction._rollback(spBefore);
-                        else if (spAfter > spBefore)
+                        else if (spAfter > spBefore) // e
                             transaction._rollback(spBefore + 1);
+                        // else f
                     }
                 }
             }
