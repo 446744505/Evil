@@ -59,8 +59,12 @@ namespace Generator.AttributeHandler
             }
             
             // 给table创建一个XBean
-            var xBean = m_XBeanCreateIdentiferFactory.CreateIdentifer(new ClassType(TypeContext.OldClassName),
+            var xBean = (XBeanClassKind)m_XBeanCreateIdentiferFactory.CreateIdentifer(new ClassType(TypeContext.OldClassName),
                 TypeContext.FileContext.GetOrCreateNamespaceKind(Namespaces.XBeanNamespace, m_XBeanCreateNamespaceFactory));
+            if (AnalysisUtil.HadAttribute(TypeContext.OldTypeSyntax, Attributes.Protocol, out _))
+            {
+                xBean.IsProtoField = true;
+            }
 
             var idFieldName = string.Empty;
             var fields = TypeContext.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
@@ -84,11 +88,17 @@ namespace Generator.AttributeHandler
                         idFieldName = fieldName;
                     }
                 }
-                
+
                 // 给xtable加字段
                 NewField(NewFieldContext.Parse(f));
+                
                 // 给xbean加字段
-                xBean.AddField(m_XBeanCreateFieldFactory.CreateField(NewFieldContext.Parse(f), xBean));
+                var xBeanField = m_XBeanCreateFieldFactory.CreateField(NewFieldContext.Parse(f), xBean);
+                if (AnalysisUtil.HadAttribute(f, Attributes.ProtocolField, out _))
+                {
+                    xBeanField.IsProtoField = true;
+                }
+                xBean.AddField(xBeanField);
             }
             if (string.IsNullOrEmpty(idFieldName))
             {

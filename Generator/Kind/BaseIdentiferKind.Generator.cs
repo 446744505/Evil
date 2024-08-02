@@ -1,4 +1,5 @@
 using Generator.Util;
+using Generator.Visitor;
 
 namespace Generator.Kind
 {
@@ -12,7 +13,9 @@ namespace Generator.Kind
             writer.WriteLine(initTabN + 1, $"var sb = new System.Text.StringBuilder(\"{Name}{{\");");
             foreach (var fieldKind in Children())
             {
-                writer.WriteLine(initTabN + 1, $"sb.Append(\"{fieldKind.Name}=\").Append({fieldKind.Name}).Append(\",\");");
+                var visitor = new ToStringTypeVisitor(fieldKind);
+                fieldKind.Type.Accept(visitor);
+                writer.WriteLine(initTabN + 1, $"sb.Append(\"{fieldKind.Name}=\").Append({visitor.Result}).Append(\",\");");
             }
             writer.WriteLine(initTabN + 1, "sb.Append(\"}\");");
             writer.WriteLine(initTabN + 1, "return sb.ToString();");

@@ -9,6 +9,7 @@ namespace Hero
     {
         [XColumn(true)] 
         private long playerId;
+        
         [ProtocolField(1)]
         [XColumn]
         private Dictionary<long, Hero> heroes;

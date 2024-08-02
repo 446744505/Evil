@@ -27,11 +27,19 @@ namespace Generator.AttributeHandler
         
         protected override void Parse0()
         {
+            if (AnalysisUtil.HadAttribute(TypeContext.OldTypeSyntax, Attributes.Protocol, out _))
+            {
+                ((XBeanClassKind)TypeContext.IdentiferKind).IsProtoField = true;
+            }
             var fields = TypeContext.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
             foreach (var f in fields)
             {
                 var ctx = NewFieldContext.Parse(f);
-                NewField(ctx);
+                var xBeanField = (XBeanFieldKind)NewField(ctx);
+                if (AnalysisUtil.HadAttribute(f, Attributes.ProtocolField, out _))
+                {
+                    xBeanField.IsProtoField = true;
+                }
             }
         }
 

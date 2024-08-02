@@ -40,12 +40,28 @@ namespace Generator.Edb
             var constructorLine = new Writer(true, 3);
             var copyConstructorLine = new Writer(true, 3);
             var copyFromLine = new Writer(true, 3);
+            var toProtoLine = new Writer(false);
+            if (beanKind.IsProtoField) // 生成ToProto前半部分
+            {
+                toProtoLine.WriteLine();
+                toProtoLine.WriteLine(2,$"public Proto.{beanKind.Name} ToProto()");
+                toProtoLine.WriteLine(2,"{");
+                toProtoLine.WriteLine(3,$"var _p_ = new Proto.{beanKind.Name}();");
+            }
             foreach (var fk in beanKind.Children())
             {
                 var fieldKind = (XBeanFieldKind)fk;
                 // 字段定义
                 var defineVisitor = new EdbFullNameTypeVisitor();
                 fieldKind.Type.Accept(defineVisitor);
+                if (beanKind.IdFieldName == fieldKind.Name) // bson id特性生成
+                    fieldsLine.WriteLine("[MongoDB.Bson.Serialization.Attributes.BsonId]");
+                else
+                {
+                    var addBsonAttrVisitor = new XBeanFieldAddBsonAttrTypeVisitor(beanKind, fieldKind);
+                    fieldKind.Type.Accept(addBsonAttrVisitor);
+                    fieldsLine.WriteLine(addBsonAttrVisitor.Result);
+                }
                 fieldsLine.WriteLine($"private {defineVisitor.Result} {fieldKind.Name};");
                 
                 // 构造函数生成
@@ -61,20 +77,24 @@ namespace Generator.Edb
                 // 复制函数生成
                 var copyFromVisitor = new CopyFromTypeVisitor(fieldKind, copyFromLine);
                 fieldKind.Type.Accept(copyFromVisitor);
+                
+                // toProto生成
+                if (beanKind.IsProtoField && fieldKind.IsProtoField)
+                {
+                    var toProtoVisitor = new ToProtoTypeVisitor(fieldKind, toProtoLine, 3);
+                    fieldKind.Type.Accept(toProtoVisitor);   
+                }
 
                 // getter 生成
-                if (beanKind.IdFieldName == fieldKind.Name) // bson id特性生成
-                    getterLine.WriteLine("[MongoDB.Bson.Serialization.Attributes.BsonId]");
-                else
-                {
-                    var addBsonAttrVisitor = new XBeanFieldAddBsonAttrTypeVisitor(beanKind, fieldKind);
-                    fieldKind.Type.Accept(addBsonAttrVisitor);
-                    getterLine.WriteLine(addBsonAttrVisitor.Result);
-                }
-                    
                 var getterVisitor = new XBeanFieldGetterTypeVisitor(beanKind, fieldKind);
                 fieldKind.Type.Accept(getterVisitor);
                 getterLine.WriteLine($"{getterVisitor.Result}");
+            }
+            
+            if (beanKind.IsProtoField) // 生成ToProto后半部分
+            {
+                toProtoLine.WriteLine(3,"return _p_;");
+                toProtoLine.WriteLine(2,"}");
             }
             
             var filePath = Path.Combine(OutPath, $"{beanKind.Name}{Files.CodeFileSuffix}");
@@ -111,7 +131,7 @@ namespace XBean
             VerifyStandaloneOrLockHeld(""CopyTo{beanKind.Name}"", false);
             {copyFromLine}
         }}
-        
+{toProtoLine}
         {getterLine}
 
 {beanKind.GenToString(2)}

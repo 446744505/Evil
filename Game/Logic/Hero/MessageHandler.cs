@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+
 using System.Threading.Tasks;
 using Edb;
 
@@ -8,7 +8,7 @@ namespace Proto
     {
         public override async Task<PlayerHero> DeRequest()
         {
-            Proto.PlayerHero result = new();
+            Proto.PlayerHero? result = null;
             await Procedure.Submit(async () =>
             {
                 var ph = await XTable.PlayerHero.Update(playerId);
@@ -40,32 +40,11 @@ namespace Proto
                     };
                     await XTable.PlayerHero.Insert(ph);
                 }
-                foreach (var pair in ph.Heroes)
-                {
-                    var hero = new Proto.Hero()
-                    {
-                        heroId = pair.Value.HeroId,
-                        star = pair.Value.Star,
-                        properties = new Proto.Properties()
-                        {
-                            abs = pair.Value.Properties.Abs,
-                            pct = pair.Value.Properties.Pct,
-                        },
-                    };
-                    foreach (var skill in pair.Value.Skills)
-                    {
-                        hero.skills.Add(new Proto.HeroSkill()
-                        {
-                            cfgId = skill.CfgId,
-                            level = skill.Level,
-                        });
-                    }
-                    result.heroes.Add(pair.Key, hero);
-                }
 
+                result = ph.ToProto();
                 return true;
             });
-            return result;
+            return result ?? new();
         }
     }
     public partial class GetHero
@@ -80,18 +59,14 @@ namespace Proto
                 {
                     if (ph.Heroes.TryGetValue(heroId, out var hero))
                     {
-                        result = new Proto.Hero()
-                        {
-                            heroId = hero.HeroId,
-                            star = hero.Star,
-                        };
+                        result = hero.ToProto();
                     }
                 }
                 
                 return true;
             });
 
-            return result ?? new Proto.Hero();
+            return result ?? new();
         }
     }
 
