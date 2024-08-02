@@ -2,7 +2,6 @@
 using Edb;
 using Evil.Util;
 using Game.NetWork;
-using Game.Test;
 using NetWork.Transport;
 
 namespace Game

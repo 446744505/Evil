@@ -15,4 +15,6 @@
 /Edb/bin/
 /Util/obj/
 /Util/bin/
+/Evil/obj/
+/Evil/bin/
 **/*.g.cs

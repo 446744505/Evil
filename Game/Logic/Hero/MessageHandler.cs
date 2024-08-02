@@ -1,6 +1,7 @@
 
 using System.Threading.Tasks;
 using Edb;
+using Evil.Util;
 
 namespace Proto
 {
@@ -82,7 +83,7 @@ namespace Proto
                     if (ph.Heroes.TryGetValue(heroId, out var hero))
                     {
                         hero.Star += 1;
-                        _ = Session.Send(new HeroStarNtf()
+                        ProcedureHelper.SendWhenCommit(Session, new HeroStarNtf()
                         {
                             heroId = heroId,
                             star = hero.Star,
