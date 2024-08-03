@@ -72,7 +72,7 @@ namespace Edb
                    Remove(key);
                    if (m_RemoveHandler != null)
                    {
-                       _ = Edb.I.ExecuteAsync(() => m_RemoveHandler.OnRemoved(key, r.Value!));
+                       _ = Edb.I.Executor.ExecuteAsync(() => m_RemoveHandler.OnRemoved(key, r.Value!));
                    }
 
                    return true;

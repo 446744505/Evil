@@ -9,7 +9,7 @@ namespace NetWork
         public virtual uint MessageId { get; }
         public ushort Pvid { get; set; }
         public Session Session { get; set; }
-        public static IMessgeDispatcher Dispatcher { get; set; } = new MessgeDispatcher();
+        public IMessgeDispatcher Dispatcher { get; set; }
 
         public void Send(Session? session)
         {
@@ -24,10 +24,10 @@ namespace NetWork
         /// 在网络线程中执行，保证顺序
         /// </summary>
         /// <returns></returns>
-        public virtual Task<bool> Dispatch()
+        public virtual void Dispatch()
         {
             // 因为外面没有await，所以这里要用ContinueWith打印异常
-            return Dispatcher.Dispatch(this).ContinueWith(task =>
+            Dispatcher.Dispatch(this).ContinueWith(task =>
             {
                 if (task.IsFaulted)
                 {

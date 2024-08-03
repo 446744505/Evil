@@ -24,7 +24,7 @@ namespace Edb
             };
             var delay = 3600 * 1000;
             var initDelay = Edb.I.Random.Next(delay);
-            Edb.I.Tick(m_CleanWorker, initDelay, delay);
+            Edb.I.Executor.Tick(m_CleanWorker, initDelay, delay);
         }
 
         private bool SetCleaning()

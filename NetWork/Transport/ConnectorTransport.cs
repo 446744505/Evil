@@ -16,7 +16,7 @@ namespace NetWork.Transport
         {
         }
 
-        public override async Task Start()
+        protected override async void Start0()
         {
             var group = new MultithreadEventLoopGroup(Config.WorkerCount);
             try
@@ -33,14 +33,16 @@ namespace NetWork.Transport
                         pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
                         pipeline.AddLast(new MessageDecode(m_MessageProcessor));
                         pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr));
+                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr, Config.Dispatcher));
                     }));
                 var channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Config.Host), Config.Port));
                 Log.I.Info($"connector connect to {Config.Host}:{Config.Port}");
                 // 等待关闭
+                // todo 这里会阻塞主线程
                 WaitStop();
                 // 关闭连接
                 await channel.CloseAsync();
+                await Config.Executor.DisposeAsync();
                 Log.I.Info($"connector stop at {Config.Host}:{Config.Port}");
             }
             finally

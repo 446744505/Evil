@@ -26,6 +26,8 @@ namespace NetWork.Transport
         {
             Config = config;
             m_SessionMgr = Config.NetWorkFactory.CreateSessionMgr();
+            if (Config.Dispatcher == null)
+                Config.Dispatcher = new MessgeDispatcher(Config.Executor);
             var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
             m_MessageProcessor = new MessageProcessor();
             RegisterMessages();
@@ -56,8 +58,14 @@ namespace NetWork.Transport
                 Thread.Sleep(1000);
             }
         }
-    
-        public abstract Task Start();
+        
+        public void Start()
+        {
+            // 直接启动一个线程，不阻塞主线程
+            Task.Factory.StartNew(Start0, TaskCreationOptions.LongRunning);
+        }
+        
+        protected abstract void Start0();
 
         public virtual void RegisterExtMessages()
         {

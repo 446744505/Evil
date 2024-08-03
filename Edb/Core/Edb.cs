@@ -7,11 +7,13 @@ namespace Edb
         private volatile Tables? m_Tables;
         private bool m_Running;
         private volatile Checkpoint? m_Checkpoint;
+        private Executor m_Executor = new();
         private LockAsync m_Lock = new();
 
         public Config Config { get; set; } = null!;
         internal Tables? Tables => m_Tables;
         public Random Random => m_Random.Value!;
+        public Executor Executor => m_Executor;
         
         private readonly ThreadLocal<Random> m_Random = new(() => new Random());
 
@@ -51,14 +53,6 @@ namespace Edb
             await m_Checkpoint!.CheckpointNow();
         }
 
-        private void CheckDisposed()
-        {
-            if (m_IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(Edb));
-            }
-        }
-
         public async Task DisposeAsync(bool locked = false)
         {
             IDisposable? release = null;
@@ -68,25 +62,9 @@ namespace Edb
             {
                 if (!m_Running)
                     return;
-                
-                m_IsDisposed = true;
-                // 等待所有的定时器任务执行完毕
-                while (Interlocked.Read(ref m_RunningTimerCount) > 0)
-                {
-                    await Task.Delay(100);
-                }
-
-                // 放在后面，否者直接关闭timer会导致在执行的任务无法执行完毕
-                foreach (var timer in m_Timers)
-                {
-                    await timer.DisposeAsync();
-                }
 
                 // 等待所有任务执行完毕
-                foreach (var task in m_Tasks)
-                {
-                    await task;
-                }
+                await m_Executor.DisposeAsync();
 
                 // 执行最后一次checkpoint
                 if (m_Checkpoint != null)

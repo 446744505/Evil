@@ -16,12 +16,12 @@ namespace Game
             {
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
                 // 设置消息处理器为edb事务处理
-                Message.Dispatcher = new ProcedureHelper.MessageDispatcher();
+                // Message.Dispatcher = new ProcedureHelper.MessageDispatcher();
                 
                 var netConfig = new AcceptorTransportConfig();
                 netConfig.NetWorkFactory = new GameNetWorkFactory();
                 var acceptor = new AcceptorTransport(netConfig);
-                await acceptor.Start();
+                acceptor.Start();
                 Log.I.Info("server started");
                 
                 stopper = new Stopper()

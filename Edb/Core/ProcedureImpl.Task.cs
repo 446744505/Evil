@@ -25,7 +25,8 @@ namespace Edb
                     null);
                 try
                 {
-                    await Task.Run(Start);
+                    // 用edb的任务接口执行，保证任务不会丢失
+                    await Edb.I.Executor.ExecuteAsync(Start);
                 }
                 catch (Exception)
                 {
@@ -74,7 +75,7 @@ namespace Edb
 
                     if (m_Retry == m_Procedure.RetryTimes && m_Procedure.RetrySerial)
                         m_Procedure.IsolationLevel = IsolationLevel.Level3;
-                    Edb.I.Delay(Launch, m_Procedure.CalcDelay());
+                    Edb.I.Executor.Delay(Launch, m_Procedure.CalcDelay());
                 }
                 catch (XError)
                 {

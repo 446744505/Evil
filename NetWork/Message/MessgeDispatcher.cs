@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Evil.Util;
 
 namespace NetWork
 {
@@ -9,9 +10,17 @@ namespace NetWork
     
     public class MessgeDispatcher : IMessgeDispatcher
     {
+        private readonly Executor m_Executor;
+
+        public MessgeDispatcher(Executor executor)
+        {
+            m_Executor = executor;
+        }
+
         public async Task<bool> Dispatch(Message msg)
         {
             return await Task.Run(msg.Process);
+            return await m_Executor.ExecuteAsync(msg.Process);
         }
     }
 }

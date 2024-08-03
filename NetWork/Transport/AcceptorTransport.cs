@@ -16,7 +16,7 @@ namespace NetWork.Transport
         {
         }
 
-        public override async Task Start()
+        protected override async void Start0()
         {
             var bossGroup = new DispatcherEventLoopGroup();
             var workerGroup = new WorkerEventLoopGroup(bossGroup);
@@ -34,7 +34,7 @@ namespace NetWork.Transport
                         pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
                         pipeline.AddLast(new MessageDecode(m_MessageProcessor));
                         pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr));
+                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr, Config.Dispatcher));
                     }));
                 
                 var channel = await bootstrap.BindAsync(Config.Port);
@@ -43,6 +43,7 @@ namespace NetWork.Transport
                 WaitStop();
                 // 关闭连接
                 await channel.CloseAsync();
+                await Config.Executor.DisposeAsync();
                 Log.I.Info($"acceptor stop at {Config.Port}");
             }
             finally

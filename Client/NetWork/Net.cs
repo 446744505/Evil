@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Client.Hero;
 using Evil.Util;
 using NetWork;
+using Nito.AsyncEx;
 using Proto;
 
 namespace Client.NetWork
@@ -29,7 +30,7 @@ namespace Client.NetWork
         public override void OnAddSession(Session session)
         {
             base.OnAddSession(session);
-            Task.Run(() => HeroMgr.I.Test());
+            Program.Executor.ExecuteAsync(() => HeroMgr.I.Test());
         }
     }
 }

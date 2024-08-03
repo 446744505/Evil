@@ -7,13 +7,15 @@ namespace NetWork.Handler
     internal class LogicHandler : SimpleChannelInboundHandler<Message>
     {
         private Session m_Session;
+        private IMessgeDispatcher m_Dispatcher;
         private readonly ISessionMgr m_SessionMgr;
         private readonly ISessionFactory m_SessionFactory;
 
-        public LogicHandler(ISessionFactory sessionFactory, ISessionMgr sessionMgr)
+        public LogicHandler(ISessionFactory sessionFactory, ISessionMgr sessionMgr, IMessgeDispatcher dispatcher)
         {
             m_SessionFactory = sessionFactory;
             m_SessionMgr = sessionMgr;
+            m_Dispatcher = dispatcher;
         }
 
         public override void ChannelActive(IChannelHandlerContext ctx)
@@ -42,6 +44,8 @@ namespace NetWork.Handler
         protected override void ChannelRead0(IChannelHandlerContext ctx, Message msg)
         {
             msg.Session = m_Session;
+            msg.Dispatcher = m_Dispatcher;
+            // todo 这里能不能await
             msg.Dispatch();
         }
     }

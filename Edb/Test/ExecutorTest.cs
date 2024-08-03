@@ -9,7 +9,7 @@ namespace Edb.Test
         {
             var edb = Edb.I;
             var num = 0;
-            edb.Tick(() =>
+            edb.Executor.Tick(() =>
             {
                 num++;
             }, 0, 500);
@@ -25,7 +25,7 @@ namespace Edb.Test
             var executed = 0;
             for (var i = 0; i < count; i++)
             {
-                edb.Tick(() =>
+                edb.Executor.Tick(() =>
                 {
                     // 模拟执行很长时间
                     Task.Delay(1000).Wait();
@@ -44,7 +44,7 @@ namespace Edb.Test
         {
             var edb = Edb.I;
             var num = 0;
-            await edb.ExecuteAsync(() =>
+            await edb.Executor.ExecuteAsync(() =>
             {
                 num++;
             });
@@ -59,7 +59,7 @@ namespace Edb.Test
             var executed = 0;
             for (var i = 0; i < count; i++)
             {
-                edb.ExecuteAsync(() =>
+                edb.Executor.ExecuteAsync(() =>
                 {
                     // 模拟执行很长时间
                     Task.Delay(1000).Wait();

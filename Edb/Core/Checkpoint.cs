@@ -37,16 +37,17 @@ namespace Edb
             var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             m_NextMarshalTime = now + Edb.I.Config.MarshalPeriod;
             m_NextCheckpointTime = now + Edb.I.Config.CheckpointPeriod;
-            Edb.I.Tick(() => _ = Checkpoint0(DateTimeOffset.Now.ToUnixTimeMilliseconds(), Edb.I.Config), 0, m_SchedPeriod);
+            Edb.I.Executor.Tick(() => Checkpoint0(DateTimeOffset.Now.ToUnixTimeMilliseconds(), Edb.I.Config), 0, m_SchedPeriod);
         }
 
         public async Task CheckpointNow()
         {
             m_CheckpointNow = true;
-            await Task.Run(() => Checkpoint0(DateTimeOffset.Now.ToUnixTimeMilliseconds(), Edb.I.Config));
+            // 用edb的任务接口执行，保证任务不会丢失
+            await Edb.I.Executor.ExecuteAsync(() => Checkpoint0(DateTimeOffset.Now.ToUnixTimeMilliseconds(), Edb.I.Config));
         }
         
-        private async Task Checkpoint0(long now, Config config)
+        private async void Checkpoint0(long now, Config config)
         {
             var release = await m_CheckpointLock.WLockAsync();
             try
