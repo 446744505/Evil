@@ -258,6 +258,78 @@ namespace Game.Test
         }
 
         [Fact]
+        public async Task TestCallCommitCommit()
+        {
+            await Init();
+            await Procedure.Submit(async () =>
+            {
+                var p = await XTable.Player.Update(1);
+                p!.Level++;
+                var subR = await Procedure.Call(async () =>
+                {
+                    var p1 = await XTable.Player.Update(1);
+                    p1!.Level++;
+                    return true;
+                });
+                return true;
+            });
+            await Procedure.Submit(async () =>
+            {
+                var p1 = await XTable.Player.Select(1);
+                Assert.Equal(3, p1!.Level);
+                return true;
+            });
+        }
+        
+        [Fact]
+        public async Task TestCallCommitRollback()
+        {
+            await Init();
+            await Procedure.Submit(async () =>
+            {
+                var p = await XTable.Player.Update(1);
+                p!.Level++;
+                var subR = await Procedure.Call(async () =>
+                {
+                    var p1 = await XTable.Player.Update(1);
+                    p1!.Level++;
+                    return false;
+                });
+                return true;
+            });
+            await Procedure.Submit(async () =>
+            {
+                var p1 = await XTable.Player.Select(1);
+                Assert.Equal(2, p1!.Level);
+                return true;
+            });
+        }
+        
+        [Fact]
+        public async Task TestCallRollbackCommit()
+        {
+            await Init();
+            await Procedure.Submit(async () =>
+            {
+                var p = await XTable.Player.Update(1);
+                p!.Level++;
+                var subR = await Procedure.Call(async () =>
+                {
+                    var p1 = await XTable.Player.Update(1);
+                    p1!.Level++;
+                    return true;
+                });
+                return false;
+            });
+            await Procedure.Submit(async () =>
+            {
+                var p1 = await XTable.Player.Select(1);
+                Assert.Equal(1, p1!.Level);
+                return true;
+            });
+        }
+
+        [Fact]
         public async Task TestDeadLock()
         {
             await Init();
