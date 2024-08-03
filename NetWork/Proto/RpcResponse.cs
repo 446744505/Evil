@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading.Tasks;
 using ProtoBuf;
 
 namespace NetWork.Proto
@@ -13,16 +14,17 @@ namespace NetWork.Proto
         [ProtoMember(2)]
         public byte[] Data { get; set; }
 
-        public override void Process()
+        public override Task<bool> Process()
         {
             var func = RpcMgr.I.RemovePending(RequestId);
             if (func == null)
             {
-                return;
+                return Task.FromResult(false);
             }
 
             using var stream = new MemoryStream(Data);
             func.Invoke(stream);
+            return Task.FromResult(true);
         }
     }
 }

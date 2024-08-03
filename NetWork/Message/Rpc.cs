@@ -37,7 +37,7 @@ namespace NetWork
             }
         }
 
-        public override async void Process()
+        public override async Task<bool> Process()
         {
             var result = await DeRequest();
             var rsp = new RpcResponse() { RequestId = m_RequestId };
@@ -47,7 +47,8 @@ namespace NetWork
                 rsp.Data = stream.GetBuffer()[..(int)stream.Length];
             }
 
-            _ = Session.Send(rsp);
+            await Session.Send(rsp);
+            return true;
         }
 
         public override void Encode(BinaryWriter writer)

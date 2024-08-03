@@ -9,90 +9,75 @@ namespace Proto
     {
         public override async Task<PlayerHero> DeRequest()
         {
-            Proto.PlayerHero? result = null;
-            await Procedure.Submit(async () =>
+            var ph = await XTable.PlayerHero.Update(playerId);
+            if (ph == null)
             {
-                var ph = await XTable.PlayerHero.Update(playerId);
-                if (ph == null)
+                var hero = new XBean.Hero()
                 {
-                    var hero = new XBean.Hero()
+                    HeroId = 1,
+                    Star = 1,
+                    Properties =
                     {
-                        HeroId = 1,
-                        Star = 1,
-                        Properties =
-                        {
-                            Abs = 1,
-                            Pct = 1,
-                        },
-                        Skills = { new XBean.HeroSkill()
-                        {
-                            CfgId = 1,
-                            Level = 1,
-                        } }
-                    };
-
-                    ph = new XBean.PlayerHero()
+                        Abs = 1,
+                        Pct = 1,
+                    },
+                    Skills = { new XBean.HeroSkill()
                     {
-                        PlayerId = playerId,
-                        Heroes =
-                        {
-                            { hero.HeroId, hero }
-                        }
-                    };
-                    await XTable.PlayerHero.Insert(ph);
-                }
+                        CfgId = 1,
+                        Level = 1,
+                    } }
+                };
 
-                result = ph.ToProto();
-                return true;
-            });
-            return result ?? new();
+                ph = new XBean.PlayerHero()
+                {
+                    PlayerId = playerId,
+                    Heroes =
+                    {
+                        { hero.HeroId, hero }
+                    }
+                };
+                await XTable.PlayerHero.Insert(ph);
+            }
+
+            return ph.ToProto();
         }
     }
     public partial class GetHero
     {
         public override async Task<Hero> DeRequest()
         {
-            Proto.Hero? result = null;
-            await Procedure.Submit(async () =>
+            var ph = await XTable.PlayerHero.Select(playerId);
+            if (ph != null)
             {
-                var ph = await XTable.PlayerHero.Select(playerId);
-                if (ph != null)
+                if (ph.Heroes.TryGetValue(heroId, out var hero))
                 {
-                    if (ph.Heroes.TryGetValue(heroId, out var hero))
-                    {
-                        result = hero.ToProto();
-                    }
+                    return hero.ToProto();
                 }
-                
-                return true;
-            });
+            }
 
-            return result ?? new();
+            return new Hero();
         }
     }
 
     public partial class HeroStar
     {
-        public override async void Process()
+        public override async Task<bool> Process()
         {
-            await Procedure.Submit(async () =>
+            var ph = await XTable.PlayerHero.Update(playerId);
+            if (ph != null)
             {
-                var ph = await XTable.PlayerHero.Update(playerId);
-                if (ph != null)
+                if (ph.Heroes.TryGetValue(heroId, out var hero))
                 {
-                    if (ph.Heroes.TryGetValue(heroId, out var hero))
+                    hero.Star += 1;
+                    ProcedureHelper.SendWhenCommit(Session, new HeroStarNtf()
                     {
-                        hero.Star += 1;
-                        ProcedureHelper.SendWhenCommit(Session, new HeroStarNtf()
-                        {
-                            heroId = heroId,
-                            star = hero.Star,
-                        });
-                    }
+                        heroId = heroId,
+                        star = hero.Star,
+                    });
                 }
+            }
 
-                return true;
-            });
+            return true;
         }
     }
 }

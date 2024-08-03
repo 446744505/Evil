@@ -2,6 +2,7 @@
 using Edb;
 using Evil.Util;
 using Game.NetWork;
+using NetWork;
 using NetWork.Transport;
 
 namespace Game
@@ -14,6 +15,8 @@ namespace Game
             try
             {
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+                // 设置消息处理器为edb事务处理
+                Message.Dispatcher = new ProcedureHelper.MessageDispatcher();
                 
                 var netConfig = new AcceptorTransportConfig();
                 netConfig.NetWorkFactory = new GameNetWorkFactory();

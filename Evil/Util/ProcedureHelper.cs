@@ -46,5 +46,14 @@ namespace Evil.Util
         {
             Transaction.AddSavepointTask(action, action);
         }
+        
+        public class MessageDispatcher : IMessgeDispatcher
+        {
+            public async Task<bool> Dispatch(Message msg)
+            {
+                var result = await Procedure.Submit(msg.Process);
+                return result.IsSuccess;
+            }
+        }
     }
 }
