@@ -55,6 +55,7 @@ namespace Edb
 
         public async Task DisposeAsync(bool locked = false)
         {
+            Log.I.Info("edb start stop");
             IDisposable? release = null;
             if (!locked)
                 await m_Lock.WLockAsync();
@@ -83,6 +84,7 @@ namespace Edb
             {
                 if (release != null)
                     m_Lock.WUnlock(release);
+                Log.I.Info("edb stop end");
             }
         }
     }

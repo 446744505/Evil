@@ -23,15 +23,9 @@ namespace Edb
             {
                 Interlocked.CompareExchange(ref m_CompletionSource, new TaskCompletionSource<IProcedure.IResult>(),
                     null);
-                try
-                {
-                    // 用edb的任务接口执行，保证任务不会丢失
-                    await Edb.I.Executor.ExecuteAsync(Start);
-                }
-                catch (Exception)
-                {
-                    // ignored 已经Done中设置在p.result中
-                }
+               
+                // 用edb的任务接口执行，保证任务不会丢失
+                await Edb.I.Executor.ExecuteAsync(Start);
             }
 
             private void Done()
@@ -49,7 +43,7 @@ namespace Edb
                 }
             }
 
-            private async void Start()
+            private async Task Start()
             {
                 try
                 {

@@ -37,7 +37,7 @@ namespace NetWork.Handler
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {
             base.ExceptionCaught(context, exception);
-            Log.I.Error(exception);
+            Log.I.Error("LogicHandler.ExceptionCaught", exception);
             context.CloseAsync();
         }
 

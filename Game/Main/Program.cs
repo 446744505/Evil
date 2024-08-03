@@ -15,10 +15,10 @@ namespace Game
             try
             {
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-                // 设置消息处理器为edb事务处理
-                // Message.Dispatcher = new ProcedureHelper.MessageDispatcher();
                 
                 var netConfig = new AcceptorTransportConfig();
+                // 设置消息处理器为带edb的事务处理
+                netConfig.Dispatcher = new ProcedureHelper.MessageDispatcher();
                 netConfig.NetWorkFactory = new GameNetWorkFactory();
                 var acceptor = new AcceptorTransport(netConfig);
                 acceptor.Start();
@@ -35,6 +35,7 @@ namespace Game
             finally
             {
                 stopper?.SignalWeakUp();
+                Log.I.Info("server stop");
             }
         }
     }

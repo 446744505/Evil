@@ -31,7 +31,7 @@ namespace NetWork
             {
                 if (task.IsFaulted)
                 {
-                    Log.I.Error(task.Exception);
+                    Log.I.Error("Message.Dispatch", task.Exception);
                 }
                 return task.Result;
             });

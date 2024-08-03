@@ -30,6 +30,7 @@ namespace Client
             } finally
             {
                 stopper?.SignalWeakUp();
+                Log.I.Info("client stop");
             }
         }
     }

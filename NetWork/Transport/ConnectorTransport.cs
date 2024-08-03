@@ -16,7 +16,7 @@ namespace NetWork.Transport
         {
         }
 
-        protected override async void Start0()
+        protected override async Task Start0()
         {
             var group = new MultithreadEventLoopGroup(Config.WorkerCount);
             try
@@ -38,8 +38,7 @@ namespace NetWork.Transport
                 var channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Config.Host), Config.Port));
                 Log.I.Info($"connector connect to {Config.Host}:{Config.Port}");
                 // 等待关闭
-                // todo 这里会阻塞主线程
-                WaitStop();
+                await WaitStop();
                 // 关闭连接
                 await channel.CloseAsync();
                 await Config.Executor.DisposeAsync();

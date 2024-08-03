@@ -10,7 +10,7 @@ namespace Edb.Test
             await Edb.I.Start(new Config(), new List<BaseTable>());
         }
         [Fact]
-        public async void TestNomal()
+        public async Task TestNomal()
         {
             await Init();
             
@@ -23,7 +23,7 @@ namespace Edb.Test
         }
 
         [Fact]
-        public async void TestExecute()
+        public async Task TestExecute()
         {
             await Init();
             var list = new List<int>();
@@ -54,7 +54,7 @@ namespace Edb.Test
 
 
         [Fact]
-        public async void TestRetryFail1()
+        public async Task TestRetryFail1()
         {
             await Init();
             Edb.I.Config.LockTimeoutMills = 1000;
@@ -89,7 +89,7 @@ namespace Edb.Test
         }
 
         [Fact]
-        public async void TestFunc()
+        public async Task TestFunc()
         {
             await Init();
             var r1 = await Procedure.Submit( () => true);

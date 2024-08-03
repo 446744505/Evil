@@ -30,6 +30,7 @@ namespace Client.NetWork
         public override void OnAddSession(Session session)
         {
             base.OnAddSession(session);
+            // for test
             Program.Executor.ExecuteAsync(() => HeroMgr.I.Test());
         }
     }

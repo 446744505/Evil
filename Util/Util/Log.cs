@@ -27,7 +27,7 @@ namespace Evil.Util
         
         public void Error(string log, Exception e)
         {
-            m_Logger.Error($"{log}{e.Message}{e.StackTrace}");
+            m_Logger.Error($"{log} {e.Message} {e.StackTrace}");
             if (e.InnerException != null)
             {
                 Error(e.InnerException);

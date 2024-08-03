@@ -15,7 +15,7 @@ namespace Edb.Test
         }
         
         [Fact]
-        public async void TestCore()
+        public async Task TestCore()
         {
             Init();
             var player = new Player()
@@ -40,7 +40,7 @@ namespace Edb.Test
         }
 
         [Fact]
-        public async void TestWalk()
+        public async Task TestWalk()
         {
             Init();
             var player1 = new Player()

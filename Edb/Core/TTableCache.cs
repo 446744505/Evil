@@ -31,7 +31,7 @@ namespace Edb
             m_RemoveHandler = handler;
         }
 
-        internal async void Walk0(ICollection<TRecord<TKey, TValue>> records, Query<TKey, TValue> query)
+        internal async Task Walk0(ICollection<TRecord<TKey, TValue>> records, Query<TKey, TValue> query)
         {
             foreach (var r in records)
             {

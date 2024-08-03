@@ -11,7 +11,7 @@ namespace NetWork
     {
         private long m_RequestId = IdGenerator.NextId();
 
-        public async Task<T> SendAsync(Session? session, int timeout = 10000)
+        public async Task<T> SendAsync(Session? session, int timeout = 5000)
         {
             if (session == null)
             {

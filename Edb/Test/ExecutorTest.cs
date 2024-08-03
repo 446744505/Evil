@@ -5,7 +5,7 @@ namespace Edb.Test
     public class ExecutorTest
     {
         [Fact]
-        public async void TestTick()
+        public async Task TestTick()
         {
             var edb = Edb.I;
             var num = 0;
@@ -18,7 +18,7 @@ namespace Edb.Test
         }
         
         [Fact]
-        public async void TestTickShutDown()
+        public async Task TestTickShutDown()
         {
             var edb = Edb.I;
             var count = 100;
@@ -40,7 +40,7 @@ namespace Edb.Test
         }
         
         [Fact]
-        public async void TestExecute()
+        public async Task TestExecute()
         {
             var edb = Edb.I;
             var num = 0;
@@ -52,7 +52,7 @@ namespace Edb.Test
         }
         
         [Fact]
-        public async void TestExecuteShutDown()
+        public async Task TestExecuteShutDown()
         {
             var edb = Edb.I;
             var count = 100;

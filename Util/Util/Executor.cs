@@ -32,14 +32,32 @@ namespace Evil.Util
             return task;
         }
         
-        public Task<T> ExecuteAsync<T>(Func<Task<T>> func)
+        public Task ExecuteAsync(Func<Task> func)
         {
             CheckDisposed();
-            var task = Task.Run(() =>
+            var task = Task.Run(async () =>
             {
                 try
                 {
-                    return func();
+                    await func();
+                }
+                catch (Exception e)
+                {
+                    Log.I.Error(e);
+                }
+            });
+            m_Tasks.Add(task);
+            return task;
+        }
+        
+        public Task<T?> ExecuteAsync<T>(Func<Task<T>> func)
+        {
+            CheckDisposed();
+            var task = Task.Run<T?>(async () =>
+            {
+                try
+                {
+                    return await func();
                 }
                 catch (Exception e)
                 {
@@ -61,6 +79,28 @@ namespace Evil.Util
                 try
                 {
                     cb();
+                } 
+                catch (Exception e)
+                {
+                    Log.I.Error(e);
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref m_RunningTimerCount);
+                }
+            }, null, delay, -1);
+            m_Timers.Add(timer);
+        }
+        
+        public void Delay(Func<Task> cb, int delay)
+        {
+            CheckDisposed();
+            var timer = new Timer(async _ =>
+            {
+                Interlocked.Increment(ref m_RunningTimerCount);
+                try
+                {
+                    await cb();
                 } 
                 catch (Exception e)
                 {
@@ -96,6 +136,28 @@ namespace Evil.Util
             m_Timers.Add(timer);
         }
         
+        public void Tick(Func<Task> cb, int dueTime, int period)
+        {
+            CheckDisposed();
+            var timer = new Timer( async _ =>
+            {
+                Interlocked.Increment(ref m_RunningTimerCount);
+                try
+                {
+                    await cb();
+                }
+                catch (Exception e)
+                {
+                    Log.I.Error(e);
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref m_RunningTimerCount);
+                }
+            }, null, dueTime, period);
+            m_Timers.Add(timer);
+        }
+        
         private void CheckDisposed()
         {
             if (m_IsDisposed)
@@ -109,6 +171,7 @@ namespace Evil.Util
         /// </summary>
         public async Task DisposeAsync()
         {
+            Log.I.Info("executor start stop");
             IDisposable? release = await m_Lock.WLockAsync();
             try
             {
@@ -117,6 +180,7 @@ namespace Evil.Util
                 
                 m_IsDisposed = true;
                 // 等待所有的定时器任务执行完毕
+                Log.I.Info($"running timer count: {Interlocked.Read(ref m_RunningTimerCount)}");
                 while (Interlocked.Read(ref m_RunningTimerCount) > 0)
                 {
                     await Task.Delay(100);
@@ -129,6 +193,7 @@ namespace Evil.Util
                 }
 
                 // 等待所有任务执行完毕
+                Log.I.Info($"running task count: {m_Tasks.Count}");
                 foreach (var task in m_Tasks)
                 {
                     await task;
@@ -136,6 +201,7 @@ namespace Evil.Util
             } finally
             {
                 m_Lock.WUnlock(release);
+                Log.I.Info("executor stop end");
             }
         }
     }

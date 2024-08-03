@@ -1,4 +1,5 @@
-﻿using Evil.Util;
+﻿using System.Threading.Tasks;
+using Evil.Util;
 using Proto;
 
 namespace Client.Hero
@@ -7,7 +8,7 @@ namespace Client.Hero
     {
         private readonly HeroService m_HeroService = new();
 
-        public async void Test()
+        public async Task Test()
         {
             var playerId = 99;
             var heroes = await m_HeroService.ListHeroes(playerId);

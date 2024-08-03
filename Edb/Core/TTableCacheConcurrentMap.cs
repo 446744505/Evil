@@ -6,7 +6,7 @@ namespace Edb
         where TKey : notnull where TValue : class
     {
         private readonly ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Cache = new();
-        private Action m_CleanWorker = null!;
+        private Func<Task> m_CleanWorker = null!;
         private bool m_Cleaning;
 
         internal override int Count => m_Cache.Count;
@@ -14,11 +14,11 @@ namespace Edb
         internal override void Initialize(TTable<TKey, TValue> table, TableConfig config)
         {
             base.Initialize(table, config);
-            m_CleanWorker = () =>
+            m_CleanWorker = async () =>
             {
                 if (SetCleaning())
                 {
-                    CleanNow();
+                    await CleanNow();
                     ResetCleaning();
                 }
             };
@@ -49,7 +49,7 @@ namespace Edb
             }
         }
 
-        private async void CleanNow()
+        private async Task CleanNow()
         {
             if (m_Capacity <= 0)
                 return;

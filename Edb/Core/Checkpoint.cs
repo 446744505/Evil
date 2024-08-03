@@ -47,7 +47,7 @@ namespace Edb
             await Edb.I.Executor.ExecuteAsync(() => Checkpoint0(DateTimeOffset.Now.ToUnixTimeMilliseconds(), Edb.I.Config));
         }
         
-        private async void Checkpoint0(long now, Config config)
+        private async Task Checkpoint0(long now, Config config)
         {
             var release = await m_CheckpointLock.WLockAsync();
             try

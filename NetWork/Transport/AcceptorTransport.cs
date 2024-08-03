@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using DotNetty.Codecs;
 using DotNetty.Handlers.Logging;
@@ -16,7 +17,7 @@ namespace NetWork.Transport
         {
         }
 
-        protected override async void Start0()
+        protected override async Task Start0()
         {
             var bossGroup = new DispatcherEventLoopGroup();
             var workerGroup = new WorkerEventLoopGroup(bossGroup);
@@ -40,7 +41,7 @@ namespace NetWork.Transport
                 var channel = await bootstrap.BindAsync(Config.Port);
                 Log.I.Info($"acceptor start at {Config.Port}");
                 // 等待关闭
-                WaitStop();
+                await WaitStop();
                 // 关闭连接
                 await channel.CloseAsync();
                 await Config.Executor.DisposeAsync();

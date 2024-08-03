@@ -1,6 +1,9 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Evil.Util;
 using NetWork.Proto;
+using Nito.AsyncEx;
 
 namespace NetWork.Transport
 {
@@ -12,7 +15,7 @@ namespace NetWork.Transport
         protected IMessageProcessor m_MessageProcessor;
 
         private volatile bool m_IsStop;
-        private readonly AutoResetEvent m_StopEvent = new(false);
+        private readonly AsyncCountdownEvent m_StopEvent = new(1);
 
         #endregion
 
@@ -40,9 +43,9 @@ namespace NetWork.Transport
             RegisterExtMessages();
         }
 
-        protected void WaitStop()
+        protected async Task WaitStop()
         {
-            m_StopEvent.WaitOne();
+            await m_StopEvent.WaitAsync();
         }
         
         protected void Stopped()
@@ -52,20 +55,31 @@ namespace NetWork.Transport
     
         public void Dispose()
         {
-            m_StopEvent.Set();
+            Log.I.Info("transport start stop");
+            m_StopEvent.Signal();
             while (!m_IsStop)
             {
                 Thread.Sleep(1000);
             }
+            Log.I.Info("transport stop");
         }
-        
+
         public void Start()
         {
-            // 直接启动一个线程，不阻塞主线程
-            Task.Factory.StartNew(Start0, TaskCreationOptions.LongRunning);
+            Task.Run(async () =>
+            {
+                await Start0();
+            }).ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Log.I.Error(task.Exception);
+                    Environment.Exit(-1);
+                }
+            });
         }
         
-        protected abstract void Start0();
+        protected abstract Task Start0();
 
         public virtual void RegisterExtMessages()
         {
