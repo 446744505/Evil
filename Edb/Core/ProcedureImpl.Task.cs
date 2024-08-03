@@ -19,7 +19,7 @@ namespace Edb
                 m_Done = done;
             }
 
-            public async void Launch()
+            public async Task Launch()
             {
                 Interlocked.CompareExchange(ref m_CompletionSource, new TaskCompletionSource<IProcedure.IResult>(),
                     null);

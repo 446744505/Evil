@@ -108,13 +108,23 @@ namespace Edb
             if (Transaction.Current != null)
                 throw new ThreadStateException("can not submit procedure in transaction");
             var pt = new ProcedureTask(new ProcedureImpl<TP>(p));
-            pt.Launch();
+            pt.Launch().ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                    Log.I.Error(task.Exception);
+            
+            });
             return pt.PTask;
         }
 
         internal static void Execute(TP p, Action<TP,IProcedure.IResult>? done)
         {
-            new ProcedureTask(new ProcedureImpl<TP>(p), done).Launch();
+            new ProcedureTask(new ProcedureImpl<TP>(p), done).Launch().ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                    Log.I.Error(task.Exception);
+            
+            });
         }
 
         internal int CalcDelay()
