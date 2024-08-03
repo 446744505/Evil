@@ -19,7 +19,6 @@ namespace NetWork
 
         public async Task<bool> Dispatch(Message msg)
         {
-            return await Task.Run(msg.Process);
             return await m_Executor.ExecuteAsync(msg.Process);
         }
     }

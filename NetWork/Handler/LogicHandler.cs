@@ -45,7 +45,6 @@ namespace NetWork.Handler
         {
             msg.Session = m_Session;
             msg.Dispatcher = m_Dispatcher;
-            // todo 这里能不能await
             msg.Dispatch();
         }
     }
