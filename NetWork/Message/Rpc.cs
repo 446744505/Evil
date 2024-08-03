@@ -39,7 +39,7 @@ namespace NetWork
 
         public override async Task<bool> Process()
         {
-            var result = await DeRequest();
+            var result = await OnRequest();
             var rsp = new RpcResponse() { RequestId = m_RequestId };
             using (var stream = new MemoryStream())
             {
@@ -63,7 +63,7 @@ namespace NetWork
             m_RequestId = reader.ReadInt64();
         }
 
-        public virtual async Task<T> DeRequest()
+        public virtual async Task<T> OnRequest()
         {
             throw new NotImplementedException();
         }

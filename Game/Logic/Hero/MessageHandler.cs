@@ -7,7 +7,7 @@ namespace Proto
 {
     public partial class ListHeroes
     {
-        public override async Task<PlayerHero> DeRequest()
+        public override async Task<PlayerHero> OnRequest()
         {
             var ph = await XTable.PlayerHero.Update(playerId);
             if (ph == null)
@@ -44,7 +44,7 @@ namespace Proto
     }
     public partial class GetHero
     {
-        public override async Task<Hero> DeRequest()
+        public override async Task<Hero> OnRequest()
         {
             var ph = await XTable.PlayerHero.Select(playerId);
             if (ph != null)
