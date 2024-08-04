@@ -2,11 +2,11 @@
 
 namespace Attributes
 {
-    public class XBeanAttribute : Attribute
+    public class BindAttribute : Attribute
     {
         private readonly Node m_Nodes;
-        
-        public XBeanAttribute(Node nodes)
+
+        public BindAttribute(Node nodes)
         {
             m_Nodes = nodes;
         }

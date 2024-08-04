@@ -8,7 +8,7 @@ namespace Attributes;
 [AttributeUsage(AttributeTargets.Field|AttributeTargets.Parameter)]
 public class ProtocolFieldAttribute : Attribute
 {
-    private int m_Index;
+    private readonly int m_Index;
     
     public ProtocolFieldAttribute(int index)
     {

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Evil.Util;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace Edb
 {
@@ -220,7 +221,7 @@ namespace Edb
         private readonly Dictionary<TK, TV> m_Removed = new();
         private readonly Dictionary<TK, TV> m_Replaced = new();
         private IList? m_Changed;
-        private Dictionary<TK, TV>? m_ObjRef;
+        private IDictionary? m_ObjRef;
         private Dictionary<TK, TV>? m_ChangedMap;
 
         internal HashSet<TK> Added => m_Added;
@@ -233,20 +234,26 @@ namespace Edb
                 if (m_ChangedMap != null)
                     return m_ChangedMap;
                 
-                m_ChangedMap = m_Replaced.Keys.ToDictionary(k => k, k => m_ObjRef![k]);
+                m_ChangedMap = m_Replaced.Keys.ToDictionary(k => k, k => (TV)m_ObjRef![k]!);
                 if (m_Changed == null && m_Added.Count == 0)
                     return m_ChangedMap;
                 
                 foreach (var k in m_Added)
-                    m_ChangedMap[k] = m_ObjRef![k];
+                    m_ChangedMap[k] = (TV)m_ObjRef![k]!;
                 if (m_Changed == null) 
                     return m_ChangedMap;
                 
                 var set = new HashSet<TV>(new ReferenceEqualityComparer<TV>());
                 foreach (var v in m_Changed)
                     set.Add((TV)v);
-                m_ObjRef!.Where(pair => set.Contains(pair.Value)).ToList().ForEach(pair => m_ChangedMap[pair.Key] = pair.Value);
-
+                foreach (var pair in m_ObjRef!)
+                {
+                    var entry = (DictionaryEntry)pair;
+                    var value = (TV)entry.Value!;
+                    if (set.Contains(value))
+                        m_ChangedMap[(TK)entry.Key] = value;
+                }
+                
                 return m_ChangedMap;
             }
         }
@@ -254,7 +261,7 @@ namespace Edb
         public void SetChanged(IList changed, object objRef)
         {
             m_Changed = changed;
-            m_ObjRef = (Dictionary<TK, TV>)objRef;
+            m_ObjRef = (IDictionary)objRef;
         }
 
         internal void Merge(INote note)
@@ -306,7 +313,10 @@ namespace Edb
 
         public override string ToString()
         {
-            return $"added={m_Added} removed={m_Removed} replaced={m_Replaced} changed={m_Changed}";
+            return $"added={Strings.ToCustomString(m_Added)} " +
+                   $"removed={Strings.ToCustomString(m_Removed)} " +
+                   $"replaced={Strings.ToCustomString(m_Replaced)} " +
+                   $"changed={Strings.ToCustomStringN(m_Changed)}";
         }
     }
 }

@@ -4,7 +4,7 @@ namespace Attributes
 {
     public class XColumnAttribute : Attribute
     {
-        private bool m_Id;
+        private readonly bool m_Id;
         
         public XColumnAttribute()
         {

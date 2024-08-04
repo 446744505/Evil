@@ -4,10 +4,10 @@ namespace Attributes
 {
     public class XTableAttribute : Attribute
     {
-        private Node m_Nodes;
-        private string m_Lock;
-        private int m_Capacity;
-        private bool m_IsMemory;
+        private readonly Node m_Nodes;
+        private readonly string m_Lock;
+        private readonly int m_Capacity;
+        private readonly bool m_IsMemory;
         
         public XTableAttribute(Node nodes, int capacity, Type? lockType = null, bool memory = false)
         {
