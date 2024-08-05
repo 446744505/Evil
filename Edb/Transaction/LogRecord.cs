@@ -20,7 +20,7 @@ namespace Edb
                 : m_Cache.GetOrAdd(o.GetType(), _ => Listenable.Create(o));
         }
         
-        private LogR<TKey, TValue>? GetLogR(TRecord<TKey, TValue> r)
+        private LogR<TKey, TValue>? GetOrCreateLogR(TRecord<TKey, TValue> r)
         {
             if (m_HasListener == null)
             {
@@ -46,7 +46,7 @@ namespace Edb
 
         internal void OnChanged(TRecord<TKey,TValue> record, LogNotify ln)
         {
-            var lr = GetLogR(record);
+            var lr = GetOrCreateLogR(record);
             if (lr != null)
             {
                 ln.Pop();
@@ -56,7 +56,7 @@ namespace Edb
 
         internal void OnChanged(TRecord<TKey,TValue> record, bool cc, TRecord<TKey,TValue>.State ss)
         {
-            var lr = GetLogR(record);
+            var lr = GetOrCreateLogR(record);
             if (lr != null && lr.m_Ss == null)
             {
                 lr.m_Cc = cc;

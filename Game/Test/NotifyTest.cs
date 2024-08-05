@@ -71,19 +71,19 @@ namespace Game.Test
         public async Task TestUpdate()
         {
             await Init();
-            // XTable.Tables.Player.AddListener(new PlayerListener(), "level");
+            XTable.Tables.Player.AddListener(new PlayerListener(), "level");
             XTable.Tables.PlayerHero.AddListener(new PlayerHeroListener(), "heroes");
             await Procedure.Submit(async () =>
             {
-                // var p = await XTable.Player.Update(1);
+                var p = await XTable.Player.Update(1);
                 var ph = await XTable.PlayerHero.Update(1);
-                // p.Level++;
-                // var h = new XBean.Hero()
-                // {
-                //     HeroId = 2,
-                //     Star = 1,
-                // };
-                // ph.Heroes[h.HeroId] = h;
+                p.Level++;
+                var h = new XBean.Hero()
+                {
+                    HeroId = 2,
+                    Star = 1,
+                };
+                ph.Heroes[h.HeroId] = h;
                 var hero = ph.Heroes[1];
                 hero.Star++;
                 return true;

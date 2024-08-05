@@ -19,7 +19,7 @@ namespace Edb.Test
         {
             await Init();
 
-            var table = Edb.I.Tables!.Get<long, Player>("Player");
+            var table = Edb.I.Tables.Get<long, Player>("Player");
             var player1 = new Player()
             {
                 PlayerId = 1,

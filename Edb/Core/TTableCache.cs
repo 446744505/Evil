@@ -21,7 +21,7 @@ namespace Edb
         
         internal static TTableCache<TKey, TValue> NewInstance(TTable<TKey, TValue> table, TableConfig config)
         {
-            var cache = new TTableCacheConcurrentMap<TKey, TValue>();
+            var cache = new TTableCacheLru<TKey, TValue>();
             cache.Initialize(table, config);
             return cache;
         }
@@ -92,14 +92,14 @@ namespace Edb
             }
         }
 
-        public abstract void Clear();
+        public abstract Task Clear();
         public abstract void Clean();
-        public abstract void Walk(Query<TKey, TValue> query);
+        public abstract Task Walk(Query<TKey, TValue> query);
         internal abstract ICollection<TRecord<TKey, TValue>> Values();
         internal abstract TRecord<TKey, TValue>? Get(TKey key);
         internal abstract void AddNoLog(TKey key, TRecord<TKey, TValue> r);
         internal abstract void Add(TKey key, TRecord<TKey, TValue> r);
-        internal abstract TRecord<TKey, TValue>? Remove(TKey key);
+        internal abstract bool Remove(TKey key);
 
         private class LogAddRemove0 : ILog
         {
