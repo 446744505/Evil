@@ -121,7 +121,9 @@ namespace Table
 
         public override {valueFullName} UnmarshalValue(BsonDocument value)
         {{
-            return BsonSerializer.Deserialize<{valueFullName}>(value);
+            var v = new {valueFullName}();
+            v.Unmarshal(value);
+            return v;
         }}
 
         public async Task<{valueFullName}> Select({idFullName} key)

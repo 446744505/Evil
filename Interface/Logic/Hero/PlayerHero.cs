@@ -12,6 +12,7 @@ namespace Hero
         
         [ProtocolField(1)]
         [XColumn]
+        [XListener]
         private Dictionary<long, Hero> heroes;
     }
 }

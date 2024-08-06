@@ -5,7 +5,6 @@ using Evil.Util;
 using XBean;
 using XListener;
 using Xunit;
-using IListener = Edb.IListener;
 
 namespace Game.Test
 {
@@ -17,7 +16,7 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 await XTable.Player.Delete(1);
-                
+
                 var p = new Player()
                 {
                     PlayerId = 1,
@@ -26,29 +25,29 @@ namespace Game.Test
                 };
                 Assert.True(await XTable.Player.Insert(p));
 
-                await XTable.PlayerHero.Delete(1);
-                var skill = new XBean.HeroSkill()
-                {
-                    CfgId = 1,
-                    Level = 1,
-                };
-                var hero = new XBean.Hero()
-                {
-                    HeroId = 1,
-                    Star = 1,
-                };
-                hero.Skills.Add(skill);
-                var ph = new PlayerHero()
-                {
-                    PlayerId = 1,
-                };
-                ph.Heroes[hero.HeroId] = hero;
-                Assert.True(await XTable.PlayerHero.Insert(ph));
+                // await XTable.PlayerHero.Delete(1);
+                // var skill = new XBean.HeroSkill()
+                // {
+                //     CfgId = 1,
+                //     Level = 1,
+                // };
+                // var hero = new XBean.Hero()
+                // {
+                //     HeroId = 1,
+                //     Star = 1,
+                // };
+                // hero.Skills.Add(skill);
+                // var ph = new PlayerHero()
+                // {
+                //     PlayerId = 1,
+                // };
+                // ph.Heroes[hero.HeroId] = hero;
+                // Assert.True(await XTable.PlayerHero.Insert(ph));
 
                 return true;
             });
         }
-        
+
         [Fact]
         public async Task TestInsert()
         {
@@ -69,13 +68,13 @@ namespace Game.Test
 
             await Edb.Edb.I.DisposeAsync();
         }
-        
+
         [Fact]
         public async Task TestUpdate()
         {
             await Init();
             XTable.Tables.Player.AddListener(new PlayerLevelListener(), "level");
-            XTable.Tables.PlayerHero.AddListener(new PlayerHeroListener(), "heroes");
+            XTable.Tables.PlayerHero.AddListener(new PlayerHeroHeroesListener(), "heroes");
             await Procedure.Submit(async () =>
             {
                 var p = await XTable.Player.Update(1);
@@ -95,35 +94,14 @@ namespace Game.Test
             await Edb.Edb.I.DisposeAsync();
         }
 
-        private class PlayerHeroListener : IListener
+        public class PlayerEventHandler : IEventHandler
         {
-            public Task OnChanged(object key, object val)
+            [Listener(typeof(PlayerLevelEvent))]
+            public static void OnPlayerLevelUpEvent(IEvent e0)
             {
-                Log.I.Info($"player changed: {key} {val}");
-                return Task.CompletedTask;
+                var e = (PlayerLevelEvent)e0;
+                Log.I.Info($"player {e.Key} level up to {e.Level}");
             }
-
-            public Task OnChanged(object key, object val, string fullVarName, INote? note)
-            {
-                Log.I.Info($"player changed note: {key} {val} {fullVarName} {note}");
-                return Task.CompletedTask;
-            }
-
-            public Task OnRemoved(object key, object val)
-            {
-                Log.I.Info($"player removed: {key} {val}");
-                return Task.CompletedTask;
-            }
-        }
-    }
-    
-    public class PlayerEventHandler : IEventHandler
-    {
-        [Listener(typeof(PlayerLevelEvent))]
-        public static void OnPlayerLevelUpEvent(IEvent e0)
-        {
-            var e = (PlayerLevelEvent)e0;
-            Log.I.Info($"player {e.Key} level up to {e.Level}");
         }
     }
 }

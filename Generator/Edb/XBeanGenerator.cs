@@ -40,7 +40,8 @@ namespace Generator.Edb
             var constructorLine = new Writer(true, 3);
             var copyConstructorLine = new Writer(true, 3);
             var copyFromLine = new Writer(true, 3);
-            var toProtoLine = new Writer(false);
+            var unmarshalLine = new Writer(true, 3);
+            var toProtoLine = new Writer();
             if (beanKind.IsProtoField) // 生成ToProto前半部分
             {
                 toProtoLine.WriteLine();
@@ -78,6 +79,10 @@ namespace Generator.Edb
                 var copyFromVisitor = new CopyFromTypeVisitor(fieldKind, copyFromLine);
                 fieldKind.Type.Accept(copyFromVisitor);
                 
+                // unmarshal生成
+                var unmarshalVisitor = new MongoUnmarshalTypeVisitor(fieldKind, beanKind.IdFieldName == fieldKind.Name, unmarshalLine);
+                fieldKind.Type.Accept(unmarshalVisitor);
+                
                 // toProto生成
                 if (beanKind.IsProtoField && fieldKind.IsProtoField)
                 {
@@ -103,7 +108,7 @@ namespace Generator.Edb
 #pragma warning disable 8669
 namespace XBean
 {{
-    public class {beanKind.Name} : Edb.XBean
+    public class {beanKind.Name} : Edb.XBean, Edb.IMongoCodec
     {{
         {fieldsLine}
 
@@ -131,6 +136,12 @@ namespace XBean
             _o_.VerifyStandaloneOrLockHeld(""CopyFrom{beanKind.Name}"", true);
             VerifyStandaloneOrLockHeld(""CopyTo{beanKind.Name}"", false);
             {copyFromLine}
+        }}
+        
+        public void Unmarshal(MongoDB.Bson.BsonDocument doc)
+        {{
+            VerifyStandaloneOrLockHeld(""Unmarshal"", false);
+            {unmarshalLine}
         }}
 {toProtoLine}
         {getterLine}

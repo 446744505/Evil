@@ -1,13 +1,16 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Evil.Util
 {
     public interface ILruCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         bool Contains(TKey key);
-        bool TryGet(TKey key, out TValue value);
+        bool TryGet(TKey key, [MaybeNullWhen(false)]out TValue value);
         TValue? Lookup(TKey key);
         void Add(TKey key, TValue value);
+        void Clear();
+        bool Remove(TKey key);
     }
 
     public class LruCache<TKey, TValue> : ILruCache<TKey, TValue> where TKey : notnull
@@ -39,7 +42,7 @@ namespace Evil.Util
             return m_LinkedHashMap.Remove(key);
         }
 
-        public bool TryGet(TKey key, out TValue value)
+        public bool TryGet(TKey key, [MaybeNullWhen(false)]out TValue value)
         {
             var result = m_LinkedHashMap.TryGetValue(key, out value);
             m_LinkedHashMap.UpdateKey(key);

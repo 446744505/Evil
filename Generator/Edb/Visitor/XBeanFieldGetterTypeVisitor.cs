@@ -31,7 +31,8 @@ namespace Generator.Visitor
             var fullNameVisitor = new EdbFullNameTypeVisitor();
             type.Accept(fullNameVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 VerifyStandaloneOrLockHeld(""Get{attrName}"", true);
@@ -46,7 +47,8 @@ namespace Generator.Visitor
             var fullNameVisitor = new EdbFullNameTypeVisitor();
             type.Accept(fullNameVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 VerifyStandaloneOrLockHeld(""Get{attrName}"", true);
@@ -99,7 +101,8 @@ namespace Generator.Visitor
             var valueVisitor = new FullNameTypeVisitor();
             type.Value().Accept(valueVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 if (!Edb.Transaction.IsActive)
@@ -121,7 +124,8 @@ namespace Generator.Visitor
             type.Key().Accept(keyVisitor);
             type.Value().Accept(valueVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 if (!Edb.Transaction.IsActive)

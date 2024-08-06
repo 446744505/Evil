@@ -46,6 +46,16 @@ namespace Generator.Util
             m_Sb.Append(content);
             m_Sb.Append(Files.NewLine);
         }
+        
+        public void Write(int tabCnt, string content)
+        {
+            for (var i = 0; i < tabCnt; i++)
+            {
+                m_Sb.Append("    ");
+            }
+
+            m_Sb.Append(content);
+        }
 
         public override string ToString()
         {

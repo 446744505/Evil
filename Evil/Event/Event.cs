@@ -1,5 +1,6 @@
 
 using System.Reflection;
+using Edb;
 using Evil.Util;
 
 namespace Evil.Event
@@ -30,6 +31,11 @@ namespace Evil.Event
                     }
                 }
             }
+        }
+
+        public static void FireWhenCommit(IEvent e)
+        {
+            Transaction.AddSavepointTask(() => Fire(e), null);
         }
         
         public static void Register<T>(Action<T> listener) where T : IEvent
