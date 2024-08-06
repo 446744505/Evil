@@ -6,7 +6,7 @@ namespace NetWork.Handler
 {
     internal class LogicHandler : SimpleChannelInboundHandler<Message>
     {
-        private Session m_Session;
+        private Session m_Session = null!;
         private IMessgeDispatcher m_Dispatcher;
         private readonly ISessionMgr m_SessionMgr;
         private readonly ISessionFactory m_SessionFactory;

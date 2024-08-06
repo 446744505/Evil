@@ -6,8 +6,8 @@ namespace Edb
         where TKey : notnull where TValue : class
     {
         private LockAsync m_Lock = new();
-        private LruCache<TKey, TRecord<TKey, TValue>> m_Cache;
-        private Cleaner m_Cleaner;
+        private LruCache<TKey, TRecord<TKey, TValue>> m_Cache = null!;
+        private Cleaner m_Cleaner = null!;
 
         internal override int Count
         {

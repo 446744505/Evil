@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
 using Edb;
+using Evil.Event;
 using Evil.Util;
 using XBean;
 using Xunit;
+using IListener = Edb.IListener;
 
 namespace Game.Test
 {
@@ -50,7 +52,7 @@ namespace Game.Test
         public async Task TestInsert()
         {
             await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-            XTable.Tables.Player.AddListener(new PlayerListener());
+            XTable.Tables.Player.AddListener(new PlayerListenerLevel(), "level");
             await Procedure.Submit(async () =>
             {
                 await XTable.Player.Delete(1);
@@ -71,7 +73,7 @@ namespace Game.Test
         public async Task TestUpdate()
         {
             await Init();
-            XTable.Tables.Player.AddListener(new PlayerListener(), "level");
+            XTable.Tables.Player.AddListener(new PlayerListenerLevel(), "level");
             XTable.Tables.PlayerHero.AddListener(new PlayerHeroListener(), "heroes");
             await Procedure.Submit(async () =>
             {
@@ -92,24 +94,33 @@ namespace Game.Test
             await Edb.Edb.I.DisposeAsync();
         }
         
-        private class PlayerListener : IListener
+        private class PlayerListenerLevel : IListener
         {
-            public async Task OnChanged(object key, object val)
+            public Task OnChanged(object key, object val)
             {
                 Log.I.Info($"player changed: {key} {val}");
+                return Task.CompletedTask;
             }
 
-            public async Task OnChanged(object key, object val, string fullVarName, INote? note)
+            public Task OnChanged(object key, object val, string fullVarName, INote? note)
             {
                 Log.I.Info($"player changed note: {key} {val} {fullVarName} {note}");
+                var player = (Player)val;
+                
+                Event.Fire(new PlayerEventLevel((long)key)
+                {
+                    Level = player.Level,
+                });
+                return Task.CompletedTask;
             }
 
-            public async Task OnRemoved(object key, object val)
+            public Task OnRemoved(object key, object val)
             {
                 Log.I.Info($"player removed: {key} {val}");
+                return Task.CompletedTask;
             }
         }
-        
+
         private class PlayerHeroListener : IListener
         {
             public async Task OnChanged(object key, object val)
@@ -126,6 +137,25 @@ namespace Game.Test
             {
                 Log.I.Info($"player removed: {key} {val}");
             }
+        }
+    }
+
+    public class PlayerEventLevel : EEvent<long>
+    {
+        public int Level { get; set; }
+
+        public PlayerEventLevel(long key) : base(key)
+        {
+        }
+    }
+    
+    public class PlayerEventHandler : IEventHandler
+    {
+        [Listener(typeof(PlayerEventLevel))]
+        public static void OnPlayerLevelUpEvent(IEvent e0)
+        {
+            var e = (PlayerEventLevel)e0;
+            Log.I.Info($"player {e.Key} level up to {e.Level}");
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Attributes
 {
+    [AttributeUsage(AttributeTargets.Field)]
     public class XColumnAttribute : Attribute
     {
         private readonly bool m_Id;

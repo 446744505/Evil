@@ -11,8 +11,8 @@ namespace NetWork.Proto
 
         [ProtoMember(1)]
         public long RequestId { get; set; }
-        [ProtoMember(2)]
-        public byte[] Data { get; set; }
+
+        [ProtoMember(2)] public byte[] Data { get; set; } = null!;
 
         public override Task<bool> Process()
         {

@@ -1,5 +1,6 @@
 
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Evil.Util
 {
@@ -16,8 +17,8 @@ namespace Evil.Util
         public ICollection<TKey> Keys => m_ValueByKey.Keys;
         public ICollection<TValue> Values => m_ValueByKey.Values.Select(pair => pair.Value).ToList();
 
-        private LinkedList<TKey> m_Items;
-        private IDictionary<TKey, ValueNodePair> m_ValueByKey;
+        private LinkedList<TKey> m_Items = null!;
+        private IDictionary<TKey, ValueNodePair> m_ValueByKey = null!;
 
         public void Clear()
         {
@@ -63,7 +64,7 @@ namespace Evil.Util
             return true;
         }
 
-        public bool TryGetValue(TKey key, out TValue value)
+        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (!m_ValueByKey.TryGetValue(key, out var tempValue)) {
                 value = default;

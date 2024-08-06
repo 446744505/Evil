@@ -63,7 +63,7 @@ namespace NetWork
             m_RequestId = reader.ReadInt64();
         }
 
-        public virtual async Task<T> OnRequest()
+        public virtual Task<T> OnRequest()
         {
             throw new NotImplementedException();
         }

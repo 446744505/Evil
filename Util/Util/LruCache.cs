@@ -6,7 +6,7 @@ namespace Evil.Util
     {
         bool Contains(TKey key);
         bool TryGet(TKey key, out TValue value);
-        TValue Lookup(TKey key);
+        TValue? Lookup(TKey key);
         void Add(TKey key, TValue value);
     }
 
@@ -46,7 +46,7 @@ namespace Evil.Util
             return result;
         }
 
-        public TValue Lookup(TKey key)
+        public TValue? Lookup(TKey key)
         {
             return !TryGet(key, out var value) ? default : value;
         }

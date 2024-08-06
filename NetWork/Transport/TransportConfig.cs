@@ -5,10 +5,10 @@ namespace NetWork.Transport
     public abstract class TransportConfig
     {
         public int Port { get; set; } = 27519;
-        public INetWorkFactory NetWorkFactory { get; set; }
+        public INetWorkFactory NetWorkFactory { get; set; } = null!;
 
-        internal Executor Executor = new();
-        public IMessgeDispatcher? Dispatcher { get; set; }
+        internal Executor Executor { get; } = new();
+        public IMessgeDispatcher Dispatcher { get; set; } = null!;
     }
     
     public class AcceptorTransportConfig : TransportConfig

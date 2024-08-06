@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Edb;
+using Evil.Event;
 using Evil.Util;
 using Game.NetWork;
 using Game.Test;
@@ -11,6 +12,7 @@ namespace Game
     {
         public static async Task Main(string[] args)
         {
+            Event.Start();
             var test = new NotifyTest();
             await test.TestUpdate();
             // Stopper? stopper = null;

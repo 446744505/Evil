@@ -6,10 +6,10 @@ namespace NetWork
 {
     public abstract class Message
     {
-        public virtual uint MessageId { get; }
+        public virtual uint MessageId { get; } = 0;
         public ushort Pvid { get; set; }
-        public Session Session { get; set; }
-        public IMessgeDispatcher Dispatcher { get; set; }
+        public Session Session { get; set; } = null!;
+        public IMessgeDispatcher Dispatcher { get; set; } = null!;
 
         public void Send(Session? session)
         {
