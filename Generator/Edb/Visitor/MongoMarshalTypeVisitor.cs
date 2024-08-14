@@ -5,7 +5,7 @@ using Generator.Util;
 
 namespace Generator.Visitor
 {
-    public class MongoUnmarshalTypeVisitor : ITypeVisitor
+    public class MongoMarshalTypeVisitor : ITypeVisitor
     {
         private readonly XBeanFieldKind m_FieldKind;
         private readonly bool m_IsIdField;
@@ -15,14 +15,14 @@ namespace Generator.Visitor
         private string FieldName => m_FieldKind.Name;
         private string DocName => m_IsIdField ? "_id" : m_FieldKind.Name;
 
-        public MongoUnmarshalTypeVisitor(XBeanFieldKind fieldKind, bool isIdField, Writer writer)
+        public MongoMarshalTypeVisitor(XBeanFieldKind fieldKind, bool isIdField, Writer writer)
         {
             m_FieldKind = fieldKind;
             m_IsIdField = isIdField;
             m_Writer = writer;
         }
         
-        private MongoUnmarshalTypeVisitor(XBeanFieldKind fieldKind, Writer writer, CollectionType collectionType)
+        private MongoMarshalTypeVisitor(XBeanFieldKind fieldKind, Writer writer, CollectionType collectionType)
         {
             m_FieldKind = fieldKind;
             m_Writer = writer;
@@ -39,44 +39,29 @@ namespace Generator.Visitor
             switch (m_CollectionType)
             {
                 case CollectionType.None:
-                    m_Writer.WriteLine($@"{FieldName}.Unmarshal(_doc_[""{FieldName}""].AsBsonDocument);");
+                    m_Writer.WriteLine($"_doc_[\"{DocName}\"] = {FieldName}.Marshal(new BsonDocument());");
                     break;
                 case CollectionType.List:
-                    m_Writer.Write($@"{FieldName}.Add(new {type.Name}(this, ""{FieldName}"").Unmarshal(_{FieldName}_[_i_].AsBsonDocument));");
+                    m_Writer.Write($"_{FieldName}_.Add(_v_.Marshal(new BsonDocument()));");
                     break;
                 case CollectionType.Map:
-                    var asVisitor = new MongoAsTypeVisitor();
-                    var mapType = m_FieldKind.Type as MapType;
-                    mapType!.Key().Accept(asVisitor);
-                    m_Writer.WriteLine("// 为了map的key可以是任意类型，所以map是以array的方式存入mongo的");
-                    m_Writer.WriteLine(4, $"var _arr_ = _{FieldName}_[_i_].AsBsonArray;");
-                    m_Writer.Write(4, $@"{FieldName}[_arr_[0].{asVisitor.Result}] = new {type.Name}(this, ""{FieldName}"").Unmarshal(_arr_[1].AsBsonDocument);");
+                    m_Writer.Write($"_arr_.Add(_pair_.Value.Marshal(new BsonDocument()));");
                     break;
             }
         }
 
         private void BaseVisit(IType type)
         {
-            var asVisitor = new MongoAsTypeVisitor();
             switch (m_CollectionType)
             {
                 case CollectionType.None:
-                    type.Accept(asVisitor);
-                    m_Writer.WriteLine($@"{FieldName} = _doc_[""{DocName}""].{asVisitor.Result};");
+                    m_Writer.WriteLine($@"_doc_[""{DocName}""] = {FieldName};");
                     break;
                 case CollectionType.List:
-                    type.Accept(asVisitor);
-                    m_Writer.WriteLine($"{FieldName}.Add(_{FieldName}_[_i_].{asVisitor.Result});");
+                    m_Writer.WriteLine($@"_{FieldName}_.Add(_v_);");
                     break;
                 case CollectionType.Map:
-                    var keyAsVisitor = new MongoAsTypeVisitor();
-                    var valAsVisitor = new MongoAsTypeVisitor();
-                    var mapType = m_FieldKind.Type as MapType;
-                    mapType!.Key().Accept(keyAsVisitor);
-                    mapType.Value().Accept(valAsVisitor);
-                    m_Writer.WriteLine(4,"// 为了map的key可以是任意类型，所以map是以array的方式存入mongo的");
-                    m_Writer.WriteLine(4, $"var _arr_ = _{FieldName}_[_i_].AsBsonArray;");
-                    m_Writer.Write(4, $"{FieldName}[_arr_[0].{keyAsVisitor.Result}] = _arr_[1].{valAsVisitor.Result};");
+                    m_Writer.WriteLine($@"_arr_.Add(_pair_.Value);");
                     break;
             }
         }
@@ -114,30 +99,35 @@ namespace Generator.Visitor
         public void Visit(ListType type)
         {
             var writer = new Writer();
-            var collectionVisitor = new MongoUnmarshalTypeVisitor(m_FieldKind, writer, CollectionType.List);
+            var collectionVisitor = new MongoMarshalTypeVisitor(m_FieldKind, writer, CollectionType.List);
             type.Value().Accept(collectionVisitor);
             
             m_Writer.WriteLine($@"
-            var _{FieldName}_ = _doc_[""{DocName}""].AsBsonArray;
-            for (var _i_ = 0; _i_ < _{FieldName}_.Count; _i_++)
+            var _{FieldName}_ = new BsonArray({FieldName}.Count);
+            foreach (var _v_ in {FieldName})
             {{
                 {writer}
             }}
+            _doc_[""{DocName}""] = _{FieldName}_;
     ");
         }
 
         public void Visit(MapType type)
         {
             var writer = new Writer();
-            var collectionVisitor = new MongoUnmarshalTypeVisitor(m_FieldKind, writer, CollectionType.Map);
+            var collectionVisitor = new MongoMarshalTypeVisitor(m_FieldKind, writer, CollectionType.Map);
             type.Value().Accept(collectionVisitor);
             
             m_Writer.WriteLine($@"
-            var _{FieldName}_ = _doc_[""{DocName}""].AsBsonArray;
-            for (var _i_ = 0; _i_ < _{FieldName}_.Count; _i_++)
+            var _{FieldName}_ = new BsonArray({FieldName}.Count);
+            foreach (var _pair_ in {FieldName})
             {{
+                var _arr_ = new BsonArray(2);
+                _arr_.Add(_pair_.Key);
                 {writer}
+                _{FieldName}_.Add(_arr_);
             }}
+            _doc_[""{DocName}""] = _{FieldName}_;
     ");
         }
 

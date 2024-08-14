@@ -89,7 +89,6 @@ using System.Threading.Tasks;
 
 using Edb;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 
 namespace Table
 {{
@@ -116,14 +115,12 @@ namespace Table
 
         public override BsonDocument MarshalValue({valueFullName} value)
         {{
-            return value.ToBsonDocument();
+            return value.Marshal(new BsonDocument());
         }}
 
         public override {valueFullName} UnmarshalValue(BsonDocument value)
         {{
-            var v = new {valueFullName}();
-            v.Unmarshal(value);
-            return v;
+            return new {valueFullName}().Unmarshal(value);
         }}
 
         public async Task<{valueFullName}> Select({idFullName} key)

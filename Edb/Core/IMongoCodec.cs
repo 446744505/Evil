@@ -2,8 +2,9 @@ using MongoDB.Bson;
 
 namespace Edb
 {
-    public interface IMongoCodec
+    public interface IMongoCodec<T>
     {
-        void Unmarshal(BsonDocument doc);
+        T Unmarshal(BsonDocument doc);
+        BsonDocument Marshal(BsonDocument doc);
     }
 }

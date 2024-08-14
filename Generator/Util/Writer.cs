@@ -56,6 +56,11 @@ namespace Generator.Util
 
             m_Sb.Append(content);
         }
+        
+        public void Write(string content)
+        {
+            m_Sb.Append(content);
+        }
 
         public override string ToString()
         {
