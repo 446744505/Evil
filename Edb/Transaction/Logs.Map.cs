@@ -224,7 +224,7 @@ namespace Edb
         private IDictionary? m_ObjRef;
         private Dictionary<TK, TV>? m_ChangedMap;
 
-        internal HashSet<TK> Added => m_Added;
+        public HashSet<TK> Added => m_Added;
         internal Dictionary<TK, TV> Replaced => m_Replaced;
         public Dictionary<TK, TV> Removed => m_Removed;
         protected bool IsMapChanged => m_Added.Count > 0 || m_Removed.Count > 0 || m_Replaced.Count > 0;

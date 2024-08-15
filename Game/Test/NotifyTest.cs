@@ -25,24 +25,24 @@ namespace Game.Test
                 };
                 Assert.True(await XTable.Player.Insert(p));
 
-                // await XTable.PlayerHero.Delete(1);
-                // var skill = new XBean.HeroSkill()
-                // {
-                //     CfgId = 1,
-                //     Level = 1,
-                // };
-                // var hero = new XBean.Hero()
-                // {
-                //     HeroId = 1,
-                //     Star = 1,
-                // };
-                // hero.Skills.Add(skill);
-                // var ph = new PlayerHero()
-                // {
-                //     PlayerId = 1,
-                // };
-                // ph.Heroes[hero.HeroId] = hero;
-                // Assert.True(await XTable.PlayerHero.Insert(ph));
+                await XTable.PlayerHero.Delete(1);
+                var skill = new XBean.HeroSkill()
+                {
+                    CfgId = 1,
+                    Level = 1,
+                };
+                var hero = new XBean.Hero()
+                {
+                    HeroId = 1,
+                    Star = 1,
+                };
+                hero.Skills.Add(skill);
+                var ph = new PlayerHero()
+                {
+                    PlayerId = 1,
+                };
+                ph.Heroes[hero.HeroId] = hero;
+                Assert.True(await XTable.PlayerHero.Insert(ph));
 
                 return true;
             });
@@ -101,6 +101,16 @@ namespace Game.Test
             {
                 var e = (PlayerLevelEvent)e0;
                 Log.I.Info($"player {e.Key} level up to {e.Level}");
+            }
+        }
+        
+        public class PlayerHeroEventHandler : IEventHandler
+        {
+            [Listener(typeof(PlayerHeroHeroesEvent))]
+            public static void OnPlayerHeroEvent(IEvent e0)
+            {
+                var e = (PlayerHeroHeroesEvent)e0;
+                Log.I.Info(e.IsAdd ? $"player {e.Key} add hero {e.K}" : $"player {e.Key} remove hero {e.K}");
             }
         }
     }

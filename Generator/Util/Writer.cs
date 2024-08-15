@@ -59,7 +59,14 @@ namespace Generator.Util
         
         public void Write(string content)
         {
-            m_Sb.Append(content);
+            if (m_IsMultiLine && !m_IsFirst)
+            {
+                WriteLine(m_NotFirstTabCnt, content);
+            }
+            else
+            {
+                m_Sb.Append(content);   
+            }
         }
 
         public override string ToString()
