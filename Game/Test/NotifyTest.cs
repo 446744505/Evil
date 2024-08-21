@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Edb;
 using Evil.Event;
@@ -110,7 +111,7 @@ namespace Game.Test
             public static void OnPlayerHeroEvent(IEvent e0)
             {
                 var e = (PlayerHeroHeroesEvent)e0;
-                Log.I.Info(e.IsAdd ? $"player {e.Key} add hero {e.K}" : $"player {e.Key} remove hero {e.K}");
+                Log.I.Info(e.IsAdd ? $"player {e.Key} add hero {e.MKey}" : $"player {e.Key} remove hero {e.MKey}");
             }
         }
     }

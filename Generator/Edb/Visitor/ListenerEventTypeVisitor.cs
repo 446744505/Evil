@@ -71,7 +71,7 @@ namespace Generator.Visitor
             m_Writer.WriteLine($"public bool IsAdd {{ get; set; }} // true for add, false for remove");
             var keyFullNameVisitor = new FullNameTypeVisitor();
             type.Key().Accept(keyFullNameVisitor);
-            m_Writer.Write(2,$"public {keyFullNameVisitor.Result} K {{ get; set; }} // add or removed key");
+            m_Writer.Write(2,$"public {keyFullNameVisitor.Result} MKey {{ get; set; }} // add or removed key");
         }
 
         public void Visit(TaskType type)

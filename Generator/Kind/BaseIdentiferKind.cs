@@ -16,6 +16,7 @@ namespace Generator.Kind
         
         public string Name => Type.Name;
         public string Comment { get; set; }
+        public string OriginalNamespaceName { get; set; } // 生成不同的.proto文件时会用到
         public BaseIdentiferType Type { get; }
 
         #endregion

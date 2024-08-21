@@ -89,14 +89,14 @@ namespace Generator.Visitor
             m_Writer.WriteLine($"    Event.Fire(new {m_EventName}(({m_IdFullName})key)");
             m_Writer.WriteLine(($"    {{"));
             m_Writer.WriteLine($"        IsAdd = true,");
-            m_Writer.WriteLine($"        K = k,");
+            m_Writer.WriteLine($"        MKey = k,");
             m_Writer.WriteLine(($"    }});"));
             m_Writer.WriteLine($"}}");
             m_Writer.WriteLine($"foreach (var pair in noteMap!.Removed)");
             m_Writer.WriteLine($"{{");
             m_Writer.WriteLine($"    Event.Fire(new {m_EventName}(({m_IdFullName})key)");
             m_Writer.WriteLine(($"    {{"));
-            m_Writer.WriteLine($"        K = pair.Key,");
+            m_Writer.WriteLine($"        MKey = pair.Key,");
             m_Writer.WriteLine(($"    }});"));
             m_Writer.WriteLine($"}}");
         }
