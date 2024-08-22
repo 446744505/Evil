@@ -6,6 +6,9 @@ namespace NetWork
 {
     public abstract class Message
     {
+        protected static readonly Task<bool> FalseTask = Task.FromResult(false);
+        protected static readonly Task<bool> TrueTask = Task.FromResult(true);
+        
         public virtual uint MessageId { get; } = 0;
         public ushort Pvid { get; set; }
         public Session Session { get; set; } = null!;
@@ -42,7 +45,7 @@ namespace NetWork
         /// </summary>
         public virtual Task<bool> Process()
         {
-            return Task.FromResult(false);
+            return FalseTask;
         }
 
         public virtual void Decode(BinaryReader reader)

@@ -18,10 +18,7 @@ namespace Evil.Util
 
         public Executor(TimeProvider? provider = null)
         {
-            if (provider == null)
-                provider = TimeProvider.System;
-            else
-                m_TimeProvider = provider;
+            m_TimeProvider = provider ?? TimeProvider.System;
         }
         
         public Task ExecuteAsync(Action action)

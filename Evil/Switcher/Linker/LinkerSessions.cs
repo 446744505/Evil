@@ -27,7 +27,7 @@ namespace Evil.Switcher
             return m_Sessions.TryGetValue(sid, out var session) ? session : null;
         }
 
-        internal async void CheckAlive()
+        internal async Task CheckAlive()
         {
             foreach (var session in m_Sessions.Values)
             {

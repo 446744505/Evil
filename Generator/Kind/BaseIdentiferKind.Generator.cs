@@ -7,6 +7,9 @@ namespace Generator.Kind
     {
         public string GenConstFields(int initTabN)
         {
+            if (m_ConstFields.Count == 0)
+                return string.Empty;
+            
             var writer = new Writer();
             foreach (var field in m_ConstFields)
             {
@@ -17,6 +20,9 @@ namespace Generator.Kind
         
         public string GenToString(int initTabN)
         {
+            if (Children().Count == 0)
+                return string.Empty;
+            
             var writer = new Writer();
             writer.WriteLine(initTabN, "public override string ToString()");
             writer.WriteLine(initTabN, "{");

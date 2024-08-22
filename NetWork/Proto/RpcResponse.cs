@@ -19,12 +19,12 @@ namespace NetWork.Proto
             var func = RpcMgr.I.RemovePending(RequestId);
             if (func == null)
             {
-                return Task.FromResult(false);
+                return FalseTask;
             }
 
             using var stream = new MemoryStream(Data);
             func.Invoke(stream);
-            return Task.FromResult(true);
+            return TrueTask;
         }
     }
 }
