@@ -8,6 +8,10 @@ namespace NetWork.Codec
 {
     internal class MessageEncode : MessageToByteEncoder<Message>
     {
+        /// <summary>
+        /// 一个连接用一个BinaryWriter就好，减少gc，但是内存占用会稍微高一些
+        /// 可以考虑直接使用IByteBuffer性能更好(但是需要研究如何用IByteBuffer编解码protobuf or protobuf-net)
+        /// </summary>
         private BinaryWriter m_Writer;
         
         public MessageEncode()
@@ -22,6 +26,8 @@ namespace NetWork.Codec
             stream.Position = 0;
             // encode head
             m_Writer.Write(message.MessageId);
+            m_Writer.Write(message.Pvid);
+            // encode ext head
             message.Encode(m_Writer);
             // encode body
             Serializer.Serialize(stream, message);

@@ -15,15 +15,6 @@ namespace Evil.Util
             return this;
         }
 
-        public Log UnhandledException()
-        {
-            AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-            {
-                Error("Log UnhandledException", (Exception)e.ExceptionObject);
-            };
-            return this;
-        }
-        
         public void Info(string log)
         {
             m_Logger.Info(log);

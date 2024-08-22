@@ -8,19 +8,11 @@ namespace Evil.Switcher
     {
         private MessageRegister m_MessageRegister = new();
         public IMessageRegister MessageRegister => m_MessageRegister;
-        public void Start()
+        public void Start(string[] args)
         {
-            Stopper? stopper = null;
-            try
-            {
-                Linker.I.Start();
-                stopper = new Stopper().BindAndWait();
-            }
-            finally
-            {
-                stopper?.SignalWeakUp();   
-                Log.I.Info("Switcher Stop");
-            }
+            CmdLine.Init(args);
+            Linker.I.Start();
+            Provider.I.Start();
         }
     }
 }

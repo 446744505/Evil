@@ -4,12 +4,23 @@ using Evil.Util;
 
 namespace NetWork
 {
+    public struct MessageHeader
+    {
+        public uint MessageId { get; set; }
+        public ushort Pvid { get; set; }
+        public void Decode(BinaryReader reader)
+        {
+            MessageId = reader.ReadUInt32();
+            Pvid = reader.ReadUInt16();
+        }
+    }
     public abstract class Message
     {
         protected static readonly Task<bool> FalseTask = Task.FromResult(false);
         protected static readonly Task<bool> TrueTask = Task.FromResult(true);
         
         public virtual uint MessageId { get; } = 0;
+        public virtual int MaxSize { get; } = 1024 * 1024;
         public ushort Pvid { get; set; }
         public Session Session { get; set; } = null!;
         public IMessgeDispatcher Dispatcher { get; set; } = null!;
@@ -50,12 +61,10 @@ namespace NetWork
 
         public virtual void Decode(BinaryReader reader)
         {
-            Pvid = reader.ReadUInt16();
         }
         
         public virtual void Encode(BinaryWriter writer)
         {
-            writer.Write(Pvid);
         }
     }
 }

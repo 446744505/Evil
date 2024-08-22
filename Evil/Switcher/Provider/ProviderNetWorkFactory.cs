@@ -3,16 +3,16 @@ using NetWork;
 
 namespace Evil.Switcher
 {
-    public class LinkerNetWorkFactory : INetWorkFactory
+    public class ProviderNetWorkFactory : INetWorkFactory
     {
         public Session CreateSession(IChannelHandlerContext ctx)
         {
-            return new LinkerSession(ctx);
+            return new ProviderSession(ctx);
         }
 
         public ISessionMgr CreateSessionMgr()
         {
-            return new LinkerSessionMgr();
+            return new ProviderSessionMgr();
         }
 
         public IMessageRegister CreateMessageRegister()
@@ -22,7 +22,7 @@ namespace Evil.Switcher
 
         public IMessageProcessor CreateMessageProcessor(ushort pvid)
         {
-            return new LinkerMessageProcessor(pvid);
+            return new ProviderMessageProcessor(pvid);
         }
     }
 }

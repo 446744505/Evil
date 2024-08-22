@@ -28,19 +28,12 @@ namespace NetWork.Transport
         public BaseTransport(T config)
         {
             Config = config;
-            m_SessionMgr = Config.NetWorkFactory.CreateSessionMgr();
-            if (Config.Dispatcher == null)
-                Config.Dispatcher = new MessgeDispatcher(Config.Executor);
-            var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
-            m_MessageProcessor = new MessageProcessor();
-            RegisterMessages();
-            messageRegister.Register(m_MessageProcessor);
         }
 
-        private void RegisterMessages()
+        private void RegisterMessages(IMessageProcessor processor)
         {
-            m_MessageProcessor.Register(MessageId.RpcResponse, () => new RpcResponse());
-            RegisterExtMessages();
+            processor.Register(MessageId.RpcResponse, () => new RpcResponse());
+            RegisterExtMessages(processor);
         }
 
         protected async Task WaitStop()
@@ -66,6 +59,13 @@ namespace NetWork.Transport
 
         public void Start()
         {
+            m_SessionMgr = Config.NetWorkFactory!.CreateSessionMgr();
+            Config.Dispatcher ??= new MessgeDispatcher(Config.Executor);
+            var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
+            m_MessageProcessor = Config.NetWorkFactory.CreateMessageProcessor(Config.Pvid);
+            RegisterMessages(m_MessageProcessor);
+            messageRegister.Register(m_MessageProcessor);
+            
             Task.Run(async () =>
             {
                 await Start0();
@@ -81,7 +81,7 @@ namespace NetWork.Transport
         
         protected abstract Task Start0();
 
-        public virtual void RegisterExtMessages()
+        public virtual void RegisterExtMessages(IMessageProcessor processor)
         {
         }
     }

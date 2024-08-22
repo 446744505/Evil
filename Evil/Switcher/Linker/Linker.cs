@@ -6,14 +6,22 @@ namespace Evil.Switcher
 {
     internal class Linker : Singleton<Linker>
     {
+        #region 字段
+
         private readonly LinkerSessions m_Sessions = new();
+
+        #endregion
         
+        #region 属性
+
         internal LinkerSessions Sessions => m_Sessions;
         internal int SessionTimeout { get; private set; }
 
+        #endregion
+
         internal void Start()
         {
-            SessionTimeout = TimeSpan.FromSeconds(CmdLine.I.SessionTimeout).Milliseconds;
+            SessionTimeout = TimeSpan.FromSeconds(CmdLine.I.LinkerSessionTimeout).Milliseconds;
 
             StartNetWork();
         }

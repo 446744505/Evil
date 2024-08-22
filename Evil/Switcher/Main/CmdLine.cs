@@ -6,6 +6,8 @@ namespace Evil.Switcher
     {
         public static CmdLine I = null!;
 
+        [ConfigurationKeyName("pvid")]
+        public ushort Pvid { get; set; } = 0;
         /// <summary>
         /// linker 端口
         /// </summary>
@@ -21,8 +23,13 @@ namespace Evil.Switcher
         /// <summary>
         /// 客户端心跳超时时间
         /// </summary>
-        [ConfigurationKeyName("sessionTimeout")]
-        public int SessionTimeout { get; set; } = 120; // 单位秒
+        [ConfigurationKeyName("linkerTimeout")]
+        public int LinkerSessionTimeout { get; set; } = 120; // 单位秒
+        /// <summary>
+        /// 服务器心跳超时时间
+        /// </summary>
+        [ConfigurationKeyName("providerTimeout")]
+        public int ProviderSessionTimeout { get; set; } = 30; // 单位秒
         /// <summary>
         /// 一个linker 最多连接数
         /// </summary>
@@ -38,7 +45,7 @@ namespace Evil.Switcher
             }
             var builder = new ConfigurationBuilder().AddCommandLine(args);
             var configuration = builder.Build();
-            I = configuration.Get<CmdLine>() ?? throw new System.Exception("cmdLineArgs parse failed");
+            I = configuration.Get<CmdLine>() ?? throw new Exception("cmdLineArgs parse failed");
         }
     }
 }

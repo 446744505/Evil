@@ -2,25 +2,23 @@ using System.Threading.Tasks;
 using Client.Hero;
 using Evil.Util;
 using NetWork;
-using Nito.AsyncEx;
-using Proto;
 
 namespace Client.NetWork
 {
     public class Net : Singleton<Net>
     {
         private readonly ConnectorSessionMgr m_SessionMgr = new ClientSessionMgr();
-        private readonly MessageRegister m_MessageRegister = new();
         public ConnectorSessionMgr SessionMgr => m_SessionMgr;
-        public IMessageRegister MessageRegister => m_MessageRegister;
-
+        public ushort Pvid { get; set; } = 1;
         public void Send(Message msg)
         {
+            msg.Pvid = Pvid;
             msg.Send(m_SessionMgr.Session);
         }
 
         public async Task<T> SendAsync<T>(Rpc<T> rpc) where T : Message
         {
+            rpc.Pvid = Pvid;
             return await rpc.SendAsync(m_SessionMgr.Session);
         }
     }

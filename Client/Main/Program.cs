@@ -15,7 +15,7 @@ namespace Client
             try
             {
                 var config = new ConnectorTransportConfig();
-                // config.Port = 10000;
+                config.Port = 10000;
                 config.NetWorkFactory = new ClientNetWorkFactory();
                 var connector = new ConnectorTransport(config);
                 connector.Start();

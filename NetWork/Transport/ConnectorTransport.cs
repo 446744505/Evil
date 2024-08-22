@@ -25,6 +25,11 @@ namespace NetWork.Transport
                 bootstrap.Group(group)
                     .Channel<TcpSocketChannel>()
                     .Option(ChannelOption.TcpNodelay, true)
+                    .Option(ChannelOption.SoKeepalive, false)
+                    .Option(ChannelOption.SoRcvbuf, Config.SoRcvbuf)
+                    .Option(ChannelOption.SoSndbuf, Config.SoSndbuf)
+                    .Option(ChannelOption.WriteBufferLowWaterMark, Config.OutBufferSize)
+                    .Option(ChannelOption.WriteBufferHighWaterMark, Config.OutBufferSize)
                     .Handler(new ActionChannelInitializer<IChannel>(channel =>
                     {
                         AddChannelHandler(channel.Pipeline);
@@ -53,7 +58,7 @@ namespace NetWork.Transport
             pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
             pipeline.AddLast(new MessageDecode(m_MessageProcessor));
             pipeline.AddLast(new MessageEncode());
-            pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr, Config.Dispatcher));
+            pipeline.AddLast(new LogicHandler(Config.NetWorkFactory!, m_SessionMgr, Config.Dispatcher!));
         }
     }
 }

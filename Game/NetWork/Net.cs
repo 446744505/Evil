@@ -7,8 +7,9 @@ namespace Game.NetWork
 {
     public class Net : Singleton<Net>
     {
-        private readonly AcceptorSessionMgr m_SessionMgr = new();
         private readonly MessageRegister m_MessageRegister = new();
+        private readonly AcceptorSessionMgr m_SessionMgr = new();
+        
         public AcceptorSessionMgr SessionMgr => m_SessionMgr;
         public IMessageRegister MessageRegister => m_MessageRegister;
 
