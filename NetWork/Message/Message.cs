@@ -17,7 +17,7 @@ namespace NetWork
             {
                 throw new NetWorkException("session is null");
             }
-            session.Send(this);
+            session.SendAsync(this);
         }
         
         /// <summary>

@@ -8,11 +8,21 @@ namespace Evil.Util
     /// </summary>
     public class Executor
     {
+        private readonly TimeProvider m_TimeProvider;
+        
         private volatile bool m_IsDisposed;
         private ConcurrentBag<Task> m_Tasks = new();
         private LockAsync m_Lock = new();
         private long m_RunningTimerCount;
-        private ConcurrentBag<Timer> m_Timers = new();
+        private ConcurrentBag<ITimer> m_Timers = new();
+
+        public Executor(TimeProvider? provider = null)
+        {
+            if (provider == null)
+                provider = TimeProvider.System;
+            else
+                m_TimeProvider = provider;
+        }
         
         public Task ExecuteAsync(Action action)
         {
@@ -73,7 +83,7 @@ namespace Evil.Util
         public void Delay(Action cb, int delay)
         {
             CheckDisposed();
-            var timer = new Timer(_ =>
+            var timer = m_TimeProvider.CreateTimer(_ =>
             {
                 Interlocked.Increment(ref m_RunningTimerCount);
                 try
@@ -88,14 +98,15 @@ namespace Evil.Util
                 {
                     Interlocked.Decrement(ref m_RunningTimerCount);
                 }
-            }, null, delay, -1);
+            }, null, TimeSpan.FromMilliseconds(delay), Timeout.InfiniteTimeSpan);
+            
             m_Timers.Add(timer);
         }
         
         public void Delay(Func<Task> cb, int delay)
         {
             CheckDisposed();
-            var timer = new Timer(async _ =>
+            var timer = m_TimeProvider.CreateTimer(async _ =>
             {
                 Interlocked.Increment(ref m_RunningTimerCount);
                 try
@@ -110,14 +121,14 @@ namespace Evil.Util
                 {
                     Interlocked.Decrement(ref m_RunningTimerCount);
                 }
-            }, null, delay, -1);
+            }, null, TimeSpan.FromMilliseconds(delay), Timeout.InfiniteTimeSpan);
             m_Timers.Add(timer);
         }
 
         public void Tick(Action cb, int dueTime, int period)
         {
             CheckDisposed();
-            var timer = new Timer(_ =>
+            var timer = m_TimeProvider.CreateTimer(_ =>
             {
                 Interlocked.Increment(ref m_RunningTimerCount);
                 try
@@ -132,14 +143,14 @@ namespace Evil.Util
                 {
                     Interlocked.Decrement(ref m_RunningTimerCount);
                 }
-            }, null, dueTime, period);
+            }, null, TimeSpan.FromMilliseconds(dueTime), TimeSpan.FromMilliseconds(period));
             m_Timers.Add(timer);
         }
         
         public void Tick(Func<Task> cb, int dueTime, int period)
         {
             CheckDisposed();
-            var timer = new Timer( async _ =>
+            var timer = m_TimeProvider.CreateTimer( async _ =>
             {
                 Interlocked.Increment(ref m_RunningTimerCount);
                 try
@@ -154,7 +165,7 @@ namespace Evil.Util
                 {
                     Interlocked.Decrement(ref m_RunningTimerCount);
                 }
-            }, null, dueTime, period);
+            }, null, TimeSpan.FromMilliseconds(dueTime), TimeSpan.FromMilliseconds(period));
             m_Timers.Add(timer);
         }
         

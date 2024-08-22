@@ -6,7 +6,7 @@ namespace Generator
     {
         public static CmdLine I = null!;
 
-        [ConfigurationKeyName("interface")] 
+        [ConfigurationKeyName("interface")]
         public string InterfaceProject { get; set; } = null!;
         [ConfigurationKeyName("codeOut")] 
         public string CodeOutputPath { get; set; } = null!;

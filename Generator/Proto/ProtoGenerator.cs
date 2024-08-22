@@ -120,7 +120,7 @@ namespace Generator.Proto
             // 注释
             if (!string.IsNullOrWhiteSpace(identiferKind.Comment))
             {
-                writer.WriteLine($"// {identiferKind.Comment}");   
+                writer.WriteLine($"// {identiferKind.Comment}");
             }
             writer.WriteLine("message " + identiferKind.Name + " {");
             foreach (var field in identiferKind.Children())

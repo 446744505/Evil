@@ -5,6 +5,16 @@ namespace Generator.Kind
 {
     public abstract partial class BaseIdentiferKind
     {
+        public string GenConstFields(int initTabN)
+        {
+            var writer = new Writer();
+            foreach (var field in m_ConstFields)
+            {
+                writer.WriteLine(initTabN, $"{field.Define}");
+            }
+            return  writer.ToString();
+        }
+        
         public string GenToString(int initTabN)
         {
             var writer = new Writer();

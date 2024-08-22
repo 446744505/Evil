@@ -17,4 +17,5 @@
 /Util/bin/
 /Evil/obj/
 /Evil/bin/
+/Evil/Switcher/Generator/**
 **/*.g.cs

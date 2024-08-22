@@ -18,7 +18,7 @@ namespace NetWork
                 throw new NetWorkException("session is null");
             }
 
-            await session.Send(this);
+            await session.SendAsync(this);
             var completionSource = new TaskCompletionSource<T>();
             RpcMgr.I.PendRequest(m_RequestId, stream =>
             {
@@ -47,7 +47,7 @@ namespace NetWork
                 rsp.Data = stream.GetBuffer()[..(int)stream.Length];
             }
 
-            await Session.Send(rsp);
+            await Session.SendAsync(rsp);
             return true;
         }
 

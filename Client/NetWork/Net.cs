@@ -31,7 +31,7 @@ namespace Client.NetWork
         {
             base.OnAddSession(session);
             // for test
-            Program.Executor.ExecuteAsync(() => HeroMgr.I.Test());
+            // Program.Executor.ExecuteAsync(() => HeroMgr.I.Test());
         }
     }
 }

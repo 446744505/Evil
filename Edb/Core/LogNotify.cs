@@ -5,7 +5,7 @@ namespace Edb
     internal sealed class LogNotify
     {
         private readonly INote m_Note;
-        private readonly Deque<LogKey> m_Path = new();
+        private readonly Deque.Deque<LogKey> m_Path = new();
         
         internal INote Note => m_Note;
         internal bool IsLast => m_Path.IsEmpty;

@@ -27,13 +27,7 @@ namespace NetWork.Transport
                     .Option(ChannelOption.TcpNodelay, true)
                     .Handler(new ActionChannelInitializer<IChannel>(channel =>
                     {
-                        var pipeline = channel.Pipeline;
-                        pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
-                            Messages.HeaderSize, 0, Messages.HeaderSize));
-                        pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
-                        pipeline.AddLast(new MessageDecode(m_MessageProcessor));
-                        pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr, Config.Dispatcher));
+                        AddChannelHandler(channel.Pipeline);
                     }));
                 var channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Config.Host), Config.Port));
                 Log.I.Info($"connector connect to {Config.Host}:{Config.Port}");
@@ -50,6 +44,16 @@ namespace NetWork.Transport
                 await group.ShutdownGracefullyAsync();
                 Stopped();
             }
+        }
+        
+        protected virtual void AddChannelHandler(IChannelPipeline pipeline)
+        {
+            pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
+                Messages.HeaderSize, 0, Messages.HeaderSize));
+            pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
+            pipeline.AddLast(new MessageDecode(m_MessageProcessor));
+            pipeline.AddLast(new MessageEncode());
+            pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr, Config.Dispatcher));
         }
     }
 }

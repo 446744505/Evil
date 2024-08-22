@@ -49,6 +49,11 @@ namespace Evil.Util
             m_SignalEvent?.Set();
         }
 
+        public Stopper BindAndWait()
+        {
+            return BindSignal().BindCancelKey().Wait();
+        }
+
         public Stopper Wait()
         {
             Log.I.Info("stopper start wait");

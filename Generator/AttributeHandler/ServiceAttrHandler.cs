@@ -34,10 +34,13 @@ namespace Generator.AttributeHandler
         public ServiceAttrHandler(TypeContext tc, AttributeSyntax attr) : base(tc, attr)
         {
             AnalysisUtil.HadAttrArgument(attr, AttributeFields.ServiceClientNode, out var clientNode);
+            AnalysisUtil.HadAttrArgument(attr, AttributeFields.ServiceServerNode, out var serverNode);
             m_CreateSyntaxAttrHandler = new ServiceCreateSyntaxAttrHandler()
             {
                 IsCreateFile = TypeContext.FileContext.GloableContext.IsNodeAt(clientNode),
             };
+            NeedParse = TypeContext.FileContext.GloableContext.IsNodeAt(clientNode)
+                || TypeContext.FileContext.GloableContext.IsNodeAt(serverNode);
         }
         
         /// <summary>
