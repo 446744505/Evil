@@ -10,17 +10,17 @@ namespace Hero
           /// </summary>
           /// <param name="heroId"></param>
           /// <returns></returns>
-          public Hero GetHero([ProtocolField(1)]long playerId, [ProtocolField(2)]long heroId);
+          public Hero GetHero([ProtocolField(1)]long heroId);
           /// <summary>
           /// 获取所有英雄信息
           /// </summary>
           /// <returns></returns>
-          public PlayerHero ListHeroes([ProtocolField(1)]long playerId);
+          public PlayerHero ListHeroes();
           /// <summary>
           /// 英雄升星
           /// </summary>
           /// <param name="heroId"></param>
           /// <returns></returns>
-          public void HeroStar([ProtocolField(1)]long playerId, [ProtocolField(2)]long heroId);
+          public void HeroStar([ProtocolField(1)]long heroId);
      }
 }

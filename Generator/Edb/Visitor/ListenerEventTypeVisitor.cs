@@ -26,39 +26,59 @@ namespace Generator.Visitor
             throw new System.NotImplementedException();
         }
 
-        private void VisitBase()
+        public void Visit(ByteType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit();
+        }
+
+        private void BaseVisit()
         {
             m_Writer.Write($"public {m_ValFullName} {m_PropertiesName} {{ get; set; }}");
         }
 
         public void Visit(IntType type)
         {
-            VisitBase();
+            BaseVisit();
+        }
+
+        public void Visit(UIntType type)
+        {
+            BaseVisit();
         }
 
         public void Visit(LongType type)
         {
-            VisitBase();
+            BaseVisit();
         }
 
         public void Visit(BoolType type)
         {
-            VisitBase();
+            BaseVisit();
         }
 
         public void Visit(StringType type)
         {
-            VisitBase();
+            BaseVisit();
         }
 
         public void Visit(FloatType type)
         {
-            VisitBase();
+            BaseVisit();
         }
 
         public void Visit(DoubleType type)
         {
-            VisitBase();
+            BaseVisit();
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(ListType type)

@@ -11,11 +11,11 @@ namespace Evil.Provide
             m_Register = register;
         }
         
-        public override void RegisterExtMessages(IMessageProcessor processor)
+        public override void RegisterExtMessages()
         {
-            base.RegisterExtMessages(processor);
+            base.RegisterExtMessages();
             // 注册框架内部消息
-            m_Register.Register(processor);
+            m_Register.Register(Config.MessageProcessor);
         }
     }
 }

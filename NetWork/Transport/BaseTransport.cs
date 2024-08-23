@@ -12,7 +12,6 @@ namespace NetWork.Transport
         #region 字段
 
         protected ISessionMgr m_SessionMgr;
-        protected IMessageProcessor m_MessageProcessor;
 
         private volatile bool m_IsStop;
         private readonly AsyncCountdownEvent m_StopEvent = new(1);
@@ -30,10 +29,10 @@ namespace NetWork.Transport
             Config = config;
         }
 
-        private void RegisterMessages(IMessageProcessor processor)
+        private void RegisterMessages()
         {
-            processor.Register(MessageId.RpcResponse, () => new RpcResponse());
-            RegisterExtMessages(processor);
+            Config.MessageProcessor.Register(MessageId.RpcResponse, () => new RpcResponse());
+            RegisterExtMessages();
         }
 
         protected async Task WaitStop()
@@ -60,11 +59,12 @@ namespace NetWork.Transport
         public void Start()
         {
             m_SessionMgr = Config.NetWorkFactory!.CreateSessionMgr();
-            Config.Dispatcher ??= new MessgeDispatcher(Config.Executor);
+            Config.Dispatcher ??= new MessageDispatcher(Config.Executor);
             var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
-            m_MessageProcessor = Config.NetWorkFactory.CreateMessageProcessor(Config.Pvid);
-            RegisterMessages(m_MessageProcessor);
-            messageRegister.Register(m_MessageProcessor);
+            var messageProcessor = Config.NetWorkFactory.CreateMessageProcessor(Config.Pvid);
+            Config.MessageProcessor = messageProcessor;
+            RegisterMessages();
+            messageRegister.Register(messageProcessor);
             
             Task.Run(async () =>
             {
@@ -81,7 +81,7 @@ namespace NetWork.Transport
         
         protected abstract Task Start0();
 
-        public virtual void RegisterExtMessages(IMessageProcessor processor)
+        public virtual void RegisterExtMessages()
         {
         }
     }

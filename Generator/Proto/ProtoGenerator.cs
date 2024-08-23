@@ -58,7 +58,7 @@ namespace Generator.Proto
                         writer.WriteLine();
                     } catch (System.Exception e)
                     {
-                        throw new System.Exception($"生成{identiferKind.Name}失败:{e.Message}");
+                        throw new System.Exception($"生成{identiferKind.Name}失败", e);
                     }
                 }
                 // 使用原始命名空间让生成文件分开

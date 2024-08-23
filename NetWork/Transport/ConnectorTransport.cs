@@ -56,9 +56,9 @@ namespace NetWork.Transport
             pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
                 Messages.HeaderSize, 0, Messages.HeaderSize));
             pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
-            pipeline.AddLast(new MessageDecode(m_MessageProcessor));
+            pipeline.AddLast(new MessageDecode(Config.MessageProcessor));
             pipeline.AddLast(new MessageEncode());
-            pipeline.AddLast(new LogicHandler(Config.NetWorkFactory!, m_SessionMgr, Config.Dispatcher!));
+            pipeline.AddLast(new LogicHandler(Config, m_SessionMgr));
         }
     }
 }

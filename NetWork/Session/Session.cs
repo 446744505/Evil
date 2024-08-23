@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using Evil.Util;
+using NetWork.Transport;
 
 namespace NetWork
 {
@@ -8,6 +9,7 @@ namespace NetWork
     {
         private readonly IChannelHandlerContext m_Context;
         public long Id { get; }
+        public TransportConfig Config { get; set; } = null!;
 
         public Session(IChannelHandlerContext context)
         {
@@ -15,8 +17,9 @@ namespace NetWork
             m_Context = context;
         }
         
-        public Task SendAsync(Message msg)
+        public virtual Task SendAsync(Message msg)
         {
+            Log.I.Debug($"send {msg} session {this}");
             return m_Context.WriteAndFlushAsync(msg);
         }
 

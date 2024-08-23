@@ -3,16 +3,16 @@ using Evil.Util;
 
 namespace NetWork
 {
-    public interface IMessgeDispatcher
+    public interface IMessageDispatcher
     {
         Task<bool> Dispatch(Message msg);
     }
     
-    public class MessgeDispatcher : IMessgeDispatcher
+    public class MessageDispatcher : IMessageDispatcher
     {
         private readonly Executor m_Executor;
 
-        public MessgeDispatcher(Executor executor)
+        public MessageDispatcher(Executor executor)
         {
             m_Executor = executor;
         }

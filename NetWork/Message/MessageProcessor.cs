@@ -8,7 +8,7 @@ namespace NetWork
     public interface IMessageProcessor
     {
         public void Register<T>(uint msgId, Func<T> func) where T : Message;
-        public Message? CreateMessage(MessageHeader header, int readSize, BinaryReader reader);
+        public Message? CreateMessage(Session session, MessageHeader header, int readSize, BinaryReader reader);
     }
     public class MessageProcessor : IMessageProcessor
     {
@@ -29,16 +29,17 @@ namespace NetWork
             Creaters[msgId] = func;
         }
         
-        public Message? CreateMessage(MessageHeader header, int readSize, BinaryReader reader)
+        public Message? CreateMessage(Session session, MessageHeader header, int readSize, BinaryReader reader)
         {
             var msgId = header.MessageId;
             if (!Creaters.TryGetValue(msgId, out var func))
             {
-                return WhenNotType(header, readSize, reader);
+                return WhenNotType(session, header, readSize, reader);
             }
             
             var msg = func();
             msg.Pvid = header.Pvid;
+            msg.Session = session;
             var stream = reader.BaseStream;
             // decode ext head
             msg.Decode(reader);
@@ -55,12 +56,12 @@ namespace NetWork
             // 最大传输字节check
             if (readSize > msg.MaxSize)
             {
-                throw  new NetWorkException($"msgId:{msgId} readSize:{readSize} > MaxSize:{msg.MaxSize}");
+                throw new NetWorkException($"msgId:{msgId} readSize:{readSize} > MaxSize:{msg.MaxSize}");
             }
             return msg;
         }
 
-        protected virtual Message? WhenNotType(MessageHeader header, int readSize, BinaryReader reader)
+        protected virtual Message? WhenNotType(Session session, MessageHeader header, int readSize, BinaryReader reader)
         {
             throw new NetWorkException($"msgId:{header.MessageId} not register");
         }

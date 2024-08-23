@@ -41,7 +41,17 @@ namespace Generator.Visitor
         }}
 ";
         }
-        
+
+        public void Visit(ByteType type)
+        {
+            BaseVisit(type);
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit(type);
+        }
+
         public void BaseVisit(IType type)
         {
             var fullNameVisitor = new EdbFullNameTypeVisitor();
@@ -69,6 +79,11 @@ namespace Generator.Visitor
             BaseVisit(type);
         }
 
+        public void Visit(UIntType type)
+        {
+            BaseVisit(type);
+        }
+
         public void Visit(LongType type)
         {
             BaseVisit(type);
@@ -92,6 +107,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             BaseVisit(type);
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(ListType type)

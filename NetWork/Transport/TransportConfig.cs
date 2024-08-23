@@ -12,7 +12,8 @@ namespace NetWork.Transport
         public INetWorkFactory? NetWorkFactory { get; set; }
 
         internal Executor Executor { get; } = new();
-        public IMessgeDispatcher? Dispatcher { get; set; }
+        public IMessageDispatcher? Dispatcher { get; set; }
+        public IMessageProcessor MessageProcessor { get; set; } = null!;
     }
     
     public class AcceptorTransportConfig : TransportConfig

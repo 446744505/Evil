@@ -15,7 +15,22 @@ namespace Generator.Visitor
             throw new System.NotImplementedException();
         }
 
+        public void Visit(ByteType type)
+        {
+            Result = "AsInt32";
+        }
+
+        public void Visit(UShortType type)
+        {
+            Result = "AsInt32";
+        }
+
         public void Visit(IntType type)
+        {
+            Result = "AsInt32";
+        }
+
+        public void Visit(UIntType type)
         {
             Result = "AsInt32";
         }
@@ -43,6 +58,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             Result = "AsDouble";
+        }
+
+        public void Visit(ArrayType type)
+        {
+            Result = "AsByteArray";
         }
 
         public void Visit(ListType type)

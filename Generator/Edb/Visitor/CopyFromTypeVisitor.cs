@@ -27,6 +27,16 @@ namespace Generator.Visitor
             m_Writer.WriteLine($"{FieldName}.CopyFrom(_o_.{FieldName});");
         }
 
+        public void Visit(ByteType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit();
+        }
+
         private void BaseVisit()
         {
             m_Writer.WriteLine($"Edb.Logs.LogObject(this, \"{FieldName}\");");
@@ -34,6 +44,11 @@ namespace Generator.Visitor
         }
         
         public void Visit(IntType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UIntType type)
         {
             BaseVisit();
         }
@@ -61,6 +76,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             BaseVisit();
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(ListType type)

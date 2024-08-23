@@ -18,5 +18,9 @@ namespace Evil.Switcher
             m_AliveTime = Time.Now;
         }
 
+        public void ReceiveUnknown()
+        {
+            ResetAlive();
+        }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using Generator.Context;
 using Generator.Kind;
 using Generator.Type;
 
@@ -27,9 +26,24 @@ namespace Generator.Visitor
                 Result = m_IdentiferFind.Invoke(type.Name).FullName();
         }
 
+        public void Visit(ByteType type)
+        {
+            Result = "byte";
+        }
+
+        public void Visit(UShortType type)
+        {
+            Result = "ushort";
+        }
+
         public void Visit(IntType type)
         {
             Result = "int";
+        }
+
+        public void Visit(UIntType type)
+        {
+            Result = "uint";
         }
 
         public void Visit(LongType type)
@@ -55,6 +69,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             Result = "double";
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(ListType type)

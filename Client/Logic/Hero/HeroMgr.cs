@@ -10,14 +10,13 @@ namespace Client.Hero
 
         public async Task Test()
         {
-            var playerId = 99;
-            var heroes = await m_HeroService.ListHeroes(playerId);
+            var heroes = await m_HeroService.ListHeroes();
             Log.I.Debug($"list heroes: {heroes}");
             foreach (var pair in heroes.heroes)
             {
-                var hero = await m_HeroService.GetHero(playerId, pair.Key);
+                var hero = await m_HeroService.GetHero(pair.Key);
                 Log.I.Debug($"get hero: {hero}");
-                m_HeroService.HeroStar(playerId, pair.Key);
+                m_HeroService.HeroStar(pair.Key);
             }
         }
     }

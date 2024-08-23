@@ -1,5 +1,4 @@
 ﻿using DotNetty.Transport.Channels;
-using Evil.Switcher;
 using NetWork;
 
 namespace Evil.Provide
@@ -20,7 +19,7 @@ namespace Evil.Provide
 
         public ISessionMgr CreateSessionMgr()
         {
-            return new ProviderSessionMgr();
+            return new ProvideSessionMgr();
         }
 
         public IMessageRegister CreateMessageRegister()

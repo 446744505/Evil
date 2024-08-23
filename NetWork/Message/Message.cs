@@ -23,7 +23,7 @@ namespace NetWork
         public virtual int MaxSize { get; } = 1024 * 1024;
         public ushort Pvid { get; set; }
         public Session Session { get; set; } = null!;
-        public IMessgeDispatcher Dispatcher { get; set; } = null!;
+        public object? Context { get; set; }
 
         public void Send(Session? session)
         {
@@ -38,10 +38,10 @@ namespace NetWork
         /// 在网络线程中执行，保证顺序
         /// </summary>
         /// <returns></returns>
-        public virtual void Dispatch()
+        public virtual Task Dispatch()
         {
             // 因为外面没有await，所以这里要用ContinueWith打印异常
-            Dispatcher.Dispatch(this).ContinueWith(task =>
+            Session.Config.Dispatcher!.Dispatch(this).ContinueWith(task =>
             {
                 if (task.IsFaulted)
                 {
@@ -49,6 +49,7 @@ namespace NetWork
                 }
                 return task.Result;
             });
+            return Task.CompletedTask;
         }
 
         /// <summary>

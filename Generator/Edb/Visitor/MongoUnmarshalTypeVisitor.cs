@@ -55,6 +55,16 @@ namespace Generator.Visitor
             }
         }
 
+        public void Visit(ByteType type)
+        {
+            BaseVisit(type);
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit(type);
+        }
+
         private void BaseVisit(IType type)
         {
             var asVisitor = new MongoAsTypeVisitor();
@@ -86,6 +96,11 @@ namespace Generator.Visitor
             BaseVisit(type);
         }
 
+        public void Visit(UIntType type)
+        {
+            BaseVisit(type);
+        }
+
         public void Visit(LongType type)
         {
             BaseVisit(type);
@@ -109,6 +124,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             BaseVisit(type);
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(ListType type)

@@ -2,8 +2,8 @@ namespace Edb
 {
     public interface Procedure : IProcedure
     {
-        protected static readonly Task<bool> FalseTask = Task.FromResult(false);
-        protected static readonly Task<bool> TrueTask = Task.FromResult(true);
+        public static readonly Task<bool> FalseTask = Task.FromResult(false);
+        public static readonly Task<bool> TrueTask = Task.FromResult(true);
         
         public Task<bool> Process();
         

@@ -35,6 +35,16 @@ namespace Generator.Visitor
             throw new System.NotImplementedException();
         }
 
+        public void Visit(ByteType type)
+        {
+            VisitBase();
+        }
+
+        public void Visit(UShortType type)
+        {
+            VisitBase();
+        }
+
         private void VisitBase()
         {
             m_Writer.WriteLine($"var v = ({m_BeanFullName})val;");
@@ -45,6 +55,11 @@ namespace Generator.Visitor
         }
 
         public void Visit(IntType type)
+        {
+            VisitBase();
+        }
+
+        public void Visit(UIntType type)
         {
             VisitBase();
         }
@@ -72,6 +87,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             VisitBase();
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(ListType type)

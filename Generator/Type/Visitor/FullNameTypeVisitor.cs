@@ -31,9 +31,24 @@ namespace Generator.Visitor
             VisitRef(type);
         }
 
+        public void Visit(ByteType type)
+        {
+            Result = "byte";
+        }
+
+        public void Visit(UShortType type)
+        {
+            Result = "ushort";
+        }
+
         public void Visit(IntType type)
         {
             Result = "int";
+        }
+
+        public void Visit(UIntType type)
+        {
+            Result = "uint";
         }
 
         public void Visit(LongType type)
@@ -59,6 +74,13 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             Result = "double";
+        }
+
+        public void Visit(ArrayType type)
+        {
+            var valueVisitor = new FullNameTypeVisitor(m_IdentiferFind);
+            type.Value().Accept(valueVisitor);
+            Result = $"{valueVisitor}[]";
         }
 
         public void Visit(ListType type)

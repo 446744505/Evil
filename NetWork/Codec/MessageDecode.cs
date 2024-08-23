@@ -3,7 +3,6 @@ using System.IO;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
-using ProtoBuf;
 
 namespace NetWork.Codec
 {
@@ -24,6 +23,7 @@ namespace NetWork.Codec
 
         protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
         {
+            var session = context.GetAttribute(AttrKey.Session).Get();
             // 已经被处理粘包的size
             var readAbleSize = input.ReadableBytes;
             var stream = m_Reader.BaseStream;
@@ -36,7 +36,7 @@ namespace NetWork.Codec
             stream.Position = 0;
             var header = new MessageHeader();
             header.Decode(m_Reader);
-            var message = m_MessageProcessor.CreateMessage(header, readAbleSize, m_Reader);
+            var message = m_MessageProcessor.CreateMessage(session, header, readAbleSize, m_Reader);
             if (message != null)
             {
                 // 跳过已经读取的字节

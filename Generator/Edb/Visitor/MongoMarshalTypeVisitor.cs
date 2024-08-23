@@ -50,7 +50,17 @@ namespace Generator.Visitor
             }
         }
 
-        private void BaseVisit(IType type)
+        public void Visit(ByteType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit();
+        }
+
+        private void BaseVisit()
         {
             switch (m_CollectionType)
             {
@@ -68,22 +78,27 @@ namespace Generator.Visitor
 
         public void Visit(IntType type)
         {
-            BaseVisit(type);
+            BaseVisit();
+        }
+
+        public void Visit(UIntType type)
+        {
+            BaseVisit();
         }
 
         public void Visit(LongType type)
         {
-            BaseVisit(type);
+            BaseVisit();
         }
 
         public void Visit(BoolType type)
         {
-            BaseVisit(type);
+            BaseVisit();
         }
 
         public void Visit(StringType type)
         {
-            BaseVisit(type);
+            BaseVisit();
         }
 
         public void Visit(FloatType type)
@@ -93,7 +108,12 @@ namespace Generator.Visitor
 
         public void Visit(DoubleType type)
         {
-            BaseVisit(type);
+            BaseVisit();
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(ListType type)

@@ -74,9 +74,9 @@ namespace Generator.AttributeHandler
                 {
                     throw new TypeException($"{TypeContext.OldClassName}的字段{fieldName}的类型解析失败", e);
                 }
-                // 设置为Message类型
-                TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName);
             }
+            // 设置为Message类型
+            TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName);
         }
 
         public ICreateNamespaceFactory CreateNamespaceFactory => m_CreateKindAttrHandler.CreateNamespaceFactory;

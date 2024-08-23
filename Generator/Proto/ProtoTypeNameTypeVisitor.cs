@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Generator.Context;
 using Generator.Proto;
 using Generator.Type;
@@ -33,9 +34,24 @@ namespace Generator.Visitor
             VisitIdentiferType(type);
         }
 
+        public void Visit(ByteType type)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Visit(UShortType type)
+        {
+            throw new NotSupportedException();
+        }
+
         public void Visit(IntType type)
         {
             Result = "int32";
+        }
+
+        public void Visit(UIntType type)
+        {
+            Result = "uint32";
         }
 
         public void Visit(LongType type)
@@ -61,6 +77,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             Result = "float64";
+        }
+
+        public void Visit(ArrayType type)
+        {
+            Result = "bytes";
         }
 
         public void Visit(ListType type)
