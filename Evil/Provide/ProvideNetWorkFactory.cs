@@ -1,5 +1,7 @@
 ﻿using DotNetty.Transport.Channels;
 using NetWork;
+using NetWork.Proto;
+using Proto;
 
 namespace Evil.Provide
 {
@@ -25,6 +27,22 @@ namespace Evil.Provide
         public IMessageRegister CreateMessageRegister()
         {
             return m_MessageRegister;
+        }
+
+        public Message? CreateRpcResponse(object? ctx, long requestId, byte[] data)
+        {
+            // 是客户端来的rpc
+            if (ctx is ClientMsgBox box)
+            {
+                return new ClientRspResponse
+                {
+                    requestId = requestId,
+                    clientSessionId = box.clientSessionId,
+                    data = data,
+                };
+            }
+
+            return null;
         }
     }
 }
