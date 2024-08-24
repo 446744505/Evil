@@ -5,7 +5,7 @@ namespace Proto
 {
     public partial class ProvideKick
     {
-        public override async Task Dispatch()
+        public override Task Dispatch()
         {
             var linkerSession = Linker.I.Sessions.GetSession(clientSessionId);
             if (linkerSession != null)
@@ -20,6 +20,7 @@ namespace Proto
                     }
                 }
             }
+            return Task.CompletedTask;
         }
     }
 }
