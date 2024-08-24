@@ -15,16 +15,14 @@ namespace Client
             try
             {
                 var config = new ConnectorTransportConfig();
+                config.Port = 10000;
                 config.NetWorkFactory = new ClientNetWorkFactory();
                 var connector = new ConnectorTransport(config);
                 connector.Start();
                 Log.I.Info("client started");
-                
-                stopper = new Stopper()
-                    .BindSignal()
-                    .BindCancelKey()
-                    .Wait();
-                
+
+                stopper = new Stopper().BindAndWait();
+
                 connector.Dispose();
                 await Executor.DisposeAsync();
             } finally

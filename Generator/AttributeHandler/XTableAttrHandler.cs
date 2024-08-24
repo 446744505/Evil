@@ -90,7 +90,11 @@ namespace Generator.AttributeHandler
                 }
 
                 // 给xtable加字段
-                NewField(NewFieldContext.Parse(f));
+                var tableField = (XTableFieldKind)NewField(NewFieldContext.Parse(f));
+                if (AnalysisUtil.HadAttribute(f, Attributes.XListener, out _))
+                {
+                    tableField.IsListenerField = true;
+                }
                 
                 // 给xbean加字段
                 var xBeanField = m_XBeanCreateFieldFactory.CreateField(NewFieldContext.Parse(f), xBean);

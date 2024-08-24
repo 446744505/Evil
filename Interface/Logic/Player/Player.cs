@@ -13,6 +13,7 @@ namespace Player
         private string playerName;
         
         [XColumn]
+        [XListener]
         private int level;
     }
 }

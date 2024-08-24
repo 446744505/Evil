@@ -87,7 +87,7 @@ namespace Edb
                         if (retry == impl.RetryTimes && impl.RetrySerial)
                             impl.IsolationLevel = IsolationLevel.Level3;
 
-                        _ = Task.Delay(impl.CalcDelay());
+                        await Task.Delay(impl.CalcDelay());
                     }
                 }
                 finally

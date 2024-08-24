@@ -48,6 +48,16 @@ namespace Generator.Visitor
             RefVisit();
         }
 
+        public void Visit(ByteType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit();
+        }
+
         private void BaseVisit()
         {
             if (IsRightValue)
@@ -59,6 +69,11 @@ namespace Generator.Visitor
         }
         
         public void Visit(IntType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UIntType type)
         {
             BaseVisit();
         }
@@ -86,6 +101,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             BaseVisit();
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new NotImplementedException();
         }
 
         public void Visit(ListType type)

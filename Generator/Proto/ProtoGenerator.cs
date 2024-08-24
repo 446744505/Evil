@@ -26,10 +26,27 @@ namespace Generator.Proto
             // 遍历所有namespace，每个namespace生成一个proto文件
             var fileSet = new FileDescriptorSet();
             fileSet.AddImportPath(OutPath);
+            var classKindsByOriginNamespace = new Dictionary<string, List<BaseIdentiferKind>>();
             foreach (var namespaceClassKind in NamespaceClassKinds())
             {
-                var namespaceName = namespaceClassKind.Key;
                 var identiferKinds = namespaceClassKind.Value;
+                foreach (var identiferKind in identiferKinds)
+                {
+                    var originalNamespace = identiferKind.OriginalNamespaceName;
+                    if (!classKindsByOriginNamespace.TryGetValue(originalNamespace, out var kinds))
+                    {
+                        kinds = new List<BaseIdentiferKind>();
+                        classKindsByOriginNamespace.Add(originalNamespace, kinds);
+                    }
+                    kinds.Add(identiferKind);
+                }
+            }
+            foreach (var pair in classKindsByOriginNamespace)
+            {
+                // 永远在Proto空间下
+                var namespaceName = Namespaces.ProtoNamespace;
+                var identiferKinds = pair.Value;
+                
                 var writer = new Writer();
                 MakeHead(writer, namespaceName);
                 MakeImport(writer, identiferKinds, namespaceName, context);
@@ -41,10 +58,11 @@ namespace Generator.Proto
                         writer.WriteLine();
                     } catch (System.Exception e)
                     {
-                        throw new System.Exception($"生成{identiferKind.Name}失败:{e.Message}");
+                        throw new System.Exception($"生成{identiferKind.Name}失败", e);
                     }
                 }
-                var fileName = CreateFile(writer, namespaceName);
+                // 使用原始命名空间让生成文件分开
+                var fileName = CreateFile(writer, pair.Key);
                 fileSet.Add(fileName);
             }
 
@@ -102,7 +120,7 @@ namespace Generator.Proto
             // 注释
             if (!string.IsNullOrWhiteSpace(identiferKind.Comment))
             {
-                writer.WriteLine($"// {identiferKind.Comment}");   
+                writer.WriteLine($"// {identiferKind.Comment}");
             }
             writer.WriteLine("message " + identiferKind.Name + " {");
             foreach (var field in identiferKind.Children())

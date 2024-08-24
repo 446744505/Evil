@@ -11,5 +11,6 @@ namespace Generator
         public const string XTable = "XTable";
         public const string XBean = "XBean";
         public const string XColumn = "XColumn";
+        public const string XListener = "XListener";
     }
 }

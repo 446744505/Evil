@@ -64,6 +64,7 @@ namespace {namespaceName}
     {{
         public override uint MessageId => {messageId};
 
+{kind.GenConstFields(2)}
 {kind.GenToString(2)}
     }}
 }}

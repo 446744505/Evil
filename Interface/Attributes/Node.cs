@@ -6,7 +6,8 @@ namespace Attributes
     public enum Node
     {
         Client = 1,
-        Game = 2,
-        Map = 4,
+        Switcher = 2,
+        Game = 4,
+        Map = 8,
     }
 }

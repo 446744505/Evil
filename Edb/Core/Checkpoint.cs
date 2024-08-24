@@ -34,17 +34,17 @@ namespace Edb
             m_SchedPeriod = period == null ? 100 : int.Parse(period);
             m_Tables = tables;
             
-            var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            var now = Time.Now;
             m_NextMarshalTime = now + Edb.I.Config.MarshalPeriod;
             m_NextCheckpointTime = now + Edb.I.Config.CheckpointPeriod;
-            Edb.I.Executor.Tick(() => Checkpoint0(DateTimeOffset.Now.ToUnixTimeMilliseconds(), Edb.I.Config), 0, m_SchedPeriod);
+            Edb.I.Executor.Tick(() => Checkpoint0(Time.Now, Edb.I.Config), 0, m_SchedPeriod);
         }
 
         public async Task CheckpointNow()
         {
             m_CheckpointNow = true;
             // 用edb的任务接口执行，保证任务不会丢失
-            await Edb.I.Executor.ExecuteAsync(() => Checkpoint0(DateTimeOffset.Now.ToUnixTimeMilliseconds(), Edb.I.Config));
+            await Edb.I.Executor.ExecuteAsync(() => Checkpoint0(Time.Now, Edb.I.Config));
         }
         
         private async Task Checkpoint0(long now, Config config)
@@ -55,14 +55,14 @@ namespace Edb
                 if (config.MarshalPeriod >= 0 && m_NextMarshalTime <= now)
                 {
                     m_NextMarshalTime = now + config.MarshalPeriod;
-                    var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    var start = Time.Now;
                     long countMarshalN = 0;
                     foreach (var storage in m_Tables.Storages)
                     {
                         countMarshalN += await storage.MarshalN();
                     }
                     Interlocked.Add(ref m_MarshalNCount, countMarshalN);
-                    Interlocked.Add(ref m_MarshalNTotalTime, DateTimeOffset.Now.ToUnixTimeMilliseconds() - start);
+                    Interlocked.Add(ref m_MarshalNTotalTime, Time.Now - start);
                     Log.I.Info($"marshalN=*/{countMarshalN}");
                 }
                 var checkpointPeriod = config.CheckpointPeriod;

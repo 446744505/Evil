@@ -30,7 +30,22 @@ namespace Generator.Visitor
             SimpleVisit();
         }
 
+        public void Visit(ByteType type)
+        {
+            SimpleVisit();
+        }
+
+        public void Visit(UShortType type)
+        {
+            SimpleVisit();
+        }
+
         public void Visit(IntType type)
+        {
+            SimpleVisit();
+        }
+
+        public void Visit(UIntType type)
         {
             SimpleVisit();
         }
@@ -59,7 +74,12 @@ namespace Generator.Visitor
         {
             SimpleVisit();
         }
-        
+
+        public void Visit(ArrayType type)
+        {
+            SimpleVisit();
+        }
+
         private void CollectionVisit()
         {
             Result = $"Evil.Util.Strings.ToCustomString({FieldName})";

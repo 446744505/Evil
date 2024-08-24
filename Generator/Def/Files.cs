@@ -29,6 +29,10 @@ namespace Generator
         /// </summary>
         public const string XBeanPath = "XBean";
         /// <summary>
+        /// 生成的xlistener文件的目录
+        /// </summary>
+        public const string XListenerPath = "XListener";
+        /// <summary>
         /// Interface项目里存在所有Attribute的目录
         /// </summary>
         public const string AttributesDir = "Attributes";

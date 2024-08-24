@@ -1,10 +1,12 @@
 using DotNetty.Transport.Channels;
 using NetWork;
+using Proto;
 
 namespace Client.NetWork
 {
     public class ClientNetWorkFactory : INetWorkFactory
     {
+        private readonly MessageRegister m_MessageRegister = new();
         public Session CreateSession(IChannelHandlerContext ctx)
         {
             return new Session(ctx);
@@ -17,7 +19,7 @@ namespace Client.NetWork
 
         public IMessageRegister CreateMessageRegister()
         {
-            return Net.I.MessageRegister;
+            return m_MessageRegister;
         }
     }
 }

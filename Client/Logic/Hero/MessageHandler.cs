@@ -8,7 +8,7 @@ namespace Proto
         public override Task<bool> Process()
         {
             Log.I.Info($"hero star ntf {heroId} star:{star}");
-            return Task.FromResult(true);
+            return TrueTask;
         }
     }
 }

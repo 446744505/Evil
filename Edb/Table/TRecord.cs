@@ -1,3 +1,5 @@
+using Evil.Util;
+
 namespace Edb
 {
     internal interface ITRecord
@@ -16,7 +18,7 @@ namespace Edb
         private readonly Lockey m_Lockey;
         private TValue? m_Value;
         private State m_State;
-        private long m_LastAccessTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        private long m_LastAccessTime = Time.Now;
 
         #endregion
 
@@ -44,8 +46,7 @@ namespace Edb
 
         internal TRecord<TKey, TValue> Access()
         {
-            var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Interlocked.Exchange(ref m_LastAccessTime, now);
+            Interlocked.Exchange(ref m_LastAccessTime, Time.Now);
             return this;
         }
 

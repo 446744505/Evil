@@ -6,6 +6,8 @@ namespace Generator
     public class Nodes
     {
         public const string Client = "client";
+        public const  string Switcher = "switcher";
+        public  const string Game = "map";
         public const string Server = "game";
     }
 }

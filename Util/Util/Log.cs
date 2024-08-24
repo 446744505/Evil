@@ -6,6 +6,15 @@ namespace Evil.Util
     {
         private readonly Logger m_Logger = LogManager.GetCurrentClassLogger();
 
+        public Log UnobservedTaskException()
+        {
+            TaskScheduler.UnobservedTaskException += (_, e) =>
+            {
+                Error("Log UnobservedTaskException", e.Exception);
+            };
+            return this;
+        }
+
         public void Info(string log)
         {
             m_Logger.Info(log);

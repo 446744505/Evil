@@ -34,7 +34,22 @@ namespace Generator.Visitor
             m_Writer.WriteLine($"{FieldName} = {defaultValueVisitor.Result};");
         }
 
+        public void Visit(ByteType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit();
+        }
+
         public void Visit(IntType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UIntType type)
         {
             BaseVisit();
         }
@@ -62,6 +77,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             BaseVisit();
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(ListType type)

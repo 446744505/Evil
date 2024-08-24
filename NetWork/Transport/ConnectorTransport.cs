@@ -25,15 +25,14 @@ namespace NetWork.Transport
                 bootstrap.Group(group)
                     .Channel<TcpSocketChannel>()
                     .Option(ChannelOption.TcpNodelay, true)
+                    .Option(ChannelOption.SoKeepalive, false)
+                    .Option(ChannelOption.SoRcvbuf, Config.SoRcvbuf)
+                    .Option(ChannelOption.SoSndbuf, Config.SoSndbuf)
+                    .Option(ChannelOption.WriteBufferLowWaterMark, Config.OutBufferSize)
+                    .Option(ChannelOption.WriteBufferHighWaterMark, Config.OutBufferSize)
                     .Handler(new ActionChannelInitializer<IChannel>(channel =>
                     {
-                        var pipeline = channel.Pipeline;
-                        pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
-                            Messages.HeaderSize, 0, Messages.HeaderSize));
-                        pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
-                        pipeline.AddLast(new MessageDecode(m_MessageProcessor));
-                        pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr, Config.Dispatcher));
+                        AddChannelHandler(channel.Pipeline);
                     }));
                 var channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Config.Host), Config.Port));
                 Log.I.Info($"connector connect to {Config.Host}:{Config.Port}");
@@ -50,6 +49,16 @@ namespace NetWork.Transport
                 await group.ShutdownGracefullyAsync();
                 Stopped();
             }
+        }
+        
+        protected virtual void AddChannelHandler(IChannelPipeline pipeline)
+        {
+            pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
+                Messages.HeaderSize, 0, Messages.HeaderSize));
+            pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
+            pipeline.AddLast(new MessageDecode(Config.MessageProcessor));
+            pipeline.AddLast(new MessageEncode());
+            pipeline.AddLast(new LogicHandler(Config, m_SessionMgr));
         }
     }
 }

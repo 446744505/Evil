@@ -48,7 +48,19 @@ namespace Generator.Proto
             AddImport($"{ProtoUtil.CalProtoFileNameByNamespace(namespaceKind!.Name)}");
         }
 
+        public void Visit(ByteType type)
+        {
+        }
+
+        public void Visit(UShortType type)
+        {
+        }
+
         public void Visit(IntType type)
+        {
+        }
+
+        public void Visit(UIntType type)
         {
         }
 
@@ -71,6 +83,13 @@ namespace Generator.Proto
 
         public void Visit(DoubleType type)
         {
+        }
+
+        public void Visit(ArrayType type)
+        {
+            var importVisitor = new ProtoImportTypeVisitor(m_Pc);
+            type.Value().Accept(importVisitor);
+            AddImports(importVisitor.Imports);
         }
 
         public void Visit(ListType type)

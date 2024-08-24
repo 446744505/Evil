@@ -34,10 +34,13 @@ namespace Generator.AttributeHandler
         public ServiceAttrHandler(TypeContext tc, AttributeSyntax attr) : base(tc, attr)
         {
             AnalysisUtil.HadAttrArgument(attr, AttributeFields.ServiceClientNode, out var clientNode);
+            AnalysisUtil.HadAttrArgument(attr, AttributeFields.ServiceServerNode, out var serverNode);
             m_CreateSyntaxAttrHandler = new ServiceCreateSyntaxAttrHandler()
             {
                 IsCreateFile = TypeContext.FileContext.GloableContext.IsNodeAt(clientNode),
             };
+            NeedParse = TypeContext.FileContext.GloableContext.IsNodeAt(clientNode)
+                || TypeContext.FileContext.GloableContext.IsNodeAt(serverNode);
         }
         
         /// <summary>
@@ -77,7 +80,8 @@ namespace Generator.AttributeHandler
             var reqClassKind = new ReqClassKind(new ClassType().Parse(method),
                 TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName, m_CreateNamespaceFactory))
             {
-                Comment = AnalysisUtil.GetComment(m)
+                Comment = AnalysisUtil.GetComment(m),
+                OriginalNamespaceName = TypeContext.OldNameSpaceName,
             };
             
             TypeContext.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name);
@@ -97,6 +101,7 @@ namespace Generator.AttributeHandler
                     var ackClassKind = m_CreateIdentiferFactory.CreateIdentifer(ackClassType, 
                         TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName, m_CreateNamespaceFactory));
                     ackClassKind.Comment = reqClassKind.Comment;
+                    ackClassKind.OriginalNamespaceName = TypeContext.OldNameSpaceName;
                     TypeContext.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name);
                     // 字段名永远是data
                     var field = m_CreateFieldFactory.CreateField(

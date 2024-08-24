@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Evil.Util;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Edb
 {
@@ -213,6 +212,7 @@ namespace Edb
     public interface INoteMap : INote
     {
         internal void SetChanged(IList changed, object objRef);
+        internal void Merge(INote note);
     }
     
     public class NoteMap<TK, TV> : INoteMap where TK : notnull
@@ -224,7 +224,7 @@ namespace Edb
         private IDictionary? m_ObjRef;
         private Dictionary<TK, TV>? m_ChangedMap;
 
-        internal HashSet<TK> Added => m_Added;
+        public HashSet<TK> Added => m_Added;
         internal Dictionary<TK, TV> Replaced => m_Replaced;
         public Dictionary<TK, TV> Removed => m_Removed;
         protected bool IsMapChanged => m_Added.Count > 0 || m_Removed.Count > 0 || m_Replaced.Count > 0;
@@ -264,7 +264,7 @@ namespace Edb
             m_ObjRef = (IDictionary)objRef;
         }
 
-        internal void Merge(INote note)
+        public void Merge(INote note)
         {
             var other = (NoteMap<TK, TV>)note;
             foreach (var k in other.m_Added)

@@ -33,7 +33,19 @@ namespace Generator.Visitor
                 Result = $"new({m_CopyClass}, this, \"{FieldName}\")";
         }
 
+        public void Visit(ByteType type)
+        {
+        }
+
+        public void Visit(UShortType type)
+        {
+        }
+
         public void Visit(IntType type)
+        {
+        }
+
+        public void Visit(UIntType type)
         {
         }
 
@@ -56,6 +68,11 @@ namespace Generator.Visitor
 
         public void Visit(DoubleType type)
         {
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(ListType type)

@@ -9,6 +9,7 @@ namespace Generator.Kind
         #region 字段
         
         private readonly List<FieldKind> m_Fields = new();
+        private readonly List<ConstFieldKind> m_ConstFields = new();
 
         #endregion
         
@@ -16,6 +17,7 @@ namespace Generator.Kind
         
         public string Name => Type.Name;
         public string Comment { get; set; }
+        public string OriginalNamespaceName { get; set; } // 生成不同的.proto文件时会用到
         public BaseIdentiferType Type { get; }
 
         #endregion
@@ -28,6 +30,11 @@ namespace Generator.Kind
         public void AddField(FieldKind field)
         {
             m_Fields.Add(field);
+        }
+
+        public void AddConstField(ConstFieldKind field)
+        {
+            m_ConstFields.Add(field);
         }
         
         public string NamespaceName()

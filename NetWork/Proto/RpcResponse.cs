@@ -11,20 +11,20 @@ namespace NetWork.Proto
 
         [ProtoMember(1)]
         public long RequestId { get; set; }
-        [ProtoMember(2)]
-        public byte[] Data { get; set; }
+
+        [ProtoMember(2)] public byte[] Data { get; set; } = null!;
 
         public override Task<bool> Process()
         {
             var func = RpcMgr.I.RemovePending(RequestId);
             if (func == null)
             {
-                return Task.FromResult(false);
+                return FalseTask;
             }
 
             using var stream = new MemoryStream(Data);
             func.Invoke(stream);
-            return Task.FromResult(true);
+            return TrueTask;
         }
     }
 }

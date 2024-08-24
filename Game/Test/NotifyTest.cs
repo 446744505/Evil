@@ -1,7 +1,10 @@
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Edb;
+using Evil.Event;
 using Evil.Util;
 using XBean;
+using XListener;
 using Xunit;
 
 namespace Game.Test
@@ -14,7 +17,7 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 await XTable.Player.Delete(1);
-                
+
                 var p = new Player()
                 {
                     PlayerId = 1,
@@ -45,12 +48,12 @@ namespace Game.Test
                 return true;
             });
         }
-        
+
         [Fact]
         public async Task TestInsert()
         {
             await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-            XTable.Tables.Player.AddListener(new PlayerListener());
+            XTable.Tables.Player.AddListener(new PlayerLevelListener(), "level");
             await Procedure.Submit(async () =>
             {
                 await XTable.Player.Delete(1);
@@ -66,24 +69,24 @@ namespace Game.Test
 
             await Edb.Edb.I.DisposeAsync();
         }
-        
+
         [Fact]
         public async Task TestUpdate()
         {
             await Init();
-            // XTable.Tables.Player.AddListener(new PlayerListener(), "level");
-            XTable.Tables.PlayerHero.AddListener(new PlayerHeroListener(), "heroes");
+            XTable.Tables.Player.AddListener(new PlayerLevelListener(), "level");
+            XTable.Tables.PlayerHero.AddListener(new PlayerHeroHeroesListener(), "heroes");
             await Procedure.Submit(async () =>
             {
-                // var p = await XTable.Player.Update(1);
+                var p = await XTable.Player.Update(1);
                 var ph = await XTable.PlayerHero.Update(1);
-                // p.Level++;
-                // var h = new XBean.Hero()
-                // {
-                //     HeroId = 2,
-                //     Star = 1,
-                // };
-                // ph.Heroes[h.HeroId] = h;
+                p.Level++;
+                var h = new XBean.Hero()
+                {
+                    HeroId = 2,
+                    Star = 1,
+                };
+                ph.Heroes[h.HeroId] = h;
                 var hero = ph.Heroes[1];
                 hero.Star++;
                 return true;
@@ -91,40 +94,24 @@ namespace Game.Test
 
             await Edb.Edb.I.DisposeAsync();
         }
-        
-        private class PlayerListener : IListener
+
+        public class PlayerEventHandler : IEventHandler
         {
-            public async Task OnChanged(object key, object val)
+            [Listener(typeof(PlayerLevelEvent))]
+            public static void OnPlayerLevelUpEvent(IEvent e0)
             {
-                Log.I.Info($"player changed: {key} {val}");
-            }
-
-            public async Task OnChanged(object key, object val, string fullVarName, INote? note)
-            {
-                Log.I.Info($"player changed note: {key} {val} {fullVarName} {note}");
-            }
-
-            public async Task OnRemoved(object key, object val)
-            {
-                Log.I.Info($"player removed: {key} {val}");
+                var e = (PlayerLevelEvent)e0;
+                Log.I.Info($"player {e.Key} level up to {e.Level}");
             }
         }
         
-        private class PlayerHeroListener : IListener
+        public class PlayerHeroEventHandler : IEventHandler
         {
-            public async Task OnChanged(object key, object val)
+            [Listener(typeof(PlayerHeroHeroesEvent))]
+            public static void OnPlayerHeroEvent(IEvent e0)
             {
-                Log.I.Info($"player changed: {key} {val}");
-            }
-
-            public async Task OnChanged(object key, object val, string fullVarName, INote? note)
-            {
-                Log.I.Info($"player changed note: {key} {val} {fullVarName} {note}");
-            }
-
-            public async Task OnRemoved(object key, object val)
-            {
-                Log.I.Info($"player removed: {key} {val}");
+                var e = (PlayerHeroHeroesEvent)e0;
+                Log.I.Info(e.IsAdd ? $"player {e.Key} add hero {e.MKey}" : $"player {e.Key} remove hero {e.MKey}");
             }
         }
     }

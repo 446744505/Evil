@@ -2,6 +2,9 @@ namespace Edb
 {
     public interface Procedure : IProcedure
     {
+        public static readonly Task<bool> FalseTask = Task.FromResult(false);
+        public static readonly Task<bool> TrueTask = Task.FromResult(true);
+        
         public Task<bool> Process();
         
         public void Execute()
@@ -78,7 +81,8 @@ namespace Edb
 
             public Task<bool> Process()
             {
-                return Task.FromResult(m_Func());
+                var success = m_Func();
+                return success ? TrueTask : FalseTask;
             }
         }
         

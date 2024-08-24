@@ -12,7 +12,6 @@ namespace NetWork.Transport
         #region 字段
 
         protected ISessionMgr m_SessionMgr;
-        protected IMessageProcessor m_MessageProcessor;
 
         private volatile bool m_IsStop;
         private readonly AsyncCountdownEvent m_StopEvent = new(1);
@@ -28,18 +27,11 @@ namespace NetWork.Transport
         public BaseTransport(T config)
         {
             Config = config;
-            m_SessionMgr = Config.NetWorkFactory.CreateSessionMgr();
-            if (Config.Dispatcher == null)
-                Config.Dispatcher = new MessgeDispatcher(Config.Executor);
-            var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
-            m_MessageProcessor = new MessageProcessor();
-            RegisterMessages();
-            messageRegister.Register(m_MessageProcessor);
         }
 
         private void RegisterMessages()
         {
-            m_MessageProcessor.Register(MessageId.RpcResponse, () => new RpcResponse());
+            Config.MessageProcessor.Register(MessageId.RpcResponse, () => new RpcResponse());
             RegisterExtMessages();
         }
 
@@ -66,6 +58,14 @@ namespace NetWork.Transport
 
         public void Start()
         {
+            m_SessionMgr = Config.NetWorkFactory!.CreateSessionMgr();
+            Config.Dispatcher ??= new MessageDispatcher(Config.Executor);
+            var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
+            var messageProcessor = Config.NetWorkFactory.CreateMessageProcessor(Config.Pvid);
+            Config.MessageProcessor = messageProcessor;
+            RegisterMessages();
+            messageRegister.Register(messageProcessor);
+            
             Task.Run(async () =>
             {
                 await Start0();

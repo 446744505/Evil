@@ -55,6 +55,9 @@ namespace Generator
                 // 生成xbean文件
                 var xbg = new XBeanGenerator(gc);
                 xbg.Generate();
+                // 生成xlistener文件
+                var xlg = new XListenerGenerator(gc);
+                xlg.Generate();
             } catch (System.Exception e)
             {
                 gc.Exception(e);

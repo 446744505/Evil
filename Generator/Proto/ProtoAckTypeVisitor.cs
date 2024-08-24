@@ -40,6 +40,16 @@ namespace Generator.Visitor
             m_Gc.AddProtocolMessageName(type.Name);
         }
 
+        public void Visit(ByteType type)
+        {
+            Visit0(type);
+        }
+
+        public void Visit(UShortType type)
+        {
+            Visit0(type);
+        }
+
         private void Visit0(IType type)
         {
             TypeResult = type;
@@ -47,6 +57,11 @@ namespace Generator.Visitor
         }
 
         public void Visit(IntType type)
+        {
+            Visit0(type);
+        }
+
+        public void Visit(UIntType type)
         {
             Visit0(type);
         }
@@ -74,6 +89,11 @@ namespace Generator.Visitor
         public void Visit(DoubleType type)
         {
             Visit0(type);
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(ListType type)

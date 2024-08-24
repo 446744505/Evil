@@ -13,8 +13,4 @@
       <ProjectReference Include="..\NetWork\NetWork.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="C:\Users\ranbo\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />
-    </ItemGroup>
-
 </Project>

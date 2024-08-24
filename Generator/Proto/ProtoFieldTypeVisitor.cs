@@ -1,6 +1,6 @@
-﻿using Generator.Context;
+﻿using System;
+using Generator.Context;
 using Generator.Kind;
-using Generator.Proto;
 using Generator.Type;
 
 namespace Generator.Visitor
@@ -43,7 +43,22 @@ namespace Generator.Visitor
             Visit0(type);
         }
 
+        public void Visit(ByteType type)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Visit(UShortType type)
+        {
+            throw new NotSupportedException();
+        }
+
         public void Visit(IntType type)
+        {
+            Visit0(type);
+        }
+
+        public void Visit(UIntType type)
         {
             Visit0(type);
         }
@@ -69,6 +84,11 @@ namespace Generator.Visitor
         }
 
         public void Visit(DoubleType type)
+        {
+            Visit0(type);
+        }
+
+        public void Visit(ArrayType type)
         {
             Visit0(type);
         }

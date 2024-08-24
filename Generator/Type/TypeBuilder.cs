@@ -27,6 +27,7 @@ namespace Generator.Type
                 SyntaxKind.GenericName => ParseGenericType((typeSyntax as GenericNameSyntax)!),
                 SyntaxKind.IdentifierName => ParseIdentiferType((typeSyntax as IdentifierNameSyntax)!),
                 SyntaxKind.QualifiedName => ParseQualifiedType((typeSyntax as QualifiedNameSyntax)!),
+                SyntaxKind.ArrayType => ParseArrayType((typeSyntax as ArrayTypeSyntax)!),
                 _ => throw new TypeException($"不支持的类型:{kind.ToString()}")
             };
         }
@@ -47,12 +48,20 @@ namespace Generator.Type
             };
         }
 
+        private IType ParseArrayType(ArrayTypeSyntax typeSyntax)
+        {
+            return new ArrayType().Parse(typeSyntax.ElementType);
+        }
+
         private IType ParsePredefinedType(PredefinedTypeSyntax typeSyntax)
         {
             var kind = typeSyntax.Keyword.Kind();
             return kind switch
             {
+                SyntaxKind.ByteKeyword => new ByteType(),
+                SyntaxKind.UShortKeyword => new UShortType(),
                 SyntaxKind.IntKeyword => new IntType(),
+                SyntaxKind.UIntKeyword => new UIntType(),
                 SyntaxKind.LongKeyword => new LongType(),
                 SyntaxKind.StringKeyword => new StringType(),
                 SyntaxKind.BoolKeyword => new BoolType(),

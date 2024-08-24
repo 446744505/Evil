@@ -1,7 +1,8 @@
 
 using System.Threading.Tasks;
-using Edb;
+using Evil.Provide;
 using Evil.Util;
+using Game.NetWork;
 
 namespace Proto
 {
@@ -9,6 +10,7 @@ namespace Proto
     {
         public override async Task<PlayerHero> OnRequest()
         {
+            var playerId = Net.I.PlayerId(this);
             var ph = await XTable.PlayerHero.Update(playerId);
             if (ph == null)
             {
@@ -46,6 +48,7 @@ namespace Proto
     {
         public override async Task<Hero> OnRequest()
         {
+            var playerId = Net.I.PlayerId(this);
             var ph = await XTable.PlayerHero.Select(playerId);
             if (ph != null)
             {
@@ -63,6 +66,7 @@ namespace Proto
     {
         public override async Task<bool> Process()
         {
+            var playerId = Net.I.PlayerId(this);
             var ph = await XTable.PlayerHero.Update(playerId);
             if (ph != null)
             {

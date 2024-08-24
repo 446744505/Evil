@@ -2,7 +2,7 @@ namespace Edb
 {
     internal abstract partial class Listenable
     {
-    private class ListenableMap : Listenable
+        private class ListenableMap : Listenable
         {
             private readonly string m_VarName;
             private INote? m_Note;
@@ -48,12 +48,11 @@ namespace Edb
                     if (m_Note == null)
                         m_Note = ln.Note;
                     else
-                        ((NoteMap<TKey, TValue>)m_Note).Merge(ln.Note);
+                        ((INoteMap)m_Note).Merge(ln.Note);
                 }
                 else
                 {
-                    if (m_Changed == null)
-                        m_Changed = new List<XBean>();
+                    m_Changed ??= new List<XBean>();
                     m_Changed.Add(ln.Pop().XBean);
                 }
             }

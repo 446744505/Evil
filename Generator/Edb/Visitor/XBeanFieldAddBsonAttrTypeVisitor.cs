@@ -16,54 +16,74 @@ namespace Generator.Visitor
         
         public string Result { get; set; }
 
-        private void SimpleVisit()
+        private void Visit0()
         {
             Result = "[MongoDB.Bson.Serialization.Attributes.BsonElement]";
         }
         
         public void Visit(StructType type)
         {
-            SimpleVisit();
+            Visit0();
         }
 
         public void Visit(ClassType type)
         {
-            SimpleVisit();
+            Visit0();
+        }
+
+        public void Visit(ByteType type)
+        {
+            Visit0();
+        }
+
+        public void Visit(UShortType type)
+        {
+            Visit0();
         }
 
         public void Visit(IntType type)
         {
-            SimpleVisit();
+            Visit0();
+        }
+
+        public void Visit(UIntType type)
+        {
+            Visit0();
         }
 
         public void Visit(LongType type)
         {
-            SimpleVisit();
+            Visit0();
         }
 
         public void Visit(BoolType type)
         {
-            SimpleVisit();
+            Visit0();
         }
 
         public void Visit(StringType type)
         {
-            SimpleVisit();
+            Visit0();
         }
 
         public void Visit(FloatType type)
         {
-            SimpleVisit();
+            Visit0();
         }
 
         public void Visit(DoubleType type)
         {
-            SimpleVisit();
+            Visit0();
+        }
+
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(ListType type)
         {
-            SimpleVisit();
+            Visit0();
         }
 
         public void Visit(MapType type)

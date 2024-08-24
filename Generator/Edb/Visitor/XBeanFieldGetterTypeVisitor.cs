@@ -31,7 +31,8 @@ namespace Generator.Visitor
             var fullNameVisitor = new EdbFullNameTypeVisitor();
             type.Accept(fullNameVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 VerifyStandaloneOrLockHeld(""Get{attrName}"", true);
@@ -40,13 +41,24 @@ namespace Generator.Visitor
         }}
 ";
         }
-        
+
+        public void Visit(ByteType type)
+        {
+            BaseVisit(type);
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit(type);
+        }
+
         public void BaseVisit(IType type)
         {
             var fullNameVisitor = new EdbFullNameTypeVisitor();
             type.Accept(fullNameVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 VerifyStandaloneOrLockHeld(""Get{attrName}"", true);
@@ -63,6 +75,11 @@ namespace Generator.Visitor
         }
 
         public void Visit(IntType type)
+        {
+            BaseVisit(type);
+        }
+
+        public void Visit(UIntType type)
         {
             BaseVisit(type);
         }
@@ -92,6 +109,11 @@ namespace Generator.Visitor
             BaseVisit(type);
         }
 
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void Visit(ListType type)
         {
             var fullNameVisitor = new EdbFullNameTypeVisitor();
@@ -99,7 +121,8 @@ namespace Generator.Visitor
             var valueVisitor = new FullNameTypeVisitor();
             type.Value().Accept(valueVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 if (!Edb.Transaction.IsActive)
@@ -121,7 +144,8 @@ namespace Generator.Visitor
             type.Key().Accept(keyVisitor);
             type.Value().Accept(valueVisitor);
             var attrName = FieldName.FirstCharToUpper();
-            Result = $@"public {fullNameVisitor.Result} {attrName} {{
+            Result = $@"[MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+        public {fullNameVisitor.Result} {attrName} {{
             get
             {{
                 if (!Edb.Transaction.IsActive)

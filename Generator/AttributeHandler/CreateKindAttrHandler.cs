@@ -45,6 +45,7 @@ namespace Generator.AttributeHandler
             var namespaceKind = tc.FileContext.GetOrCreateNamespaceKind(nameSpace, CreateNamespaceFactory);
             tc.IdentiferKind = CreateIdentiferFactory.CreateIdentifer(identiferType, namespaceKind);
             tc.IdentiferKind.Comment = AnalysisUtil.GetComment(tc.OldTypeSyntax);
+            tc.IdentiferKind.OriginalNamespaceName = tc.OldNameSpaceName;
         }
 
         public FieldKind NewField(NewFieldContext ctx)

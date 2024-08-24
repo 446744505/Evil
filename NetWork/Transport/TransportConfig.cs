@@ -4,11 +4,16 @@ namespace NetWork.Transport
 {
     public abstract class TransportConfig
     {
+        public ushort Pvid { get; set; } = 0;
         public int Port { get; set; } = 27519;
-        public INetWorkFactory NetWorkFactory { get; set; }
+        public int SoRcvbuf { get; set; } = 65536;
+        public int SoSndbuf { get; set; } = 65536;
+        public int OutBufferSize { get; set; } = 1048576;
+        public INetWorkFactory? NetWorkFactory { get; set; }
 
-        internal Executor Executor = new();
-        public IMessgeDispatcher? Dispatcher { get; set; }
+        internal Executor Executor { get; } = new();
+        public IMessageDispatcher? Dispatcher { get; set; }
+        public IMessageProcessor MessageProcessor { get; set; } = null!;
     }
     
     public class AcceptorTransportConfig : TransportConfig

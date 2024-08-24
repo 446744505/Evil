@@ -27,6 +27,16 @@ namespace Generator.Visitor
             m_Writer.WriteLine($"{FieldName}.CopyFrom(_o_.{FieldName});");
         }
 
+        public void Visit(ByteType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UShortType type)
+        {
+            BaseVisit();
+        }
+
         private void BaseVisit()
         {
             m_Writer.WriteLine($"Edb.Logs.LogObject(this, \"{FieldName}\");");
@@ -34,6 +44,11 @@ namespace Generator.Visitor
         }
         
         public void Visit(IntType type)
+        {
+            BaseVisit();
+        }
+
+        public void Visit(UIntType type)
         {
             BaseVisit();
         }
@@ -63,17 +78,22 @@ namespace Generator.Visitor
             BaseVisit();
         }
 
+        public void Visit(ArrayType type)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void Visit(ListType type)
         {
             var valueCopyVisitor = new CopyFieldTypeVisitor(m_FieldKind, "_v_");
             type.Value().Accept(valueCopyVisitor);
             var valueFullNameTypeVisitor = new FullNameTypeVisitor();
             type.Value().Accept(valueFullNameTypeVisitor);
-            m_Writer.WriteLine($"var this_{FieldName} = Edb.Logs.LogList<{valueFullNameTypeVisitor.Result}>(this, \"{FieldName}\", DoNothing);");
-            m_Writer.WriteLine($"this_{FieldName}.Clear();");
+            m_Writer.WriteLine($"var _{FieldName}_ = Edb.Logs.LogList<{valueFullNameTypeVisitor.Result}>(this, \"{FieldName}\", DoNothing);");
+            m_Writer.WriteLine($"_{FieldName}_.Clear();");
             m_Writer.WriteLine($@"foreach (var _v_ in _o_.{FieldName})
             {{
-                this_{FieldName}.Add({valueCopyVisitor.Result});
+                _{FieldName}_.Add({valueCopyVisitor.Result});
             }}");
         }
 
@@ -85,8 +105,8 @@ namespace Generator.Visitor
             type.Key().Accept(keyFullNameTypeVisitor);
             var valueFullNameTypeVisitor = new FullNameTypeVisitor();
             type.Value().Accept(valueFullNameTypeVisitor);
-            m_Writer.WriteLine($"var this_{FieldName} = Edb.Logs.LogMap<{keyFullNameTypeVisitor.Result}, {valueFullNameTypeVisitor.Result}>(this, \"{FieldName}\", DoNothing);");
-            m_Writer.WriteLine($"this_{FieldName}.Clear();");
+            m_Writer.WriteLine($"var _{FieldName}_ = Edb.Logs.LogMap<{keyFullNameTypeVisitor.Result}, {valueFullNameTypeVisitor.Result}>(this, \"{FieldName}\", DoNothing);");
+            m_Writer.WriteLine($"_{FieldName}_.Clear();");
             m_Writer.WriteLine($@"foreach (var _pair_ in _o_.{FieldName})
             {{
                 {FieldName}.Add(_pair_.Key, {valueCopyVisitor.Result});

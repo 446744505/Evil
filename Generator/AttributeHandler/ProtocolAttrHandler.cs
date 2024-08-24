@@ -4,7 +4,9 @@ using Generator.Context;
 using Generator.Exception;
 using Generator.Factory;
 using Generator.Kind;
+using Generator.Type;
 using Generator.Util;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Generator.AttributeHandler
@@ -39,6 +41,13 @@ namespace Generator.AttributeHandler
                 // 不是协议字段
                 if (!AnalysisUtil.HadAttribute(f, Attributes.ProtocolField, out var attr))
                 {
+                    // 如果是常量
+                    if (f.Modifiers.Any(x => x.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.ConstKeyword)))
+                    {
+                        var ctx = NewFieldContext.Parse(f);
+                        var field = ConstFieldKind.NewConstFieldKind(ctx, TypeContext.IdentiferKind!);
+                        field.Define = f.ToString();
+                    }
                     continue;
                 }
                 var fieldName = AnalysisUtil.GetFieldName(f);
@@ -65,9 +74,9 @@ namespace Generator.AttributeHandler
                 {
                     throw new TypeException($"{TypeContext.OldClassName}的字段{fieldName}的类型解析失败", e);
                 }
-                // 设置为Message类型
-                TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName);
             }
+            // 设置为Message类型
+            TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName);
         }
 
         public ICreateNamespaceFactory CreateNamespaceFactory => m_CreateKindAttrHandler.CreateNamespaceFactory;

@@ -4,14 +4,14 @@ namespace Edb
 {
     public sealed partial class Edb : Singleton<Edb>
     {
-        private volatile Tables? m_Tables;
+        private volatile Tables m_Tables = null!;
         private bool m_Running;
         private volatile Checkpoint? m_Checkpoint;
         private Executor m_Executor = new();
         private LockAsync m_Lock = new();
 
         public Config Config { get; set; } = null!;
-        internal Tables? Tables => m_Tables;
+        internal Tables Tables => m_Tables;
         public Random Random => m_Random.Value!;
         public Executor Executor => m_Executor;
         

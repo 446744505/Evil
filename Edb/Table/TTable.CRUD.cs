@@ -5,6 +5,10 @@ namespace Edb
     public abstract partial class TTable<TKey, TValue> : BaseTable
         where TKey : notnull where TValue : class
     {
+        protected static readonly Task<bool> FalseTask = Task.FromResult(false);
+        protected static readonly Task<bool> TrueTask = Task.FromResult(true);
+        protected static readonly Task<TValue?> NullTask = Task.FromResult<TValue>(null);
+        
         protected async Task<bool> AddAsync(TKey key, TValue value)
         {
             if (value == null)
@@ -104,12 +108,12 @@ namespace Edb
         
         private Task<bool> Exist0Async(TKey key)
         {
-            return Storage == null ? Task.FromResult(false) : Storage.Exist(key, this);
+            return Storage == null ? FalseTask : Storage.Exist(key, this);
         }
 
         private Task<TValue?> Find0Async(TKey key)
         {
-            return Storage == null ? Task.FromResult<TValue?>(null) : Storage.Find(key, this);
+            return Storage == null ? NullTask : Storage.Find(key, this);
         }
     }
 }

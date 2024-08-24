@@ -75,11 +75,12 @@ namespace Edb
             }
         }
 
-        public override void Clear()
+        public override Task Clear()
         {
             if (m_Table.PersistenceType != ITable.Persistence.Memory)
                 throw new NotSupportedException();
             m_Cache.Clear();
+            return Task.CompletedTask;
         }
 
         public override void Clean()
@@ -87,9 +88,9 @@ namespace Edb
             m_CleanWorker();
         }
 
-        public override void Walk(Query<TKey, TValue> query)
+        public override Task Walk(Query<TKey, TValue> query)
         {
-            Walk0(m_Cache.Values, query);
+            return Walk0(m_Cache.Values, query);
         }
 
         internal override ICollection<TRecord<TKey, TValue>> Values()
@@ -115,10 +116,9 @@ namespace Edb
             LogAddRemove(key, r);
         }
 
-        internal override TRecord<TKey, TValue>? Remove(TKey key)
+        internal override bool Remove(TKey key)
         {
-            m_Cache.Remove(key, out var r);
-            return r;
+            return m_Cache.Remove(key, out _);
         }
         
         private struct AccessTimeRecord<TK, TV> : IComparable<AccessTimeRecord<TK, TV>>

@@ -24,7 +24,19 @@ namespace Generator.Visitor
                 Result = "new()";
         }
 
+        public void Visit(ByteType type)
+        {
+        }
+
+        public void Visit(UShortType type)
+        {
+        }
+
         public void Visit(IntType type)
+        {
+        }
+
+        public void Visit(UIntType type)
         {
         }
 
@@ -46,6 +58,10 @@ namespace Generator.Visitor
         }
 
         public void Visit(DoubleType type)
+        {
+        }
+
+        public void Visit(ArrayType type)
         {
         }
 

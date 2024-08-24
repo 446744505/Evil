@@ -1,7 +1,6 @@
-using System;
+
 using System.Threading.Tasks;
 using DotNetty.Codecs;
-using DotNetty.Handlers.Logging;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Libuv;
@@ -27,15 +26,15 @@ namespace NetWork.Transport
                 bootstrap.Group(bossGroup, workerGroup)
                     .Channel<TcpServerChannel>()
                     .Option(ChannelOption.SoBacklog, Config.Backlog)
+                    .ChildOption(ChannelOption.TcpNodelay, true)
+                    .ChildOption(ChannelOption.SoKeepalive, false)
+                    .ChildOption(ChannelOption.SoRcvbuf, Config.SoRcvbuf)
+                    .ChildOption(ChannelOption.SoSndbuf, Config.SoSndbuf)
+                    .ChildOption(ChannelOption.WriteBufferLowWaterMark, Config.OutBufferSize)
+                    .ChildOption(ChannelOption.WriteBufferHighWaterMark, Config.OutBufferSize)
                     .ChildHandler(new ActionChannelInitializer<IChannel>(channel =>
                     {
-                        var pipeline = channel.Pipeline;
-                        pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
-                            Messages.HeaderSize, 0, Messages.HeaderSize));
-                        pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
-                        pipeline.AddLast(new MessageDecode(m_MessageProcessor));
-                        pipeline.AddLast(new MessageEncode());
-                        pipeline.AddLast(new LogicHandler(Config.NetWorkFactory, m_SessionMgr, Config.Dispatcher));
+                        AddChildHandler(channel.Pipeline);
                     }));
                 
                 var channel = await bootstrap.BindAsync(Config.Port);
@@ -54,6 +53,16 @@ namespace NetWork.Transport
                     workerGroup.ShutdownGracefullyAsync());
                 Stopped();
             }
+        }
+
+        protected virtual void AddChildHandler(IChannelPipeline pipeline)
+        {
+            pipeline.AddLast(new LengthFieldBasedFrameDecoder(int.MaxValue, 0, 
+                Messages.HeaderSize, 0, Messages.HeaderSize));
+            pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
+            pipeline.AddLast(new MessageDecode(Config.MessageProcessor));
+            pipeline.AddLast(new MessageEncode());
+            pipeline.AddLast(new LogicHandler(Config, m_SessionMgr));
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Attributes
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class XBeanAttribute : Attribute
     {
         private readonly Node m_Nodes;
