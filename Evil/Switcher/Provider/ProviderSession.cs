@@ -48,7 +48,7 @@ namespace Evil.Switcher
         
         public override string ToString()
         {
-            return $"pvid {Pvid} {base.ToString()}";
+            return $"pvid:{Pvid} {base.ToString()}";
         }
     }
 }

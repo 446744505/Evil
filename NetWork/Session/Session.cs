@@ -34,7 +34,7 @@ namespace NetWork
 
         public override string ToString()
         {
-            return $"{Id} {m_Context.Channel.RemoteAddress}";
+            return $"sid:{Id} {m_Context.Channel.RemoteAddress}";
         }
     }
 }

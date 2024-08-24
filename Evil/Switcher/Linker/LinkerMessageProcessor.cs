@@ -10,7 +10,8 @@ namespace Evil.Switcher
         {
         }
 
-        protected override Message? WhenNotType(Session session, MessageHeader header, int readSize, BinaryReader reader)
+        protected override Message? WhenNotType(Session session, MessageHeader header, 
+            int readSize, BinaryReader reader)
         {
             var pvid = header.Pvid;
             var provider = Provider.I;
@@ -29,14 +30,14 @@ namespace Evil.Switcher
             var stream = reader.BaseStream;
             var len = readSize - stream.Position;
             var data = reader.ReadBytes((int)len);
-            var dispatch = new ClientMsgBox()
+            var box = new ClientMsgBox()
             {
                 clientSessionId = linkerSession.Id,
                 messageId = header.MessageId,
                 pvid = header.Pvid,
                 data = data
             };
-            providerSession.SendAsync(dispatch);
+            providerSession.SendAsync(box);
             
             return null;
         }
