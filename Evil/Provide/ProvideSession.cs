@@ -3,6 +3,7 @@ using DotNetty.Transport.Channels;
 using Evil.Util;
 using NetWork;
 using Proto;
+using ProtoBuf;
 
 namespace Evil.Provide
 {
@@ -21,11 +22,11 @@ namespace Evil.Provide
 
         public async Task SendToClientAsync(long clientSessionId, Message msg)
         {
+            Log.I.Debug($"send msg to client {clientSessionId} {msg}");
             // 考虑优化，现在是在逻辑线程同步编码
-            await using var writer = new BinaryWriter(new MemoryStream());
-            msg.Encode(writer);
-
-            var stream = (MemoryStream)writer.BaseStream;
+            await using var stream = new MemoryStream();
+            Serializer.Serialize(stream, msg);
+            
             await SendAsync(new SendToClient
             {
                 clientSessionId = clientSessionId,

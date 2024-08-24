@@ -16,6 +16,10 @@ namespace Evil.Provide
             m_Session = session;
         }
 
+        /// <summary>
+        /// 发送消息到对应的客户端
+        /// </summary>
+        /// <param name="msg"></param>
         public async Task SendAsync(Message msg)
         {
             await m_Session.SendToClientAsync(m_ClientSessionId, msg);
