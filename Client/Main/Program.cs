@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Threading.Tasks;
 using Client.NetWork;
 using Evil.Util;
@@ -20,9 +21,9 @@ namespace Client
                 var connector = new ConnectorTransport(config);
                 connector.Start();
                 Log.I.Info("client started");
-
+                
                 stopper = new Stopper().BindAndWait();
-
+                
                 connector.Dispose();
                 await Executor.DisposeAsync();
             } finally

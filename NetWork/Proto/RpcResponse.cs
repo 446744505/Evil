@@ -1,5 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
+using NetWork.Transport;
 using ProtoBuf;
 
 namespace NetWork.Proto

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Concurrent;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using DotNetty.Codecs;
@@ -47,6 +50,7 @@ namespace NetWork.Transport
             {
                 // 释放资源
                 await group.ShutdownGracefullyAsync();
+                await RpcMgr.I.DisposeAsync();
                 Stopped();
             }
         }
@@ -59,6 +63,29 @@ namespace NetWork.Transport
             pipeline.AddLast(new MessageDecode(Config.MessageProcessor));
             pipeline.AddLast(new MessageEncode());
             pipeline.AddLast(new LogicHandler(Config, m_SessionMgr));
+        }
+    }
+    
+    public class RpcMgr : Singleton<RpcMgr>
+    {
+        private readonly ConcurrentDictionary<long, Func<Stream, bool>> m_Pending = new();
+        public void PendRequest(long requestId, Func<Stream, bool> func)
+        {
+            m_Pending[requestId] = func;
+        }
+
+        public Func<Stream, bool>? RemovePending(long requestId)
+        {
+            m_Pending.TryRemove(requestId, out var func);
+            return func;
+        }
+
+        public async Task DisposeAsync()
+        {
+            while (m_Pending.Count > 0)
+            {
+                await Task.Delay(1000);
+            }
         }
     }
 }

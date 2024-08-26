@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Evil.Util;
 using NetWork.Proto;
+using NetWork.Transport;
 using ProtoBuf;
 
 namespace NetWork
@@ -30,6 +31,8 @@ namespace NetWork
             
             await session.SendAsync(this);
             
+            // 这里直接用了Task.Delay(用的后台线程),不用担心停服时超时任务不会执行
+            // 因为在RpcMgr关闭时会等待所有的PendingRequest执行完,会hold住主线程
             var timeoutTask = Task.Delay(timeout).ContinueWith(_ => completionSource.TrySetCanceled());
             await Task.WhenAny(timeoutTask, completionSource.Task);
             try
