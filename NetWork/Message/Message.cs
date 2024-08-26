@@ -13,6 +13,11 @@ namespace NetWork
             MessageId = reader.ReadUInt32();
             Pvid = reader.ReadUInt16();
         }
+
+        public override string ToString()
+        {
+            return $"{MessageId} {Pvid}";
+        }
     }
     public abstract class Message
     {

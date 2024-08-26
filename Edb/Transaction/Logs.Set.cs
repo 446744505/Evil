@@ -1,4 +1,5 @@
 using System.Collections;
+using Evil.Util;
 
 namespace Edb
 {
@@ -268,7 +269,8 @@ namespace Edb
 
         public override string ToString()
         {
-            return $"added={m_Added} removed={m_Removed}";
+            return $"added={Strings.ToCustomString(m_Added)} " +
+                   $"removed={Strings.ToCustomString(m_Removed)}";
         }
     }
 }

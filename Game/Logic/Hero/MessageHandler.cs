@@ -73,7 +73,7 @@ namespace Proto
                 if (ph.Heroes.TryGetValue(heroId, out var hero))
                 {
                     hero.Star += 1;
-                    ProcedureHelper.SendWhenCommit(Session, new HeroStarNtf()
+                    Net.I.SendToPlayerWhenCommit(playerId, new HeroStarNtf()
                     {
                         heroId = heroId,
                         star = hero.Star,

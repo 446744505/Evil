@@ -31,13 +31,13 @@ namespace NetWork.Codec
             message.Encode(m_Writer);
             // encode body
             Serializer.Serialize(stream, message);
-            output.WriteBytes(stream.GetBuffer(), 0, (int)stream.Position);
+            output.WriteBytes(stream.GetBuffer()[..(int)stream.Position]);
         }
 
         public override void ChannelInactive(IChannelHandlerContext context)
         {
-            base.ChannelInactive(context);
             m_Writer.Dispose();
+            base.ChannelInactive(context);
         }
     }
 }

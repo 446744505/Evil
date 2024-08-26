@@ -48,11 +48,16 @@ namespace NetWork
         public override async Task<bool> Process()
         {
             var result = await OnRequest();
-            var rsp = new RpcResponse { RequestId = m_RequestId };
+            Message? rsp;
             using (var stream = new MemoryStream())
             {
                 Serializer.Serialize(stream, result);
-                rsp.Data = stream.GetBuffer()[..(int)stream.Length];
+                var data = stream.GetBuffer()[..(int)stream.Length];
+                rsp = Session.Config.NetWorkFactory!.CreateRpcResponse(Context, m_RequestId, data);
+                if (rsp == null)
+                {
+                    throw new NotSupportedException();
+                }
             }
 
             await Session.SendAsync(rsp);

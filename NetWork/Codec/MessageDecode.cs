@@ -37,18 +37,18 @@ namespace NetWork.Codec
             var header = new MessageHeader();
             header.Decode(m_Reader);
             var message = m_MessageProcessor.CreateMessage(session, header, readAbleSize, m_Reader);
+            // 跳过已经读取的字节
+            input.SkipBytes((int)stream.Position);
             if (message != null)
             {
-                // 跳过已经读取的字节
-                input.SkipBytes((int)stream.Position);
                 output.Add(message);   
             }
         }
 
         public override void ChannelInactive(IChannelHandlerContext ctx)
         {
-            base.ChannelInactive(ctx);
             m_Reader.Dispose();
+            base.ChannelInactive(ctx);
         }
     }
 }

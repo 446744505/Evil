@@ -10,7 +10,7 @@ namespace Evil.Switcher
 
         protected override Message? WhenNotType(Session session, MessageHeader header, int readSize, BinaryReader reader)
         {
-            return null;
+            throw new NotImplementedException();
         }
     }
 }
