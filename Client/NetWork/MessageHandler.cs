@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Evil.Util;
 using NetWork;
 
 namespace Proto
@@ -17,7 +16,7 @@ namespace Proto
             try
             {
                 var msg = Session.Config.MessageProcessor.CreateMessage(Session, header, data.Length, reader);
-                Log.I.Debug($"receive server msg {msg}");
+                MessageHelper.OnReceiveMsg(msg!, "server");
                 await msg!.Dispatch();
             }
             finally

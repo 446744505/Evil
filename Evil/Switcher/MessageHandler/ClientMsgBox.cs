@@ -17,7 +17,7 @@ namespace Proto
             {
                 var msg = Session.Config.MessageProcessor.CreateMessage(Session, header, data.Length, reader);
                 msg!.Context = this;
-                Log.I.Debug($"receive client {clientSessionId} msg {msg}");
+                MessageHelper.OnReceiveMsg(clientSessionId, msg, "client");
                 await msg.Dispatch();
             }
             catch (Exception e)

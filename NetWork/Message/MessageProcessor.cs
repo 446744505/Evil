@@ -13,7 +13,7 @@ namespace NetWork
     public class MessageProcessor : IMessageProcessor
     {
         private readonly ushort m_Pvid;
-        private readonly Dictionary<uint, Func<Message>> Creaters = new();
+        private readonly Dictionary<uint, Func<Message>> m_Creaters = new();
 
         public MessageProcessor(ushort pvid)
         {
@@ -22,17 +22,17 @@ namespace NetWork
 
         public void Register<T>(uint msgId, Func<T> func) where T : Message
         {
-            if (Creaters.ContainsKey(msgId))
+            if (m_Creaters.ContainsKey(msgId))
             {
                 throw new NetWorkException($"msgId:{msgId} already register");
             }
-            Creaters[msgId] = func;
+            m_Creaters[msgId] = func;
         }
         
         public Message? CreateMessage(Session session, MessageHeader header, int readSize, BinaryReader reader)
         {
             var msgId = header.MessageId;
-            if (!Creaters.TryGetValue(msgId, out var func))
+            if (!m_Creaters.TryGetValue(msgId, out var func))
             {
                 return WhenNotType(session, header, readSize, reader);
             }

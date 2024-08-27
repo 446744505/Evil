@@ -8,21 +8,22 @@ namespace NetWork.Handler
     internal class LogicHandler : SimpleChannelInboundHandler<Message>
     {
         private Session m_Session = null!;
-        private readonly TransportConfig m_Config;
+        private readonly ITransport m_Transport;
         private readonly ISessionMgr m_SessionMgr;
 
-        public LogicHandler(TransportConfig config, ISessionMgr sessionMgr)
+        public LogicHandler(ITransport transport, ISessionMgr sessionMgr)
         {
-            m_Config = config;
+            m_Transport = transport;
             m_SessionMgr = sessionMgr;
         }
 
         public override void ChannelActive(IChannelHandlerContext ctx)
         {
             base.ChannelActive(ctx);
-            m_Session = m_Config.NetWorkFactory!.CreateSession(ctx);
+            var config = m_Transport.Config();
+            m_Session = config.NetWorkFactory!.CreateSession(ctx);
             ctx.GetAttribute(AttrKey.Session).Set(m_Session);
-            m_Session.Config = m_Config;
+            m_Session.Transport = m_Transport;
             m_SessionMgr.OnAddSession(m_Session);
             Log.I.Info($"add session {m_Session}");
         }
@@ -43,7 +44,6 @@ namespace NetWork.Handler
 
         protected override void ChannelRead0(IChannelHandlerContext ctx, Message msg)
         {
-            Log.I.Debug($"receive {msg} session {m_Session}");
             msg.Dispatch();
         }
     }

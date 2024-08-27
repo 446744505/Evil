@@ -32,6 +32,11 @@ namespace NetWork.Codec
             // encode body
             Serializer.Serialize(stream, message);
             output.WriteBytes(stream.GetBuffer()[..(int)stream.Position]);
+            if (MessageHelper.IsDebug)
+            {
+                var session = context.GetAttribute(AttrKey.Session).Get();
+                MessageHelper.OnSendMsg(session, message);
+            }
         }
 
         public override void ChannelInactive(IChannelHandlerContext context)

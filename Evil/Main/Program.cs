@@ -7,8 +7,9 @@ namespace Evil
         public static void Main(string[] args)
         {
             Log.I.UnobservedTaskException();
-            
+            MessageIgnore.Init();
             CmdLine.Init(args);
+            
             Stopper? stopper = null;
             try
             {

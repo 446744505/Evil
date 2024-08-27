@@ -4,6 +4,11 @@ namespace Evil.Util
 {
     public class MessageIdGenerator
     {
+        public static uint CalMessageId(Type type)
+        {
+            return BKDRHash(type.Name);
+        }
+        
         public static uint CalMessageId(string messageName)
         {
             return BKDRHash(messageName);

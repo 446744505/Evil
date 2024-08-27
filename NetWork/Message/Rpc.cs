@@ -3,8 +3,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Evil.Util;
-using NetWork.Proto;
-using NetWork.Transport;
 using ProtoBuf;
 
 namespace NetWork
@@ -21,11 +19,13 @@ namespace NetWork
             {
                 throw new NetWorkException("session is null");
             }
-            
+
+            var rpcMgr = session.Transport.RpcMgr();
             var completionSource = new TaskCompletionSource<T>();
-            RpcMgr.I.PendRequest(m_RequestId, stream =>
+            rpcMgr.PendRequest(m_RequestId, stream =>
             {
                 var message = Serializer.NonGeneric.Deserialize(typeof(T), stream) as T;
+                MessageHelper.OnReceiveMsg(session, message!);
                 return completionSource.TrySetResult(message!);
             });
             
@@ -40,7 +40,7 @@ namespace NetWork
                 return await completionSource.Task;
             } catch (TaskCanceledException)
             {
-                RpcMgr.I.RemovePending(m_RequestId);
+                rpcMgr.RemovePending(m_RequestId);
                 throw new TimeoutException(ToString()!);
             }
         }

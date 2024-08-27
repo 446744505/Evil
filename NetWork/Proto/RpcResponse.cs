@@ -1,6 +1,5 @@
 using System.IO;
 using System.Threading.Tasks;
-using NetWork.Transport;
 using ProtoBuf;
 
 namespace NetWork.Proto
@@ -18,7 +17,7 @@ namespace NetWork.Proto
 
         public override Task<bool> Process()
         {
-            var func = RpcMgr.I.RemovePending(RequestId);
+            var func = Session.Transport.RpcMgr().RemovePending(RequestId);
             if (func == null)
             {
                 return FalseTask;

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DotNetty.Transport.Channels;
 using Evil.Util;
 using NetWork.Proto;
 using Nito.AsyncEx;
@@ -11,9 +12,10 @@ namespace NetWork.Transport
     {
         #region 字段
 
-        protected ISessionMgr m_SessionMgr;
+        protected ISessionMgr m_SessionMgr = null!;
 
         private volatile bool m_IsStop;
+        private readonly RpcMgr m_RpcMgr = new();
         private readonly AsyncCountdownEvent m_StopEvent = new(1);
 
         #endregion
@@ -21,6 +23,7 @@ namespace NetWork.Transport
         #region 属性
 
         protected T Config { get; }
+        internal RpcMgr RpcMgr => m_RpcMgr;
 
         #endregion
 
@@ -40,9 +43,19 @@ namespace NetWork.Transport
             await m_StopEvent.WaitAsync();
         }
         
-        protected void Stopped()
+        protected void OnStopped()
         {
             m_IsStop = true;
+        }
+
+        protected async Task BaseDispose(IChannel channel)
+        {
+            // 关闭连接
+            await channel.CloseAsync();
+            // 关闭rpc，上面的连接已经关了，如果这时候client回调处理里还有消息发送？
+            await RpcMgr.DisposeAsync();
+            // 最后关闭线程池
+            await Config.Executor.DisposeAsync();
         }
     
         public void Dispose()
@@ -54,6 +67,16 @@ namespace NetWork.Transport
                 Thread.Sleep(1000);
             }
             Log.I.Info("transport stop");
+        }
+
+        TransportConfig ITransport.Config()
+        {
+            return Config;
+        }
+
+        RpcMgr ITransport.RpcMgr()
+        {
+            return m_RpcMgr;
         }
 
         public void Start()

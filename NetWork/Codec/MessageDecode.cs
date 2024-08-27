@@ -41,7 +41,8 @@ namespace NetWork.Codec
             input.SkipBytes((int)stream.Position);
             if (message != null)
             {
-                output.Add(message);   
+                output.Add(message);
+                MessageHelper.OnReceiveMsg(session, message);
             }
         }
 

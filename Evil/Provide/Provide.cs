@@ -1,4 +1,5 @@
-﻿using NetWork;
+﻿using Evil.Util;
+using NetWork;
 using Proto;
 
 namespace Evil.Provide
@@ -15,6 +16,11 @@ namespace Evil.Provide
 
 
         #endregion
+
+        static Provide()
+        {
+            MessageIgnore.Init();
+        }
 
         public Provide(ProvideConnectorTransportConfig config, IMessageRegister? register = null)
         {

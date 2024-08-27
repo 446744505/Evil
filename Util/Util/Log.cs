@@ -5,6 +5,7 @@ namespace Evil.Util
     public class Log : Singleton<Log>
     {
         private readonly Logger m_Logger = LogManager.GetCurrentClassLogger();
+        public bool IsDebug => m_Logger.IsDebugEnabled;
 
         public Log UnobservedTaskException()
         {

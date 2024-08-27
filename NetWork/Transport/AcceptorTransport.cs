@@ -41,9 +41,7 @@ namespace NetWork.Transport
                 Log.I.Info($"acceptor start at {Config.Port}");
                 // 等待关闭
                 await WaitStop();
-                // 关闭连接
-                await channel.CloseAsync();
-                await Config.Executor.DisposeAsync();
+                await BaseDispose(channel);
                 Log.I.Info($"acceptor stop at {Config.Port}");
             }
             finally
@@ -51,7 +49,7 @@ namespace NetWork.Transport
                 await Task.WhenAll(
                     bossGroup.ShutdownGracefullyAsync(),
                     workerGroup.ShutdownGracefullyAsync());
-                Stopped();
+                OnStopped();
             }
         }
 
@@ -62,7 +60,7 @@ namespace NetWork.Transport
             pipeline.AddLast(new LengthFieldPrepender(Messages.HeaderSize));
             pipeline.AddLast(new MessageDecode(Config.MessageProcessor));
             pipeline.AddLast(new MessageEncode());
-            pipeline.AddLast(new LogicHandler(Config, m_SessionMgr));
+            pipeline.AddLast(new LogicHandler(this, m_SessionMgr));
         }
     }
 }

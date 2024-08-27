@@ -22,7 +22,7 @@ namespace Evil.Provide
 
         public async Task SendToClientAsync(long clientSessionId, Message msg)
         {
-            Log.I.Debug($"send msg to client {clientSessionId} {msg}");
+            MessageHelper.OnSendMsg(clientSessionId, msg, "client");
             // 考虑优化，现在是在逻辑线程同步编码
             await using var stream = new MemoryStream();
             Serializer.Serialize(stream, msg);

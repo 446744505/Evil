@@ -9,7 +9,8 @@ namespace NetWork
     {
         private readonly IChannelHandlerContext m_Context;
         public long Id { get; }
-        public TransportConfig Config { get; set; } = null!;
+        public ITransport Transport { get; set; } = null!;
+        public TransportConfig Config => Transport.Config();
 
         public Session(IChannelHandlerContext context)
         {
@@ -19,7 +20,6 @@ namespace NetWork
         
         public virtual Task SendAsync(Message msg)
         {
-            Log.I.Debug($"send {msg} session {this}");
             return m_Context.WriteAndFlushAsync(msg);
         }
 
