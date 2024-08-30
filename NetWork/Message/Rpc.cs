@@ -29,10 +29,10 @@ namespace NetWork
             var timeoutTask = Task.Delay(timeout, cts.Token).ContinueWith(_ => completionSource.TrySetCanceled());
             rpcMgr.PendRequest(m_RequestId, stream =>
             {
-                cts.Cancel(); // 取消超时定时器
                 var message = Serializer.NonGeneric.Deserialize(typeof(T), stream) as T;
                 MessageHelper.OnReceiveMsg(session, message!);
-                return completionSource.TrySetResult(message!);
+                completionSource.TrySetResult(message!);
+                cts.Cancel(); // 取消超时定时器
             });
             
             await session.SendAsync(this);

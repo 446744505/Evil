@@ -17,14 +17,14 @@ namespace NetWork.Proto
 
         public override Task<bool> Process()
         {
-            var func = Session.Transport.RpcMgr().RemovePending(RequestId);
-            if (func == null)
+            var cb = Session.Transport.RpcMgr().RemovePending(RequestId);
+            if (cb == null)
             {
                 return FalseTask;
             }
 
             using var stream = new MemoryStream(Data);
-            func.Invoke(stream);
+            cb.Invoke(stream);
             return TrueTask;
         }
     }

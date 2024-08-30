@@ -14,13 +14,13 @@ namespace NetWork.Transport
     
     public class RpcMgr
     {
-        private readonly ConcurrentDictionary<long, Func<Stream, bool>> m_Pending = new();
-        public void PendRequest(long requestId, Func<Stream, bool> func)
+        private readonly ConcurrentDictionary<long, Action<Stream>> m_Pending = new();
+        public void PendRequest(long requestId, Action<Stream> cb)
         {
-            m_Pending[requestId] = func;
+            m_Pending[requestId] = cb;
         }
 
-        public Func<Stream, bool>? RemovePending(long requestId)
+        public Action<Stream>? RemovePending(long requestId)
         {
             m_Pending.TryRemove(requestId, out var func);
             return func;
