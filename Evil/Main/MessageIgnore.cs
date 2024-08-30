@@ -1,9 +1,9 @@
 ﻿using NetWork;
 using Proto;
 
-namespace Evil.Util
+namespace Evil
 {
-    public class MessageIgnore
+    internal class MessageIgnore
     {
         public static void Init()
         {

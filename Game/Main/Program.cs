@@ -12,8 +12,9 @@ namespace Game
         public static async Task Main(string[] args)
         {
             Log.I.UnobservedTaskException();
-            
+            CmdLine.Init(args);
             Event.Start();
+            
             Stopper? stopper = null;
             try
             {

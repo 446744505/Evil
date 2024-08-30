@@ -1,10 +1,9 @@
-﻿using Evil.Util;
-using NetWork;
+﻿using NetWork;
 using Proto;
 
 namespace Evil.Provide
 {
-    public class Provide : IDisposable
+    public partial class Provide : IDisposable
     {
         #region 字段
 

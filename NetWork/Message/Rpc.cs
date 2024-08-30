@@ -1,6 +1,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Evil.Util;
 using ProtoBuf;
@@ -22,19 +23,21 @@ namespace NetWork
 
             var rpcMgr = session.Transport.RpcMgr();
             var completionSource = new TaskCompletionSource<T>();
+            var cts = new CancellationTokenSource();
+            // 这里直接用了Task.Delay(用的后台线程),不用担心停服时超时任务不会执行
+            // 因为在RpcMgr关闭时会等待所有的PendingRequest执行完,会hold住主线程
+            var timeoutTask = Task.Delay(timeout, cts.Token).ContinueWith(_ => completionSource.TrySetCanceled());
             rpcMgr.PendRequest(m_RequestId, stream =>
             {
+                cts.Cancel(); // 取消超时定时器
                 var message = Serializer.NonGeneric.Deserialize(typeof(T), stream) as T;
                 MessageHelper.OnReceiveMsg(session, message!);
                 return completionSource.TrySetResult(message!);
             });
             
             await session.SendAsync(this);
-            
-            // 这里直接用了Task.Delay(用的后台线程),不用担心停服时超时任务不会执行
-            // 因为在RpcMgr关闭时会等待所有的PendingRequest执行完,会hold住主线程
-            var timeoutTask = Task.Delay(timeout).ContinueWith(_ => completionSource.TrySetCanceled());
             await Task.WhenAny(timeoutTask, completionSource.Task);
+            
             try
             {
                 return await completionSource.Task;
