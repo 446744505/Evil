@@ -7,7 +7,7 @@ namespace Evil.Provide
     {
         #region 字段
 
-        private readonly ProvideConnectorTransport m_Transport;
+        private readonly List<ProvideConnectorTransport> m_Transports = new();
 
         #endregion
 
@@ -21,26 +21,37 @@ namespace Evil.Provide
             MessageIgnore.Init();
         }
 
-        public Provide(ProvideConnectorTransportConfig config, IMessageRegister? register = null)
+        public Provide(List<ProvideConnectorTransportConfig> configs, IMessageRegister? register = null)
         {
-            if (config.NetWorkFactory == null)
+            var innerMsgRegister = new MessageRegister();
+            foreach (var config in configs)
             {
-                if (register == null)
-                    throw  new NetWorkException("provide register is null");
+                if (config.NetWorkFactory == null)
+                {
+                    if (register == null)
+                        throw  new NetWorkException("provide register is null");
                 
-                config.NetWorkFactory = new ProvideNetWorkFactory(register);
+                    config.NetWorkFactory = new ProvideNetWorkFactory(register);
+                }
+                m_Transports.Add(new ProvideConnectorTransport(config, innerMsgRegister));
             }
-            m_Transport = new ProvideConnectorTransport(config, new MessageRegister());
+            
         }
 
         public void Start()
         {
-            m_Transport.Start();
+            foreach (var transport in m_Transports)
+            {
+                transport.Start();
+            }
         }
 
         public void Dispose()
         {
-            m_Transport.Dispose();
+            foreach (var transport in m_Transports)
+            {
+                transport.Dispose();
+            }
         }
     }
 }

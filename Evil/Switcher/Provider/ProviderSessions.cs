@@ -12,7 +12,7 @@ namespace Evil.Switcher
             return m_Sessions.TryGetValue(pvid, out var session) ? session : null;
         }
         
-            internal async Task Bind(ProviderSession session)
+        internal async Task Bind(ProviderSession session)
         {
             var pvid = session.Pvid;
             if (m_Sessions.TryGetValue(pvid, out var old))

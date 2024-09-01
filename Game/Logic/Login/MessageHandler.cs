@@ -15,7 +15,7 @@ namespace Proto
             provideSession.AddClient(clientContext);
             // 上线
             await Net.I.AddPlayer(playerId, clientContext);
-            await clientContext.SendAsync(new LoginNtf());
+            await Net.I.SendToPlayer(playerId,new LoginNtf());
             return true;
         }
     }

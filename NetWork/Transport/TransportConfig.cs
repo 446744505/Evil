@@ -25,5 +25,6 @@ namespace NetWork.Transport
     {
         public string Host { get; set; } = "127.0.0.1";
         public int WorkerCount { get; set; } = 1;
+        public int ReConnectDelay { get; set; } = 5; // 秒
     }
 }

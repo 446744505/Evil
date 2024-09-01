@@ -20,7 +20,7 @@ namespace Game
         {
             if (args.Length == 0)
             {
-                I = new CmdLine();
+                I = new CmdLine().Init();
                 return;
             }
             var builder = new ConfigurationBuilder().AddCommandLine(args);
@@ -29,9 +29,10 @@ namespace Game
             I.Init();
         }
 
-        private void Init()
+        private CmdLine Init()
         {
             Providers = Provide.ParseProvider(Provider);
+            return this;
         }
     }
 }

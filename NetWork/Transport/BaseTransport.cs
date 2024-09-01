@@ -14,7 +14,7 @@ namespace NetWork.Transport
 
         protected ISessionMgr m_SessionMgr = null!;
 
-        private volatile bool m_IsStop;
+        protected volatile bool IsStop;
         private readonly RpcMgr m_RpcMgr = new();
         private readonly AsyncCountdownEvent m_StopEvent = new(1);
 
@@ -45,7 +45,7 @@ namespace NetWork.Transport
         
         protected void OnStopped()
         {
-            m_IsStop = true;
+            IsStop = true;
         }
 
         protected async Task BaseDispose(IChannel channel)
@@ -62,7 +62,7 @@ namespace NetWork.Transport
         {
             Log.I.Info("transport start stop");
             m_StopEvent.Signal();
-            while (!m_IsStop)
+            while (!IsStop)
             {
                 Thread.Sleep(1000);
             }

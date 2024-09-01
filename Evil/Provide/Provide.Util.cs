@@ -9,11 +9,11 @@
             foreach (var url in urls)
             {
                 var arr = url.Split(':');
-                if (arr.Length == 1)
-                {
-                    providers.Add(new Provider { Host = "127.0.0.1", Port = int.Parse(arr[0]) });
-                }
-                providers.Add(new Provider { Host = arr[0], Port = int.Parse(arr[1]) });
+                var host = arr[0];
+                if (string.IsNullOrEmpty(host))
+                    host = "127.0.0.1";
+                var port = int.Parse(arr[1]);
+                providers.Add(new Provider { Host = host, Port = port });
             }
 
             return providers.ToArray();

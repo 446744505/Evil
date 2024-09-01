@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Edb;
 using Evil.Event;
 using Evil.Provide;
@@ -19,12 +20,19 @@ namespace Game
             try
             {
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-                
-                var netConfig = new ProvideConnectorTransportConfig(1);
-                netConfig.Port = 10001;
-                // 设置消息处理器为带edb的事务处理
-                netConfig.Dispatcher = new ProcedureHelper.MessageDispatcher();
-                var provide = new Provide(netConfig, Net.I.MessageRegister);
+
+                var dispatcher = new ProcedureHelper.MessageDispatcher();
+                var provideCfgs = new List<ProvideConnectorTransportConfig>();
+                foreach (var provider in CmdLine.I.Providers)
+                {
+                    var netConfig = new ProvideConnectorTransportConfig(CmdLine.I.Pvid);
+                    netConfig.Host = provider.Host;
+                    netConfig.Port = provider.Port;
+                    // 设置消息处理器为带edb的事务处理
+                    netConfig.Dispatcher = dispatcher;
+                    provideCfgs.Add(netConfig);
+                }
+                var provide = new Provide(provideCfgs, Net.I.MessageRegister);
                 provide.Start();
                 Log.I.Info("server started");
 
