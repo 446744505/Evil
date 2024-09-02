@@ -1,4 +1,4 @@
-﻿using NetWork;
+﻿
 using Proto;
 
 namespace Evil.Provide
@@ -13,6 +13,8 @@ namespace Evil.Provide
 
         #region 属性
 
+        public ushort Pvid { get; set; }
+        public ProvideType Type { get; set; }
 
         #endregion
 
@@ -21,21 +23,21 @@ namespace Evil.Provide
             MessageIgnore.Init();
         }
 
-        public Provide(List<ProvideConnectorTransportConfig> configs, IMessageRegister? register = null)
+        public Provide(IProvideFactory factory)
         {
+            Pvid = factory.Pvid();
+            Type = factory.Type();
+            
             var innerMsgRegister = new MessageRegister();
-            foreach (var config in configs)
+            foreach (var provider in factory.Providers())
             {
-                if (config.NetWorkFactory == null)
-                {
-                    if (register == null)
-                        throw  new NetWorkException("provide register is null");
-                
-                    config.NetWorkFactory = new ProvideNetWorkFactory(register);
-                }
+                var config = new ProvideConnectorTransportConfig(this);
+                config.Host = provider.Host;
+                config.Port = provider.Port;
+                config.Dispatcher = factory.CreateMessageDispatcher(config);
+                config.NetWorkFactory = factory.CreateNetWorkFactory();
                 m_Transports.Add(new ProvideConnectorTransport(config, innerMsgRegister));
             }
-            
         }
 
         public void Start()

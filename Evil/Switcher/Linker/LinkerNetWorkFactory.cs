@@ -1,5 +1,6 @@
 ﻿using DotNetty.Transport.Channels;
 using NetWork;
+using NetWork.Transport;
 
 namespace Evil.Switcher
 {
@@ -20,9 +21,9 @@ namespace Evil.Switcher
             return Switcher.I.MessageRegister;
         }
 
-        public IMessageProcessor CreateMessageProcessor(ushort pvid)
+        public IMessageProcessor CreateMessageProcessor(TransportConfig config)
         {
-            return new LinkerMessageProcessor(pvid);
+            return new LinkerMessageProcessor();
         }
     }
 }

@@ -4,7 +4,6 @@ using Edb;
 using Evil.Event;
 using Evil.Provide;
 using Evil.Util;
-using Game.NetWork;
 
 namespace Game
 {
@@ -20,19 +19,8 @@ namespace Game
             try
             {
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-
-                var dispatcher = new ProcedureHelper.MessageDispatcher();
-                var provideCfgs = new List<ProvideConnectorTransportConfig>();
-                foreach (var provider in CmdLine.I.Providers)
-                {
-                    var netConfig = new ProvideConnectorTransportConfig(CmdLine.I.Pvid);
-                    netConfig.Host = provider.Host;
-                    netConfig.Port = provider.Port;
-                    // 设置消息处理器为带edb的事务处理
-                    netConfig.Dispatcher = dispatcher;
-                    provideCfgs.Add(netConfig);
-                }
-                var provide = new Provide(provideCfgs, Net.I.MessageRegister);
+                
+                var provide = new Provide(new GameProvideFactory());
                 provide.Start();
                 Log.I.Info("server started");
 

@@ -7,5 +7,7 @@ namespace Evil.Switcher.Provide
     {
         [ProtocolField(1)]
         private int pvid;
+        [ProtocolField(2)]
+        private int type; // 服务类型
     }
 }

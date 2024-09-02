@@ -12,13 +12,9 @@ namespace NetWork
     }
     public class MessageProcessor : IMessageProcessor
     {
-        private readonly ushort m_Pvid;
         private readonly Dictionary<uint, Func<Message>> m_Creaters = new();
 
-        public MessageProcessor(ushort pvid)
-        {
-            m_Pvid = pvid;
-        }
+        public ushort Pvid { get; set; }
 
         public void Register<T>(uint msgId, Func<T> func) where T : Message
         {
@@ -48,9 +44,9 @@ namespace NetWork
             Serializer.NonGeneric.Deserialize(msg.GetType(), stream, msg, null, len);
             
             // pvid check
-            if (msg.Pvid != m_Pvid)
+            if (Pvid > 0 && msg.Pvid != Pvid)
             {
-                throw new NetWorkException($"msgId:{msgId} pvid:{msg.Pvid} != {m_Pvid}");
+                throw new NetWorkException($"msgId:{msgId} pvid:{msg.Pvid} != {Pvid}");
             }
             
             // 最大传输字节check

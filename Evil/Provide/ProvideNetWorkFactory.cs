@@ -1,6 +1,7 @@
 ﻿using DotNetty.Transport.Channels;
 using NetWork;
 using NetWork.Proto;
+using NetWork.Transport;
 using Proto;
 
 namespace Evil.Provide
@@ -43,6 +44,13 @@ namespace Evil.Provide
             }
 
             return null;
+        }
+        
+        public IMessageProcessor CreateMessageProcessor(TransportConfig config)
+        {
+            var processor = new MessageProcessor();
+            processor.Pvid = ((ProvideConnectorTransportConfig)config).Provide.Pvid;
+            return processor;
         }
     }
 }

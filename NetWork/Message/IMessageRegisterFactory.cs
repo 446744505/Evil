@@ -1,4 +1,6 @@
 
+using NetWork.Transport;
+
 namespace NetWork
 {
     public interface IMessageRegisterFactory
@@ -10,9 +12,9 @@ namespace NetWork
             return null;
         }
         
-        public IMessageProcessor CreateMessageProcessor(ushort pvid)
+        public IMessageProcessor CreateMessageProcessor(TransportConfig config)
         {
-            return new MessageProcessor(pvid);
+            return new MessageProcessor();
         }
     }
 }

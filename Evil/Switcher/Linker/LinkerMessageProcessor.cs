@@ -6,10 +6,6 @@ namespace Evil.Switcher
 {
     public class LinkerMessageProcessor : MessageProcessor
     {
-        public LinkerMessageProcessor(ushort pvid) : base(pvid)
-        {
-        }
-
         protected override Message? WhenNotType(Session session, MessageHeader header, 
             int readSize, BinaryReader reader)
         {

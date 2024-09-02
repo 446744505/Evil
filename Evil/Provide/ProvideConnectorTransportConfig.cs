@@ -4,9 +4,12 @@ namespace Evil.Provide
 {
     public class ProvideConnectorTransportConfig : ConnectorTransportConfig
     {
-        public ProvideConnectorTransportConfig(ushort pvid)
+        private readonly Provide m_Provide;
+        public Provide Provide => m_Provide;
+        
+        public ProvideConnectorTransportConfig(Provide provide)
         {
-            Pvid = pvid;
+            m_Provide = provide;
         }
     }
 }

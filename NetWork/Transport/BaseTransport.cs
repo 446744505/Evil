@@ -84,7 +84,7 @@ namespace NetWork.Transport
             m_SessionMgr = Config.NetWorkFactory!.CreateSessionMgr();
             Config.Dispatcher ??= new MessageDispatcher(Config.Executor);
             var messageRegister = Config.NetWorkFactory.CreateMessageRegister();
-            var messageProcessor = Config.NetWorkFactory.CreateMessageProcessor(Config.Pvid);
+            var messageProcessor = Config.NetWorkFactory.CreateMessageProcessor(Config);
             Config.MessageProcessor = messageProcessor;
             RegisterMessages();
             messageRegister.Register(messageProcessor);

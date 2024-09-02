@@ -26,7 +26,7 @@ namespace Evil.Provide
             // 考虑优化，现在是在逻辑线程同步编码
             using var stream = new MemoryStream();
             Serializer.Serialize(stream, msg);
-          
+
             await SendAsync(new SendToClient
             {
                 clientSessionId = clientSessionId,

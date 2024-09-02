@@ -1,4 +1,5 @@
 ﻿using DotNetty.Transport.Channels;
+using Evil.Provide;
 using Evil.Util;
 using NetWork;
 using Proto;
@@ -16,6 +17,7 @@ namespace Evil.Switcher
         #region 属性
 
         internal ushort Pvid;
+        internal ProvideType Type;
         internal bool IsAlive() => Time.Now - m_AliveTime < Provider.I.SessionTimeout;
 
         #endregion
@@ -41,6 +43,7 @@ namespace Evil.Switcher
         public async Task Process(BindProvide bp)
         {
             Pvid = (ushort)bp.pvid;
+            Type = (ProvideType)bp.type;
             
             await Provider.I.Sessions.Bind(this);
             Log.I.Info($"bind provide {bp}");
