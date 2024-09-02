@@ -24,9 +24,9 @@ namespace Evil.Provide
         {
             MessageHelper.OnSendMsg(clientSessionId, msg, "client");
             // 考虑优化，现在是在逻辑线程同步编码
-            await using var stream = new MemoryStream();
+            using var stream = new MemoryStream();
             Serializer.Serialize(stream, msg);
-            
+          
             await SendAsync(new SendToClient
             {
                 clientSessionId = clientSessionId,

@@ -5,7 +5,7 @@ namespace Hero
     /// <summary>
     /// 升星返回
     /// </summary>
-    [Protocol(Node.Client|Node.Game)]
+    [Protocol(Node.Client|Node.Game, 1024)]
     public class HeroStarNtf
     {
         /// <summary>

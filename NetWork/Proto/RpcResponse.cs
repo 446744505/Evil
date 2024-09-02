@@ -8,6 +8,7 @@ namespace NetWork.Proto
     public class RpcResponse : Message
     {
         public override uint MessageId => NetWork.MessageId.RpcResponse;
+        public override int MaxSize => 0;
 
         [ProtoMember(1)]
         public long RequestId { get; set; }

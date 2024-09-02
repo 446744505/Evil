@@ -5,7 +5,7 @@ namespace NetWork
 {
     public interface IMessageDispatcher
     {
-        Task<bool> Dispatch(Message msg);
+        Task Dispatch(Message msg);
     }
     
     public class MessageDispatcher : IMessageDispatcher
@@ -17,9 +17,9 @@ namespace NetWork
             m_Executor = executor;
         }
 
-        public async Task<bool> Dispatch(Message msg)
+        public Task Dispatch(Message msg)
         {
-            return await m_Executor.ExecuteAsync(msg.Process);
+            return m_Executor.ExecuteAsync(msg.Process);
         }
     }
 }

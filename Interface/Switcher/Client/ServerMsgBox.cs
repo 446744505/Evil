@@ -2,7 +2,7 @@
 
 namespace Evil.Switcher.Client
 {
-    [Protocol(Node.Switcher|Node.Client)]
+    [Protocol(Node.Switcher|Node.Client, 0)]
     public class ServerMsgBox
     {
         [ProtocolField(1)]

@@ -49,10 +49,9 @@ namespace Evil.Util
         
         public class MessageDispatcher : IMessageDispatcher
         {
-            public async Task<bool> Dispatch(Message msg)
+            public Task Dispatch(Message msg)
             {
-                var result = await Procedure.Submit(msg.Process);
-                return result.IsSuccess;
+                return Procedure.Submit(msg.Process);
             }
         }
     }

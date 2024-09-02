@@ -50,10 +50,9 @@ namespace NetWork
             {
                 if (task.IsFaulted)
                 {
-                    Log.I.Error("Message.Dispatch", task.Exception);
+                    Log.I.Error($"Message.Dispatch {this}", task.Exception);
                 }
-                return task.Result;
-            });
+            }).ConfigureAwait(false);
             return Task.CompletedTask;
         }
 

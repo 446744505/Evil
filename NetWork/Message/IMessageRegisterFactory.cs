@@ -1,6 +1,4 @@
 
-using NetWork.Proto;
-
 namespace NetWork
 {
     public interface IMessageRegisterFactory

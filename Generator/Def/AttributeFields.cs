@@ -12,6 +12,8 @@ namespace Generator
         
         // Protocol.nodes
         public const int ProtocolNodes = 0;
+        // Protocol.maxSize
+        public const int ProtocolMaxSize = 1;
         
         // XTalbe.nodes
         public const int XTableNodes = 0;

@@ -54,7 +54,7 @@ namespace NetWork
             }
             
             // 最大传输字节check
-            if (readSize > msg.MaxSize)
+            if (msg.MaxSize > 0 && readSize > msg.MaxSize)
             {
                 throw new NetWorkException($"msgId:{msgId} readSize:{readSize} > MaxSize:{msg.MaxSize}");
             }

@@ -2,7 +2,7 @@
 
 namespace Evil.Switcher.Provide
 {
-    [Protocol(Node.Switcher)]
+    [Protocol(Node.Switcher, 0)]
     public class ClientRspResponse
     {
         [ProtocolField(1)]
