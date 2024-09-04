@@ -6,7 +6,6 @@ namespace Evil.Provide
     public interface IProvideFactory
     {
         ushort Pvid();
-        Provider[] Providers();
         IMessageRegister MessageRegister();
         ProvideType Type();
 
@@ -23,6 +22,7 @@ namespace Evil.Provide
 
     public enum ProvideType
     {
+        _,
         Game,
         Map
     }

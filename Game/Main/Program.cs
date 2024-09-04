@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿
 using System.Threading.Tasks;
 using Edb;
 using Evil.Event;
@@ -21,7 +21,7 @@ namespace Game
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
                 
                 var provide = new Provide(new GameProvideFactory());
-                provide.Start();
+                await provide.Start(CmdLine.I.Etcd);
                 Log.I.Info("server started");
 
                 stopper = new Stopper().BindAndWait();

@@ -10,6 +10,7 @@ namespace NetWork.Transport
 {
     public abstract class BaseTransport<T> : ITransport where T : TransportConfig
     {
+        
         #region 字段
 
         protected ISessionMgr m_SessionMgr = null!;
@@ -17,11 +18,12 @@ namespace NetWork.Transport
         protected volatile bool IsStop;
         private readonly RpcMgr m_RpcMgr = new();
         private readonly AsyncCountdownEvent m_StopEvent = new(1);
-
+        public event EventHandler<IChannel> OnStarted;
+        
         #endregion
 
         #region 属性
-
+        
         protected T Config { get; }
         internal RpcMgr RpcMgr => m_RpcMgr;
 
@@ -77,6 +79,11 @@ namespace NetWork.Transport
         RpcMgr ITransport.RpcMgr()
         {
             return m_RpcMgr;
+        }
+
+        protected void OnStarted0(IChannel channel)
+        {
+            OnStarted?.Invoke(this, channel);
         }
 
         public void Start()

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Evil.Util;
 
@@ -24,10 +25,15 @@ namespace NetWork
         protected static readonly Task<bool> FalseTask = Task.FromResult(false);
         protected static readonly Task<bool> TrueTask = Task.FromResult(true);
         
+        [JsonIgnore]
         public virtual uint MessageId { get; } = 0;
+        [JsonIgnore]
         public virtual int MaxSize { get; } = 1024 * 1024;
+        [JsonIgnore]
         public ushort Pvid { get; set; }
+        [JsonIgnore]
         public Session Session { get; set; } = null!;
+        [JsonIgnore]
         public object? Context { get; set; }
 
         public void Send(Session? session)
@@ -52,7 +58,7 @@ namespace NetWork
                 {
                     Log.I.Error($"Message.Dispatch {this}", task.Exception);
                 }
-            }).ConfigureAwait(false);
+            });
             return Task.CompletedTask;
         }
 

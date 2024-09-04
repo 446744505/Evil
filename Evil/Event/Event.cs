@@ -27,7 +27,7 @@ namespace Evil.Event
                         listener(e);
                     } catch (Exception ex)
                     {
-                        Log.I.Error($"Event {type} listener error", ex);
+                        Log.I.Error($"Event {e} handle error", ex);
                     }
                 }
             }

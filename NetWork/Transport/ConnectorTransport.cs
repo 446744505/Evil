@@ -65,6 +65,7 @@ namespace NetWork.Transport
                 if (task.IsCompletedSuccessfully)
                 {
                     m_Channel = task.Result;
+                    OnStarted0(m_Channel);
                     Log.I.Info($"connector connect to {this} success");
                 }
                 else

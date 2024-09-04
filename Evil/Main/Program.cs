@@ -13,6 +13,7 @@ namespace Evil
             Stopper? stopper = null;
             try
             {
+                // start
                 switch (CmdLine.I.Node)
                 {
                     case "switcher":
@@ -22,6 +23,14 @@ namespace Evil
                         throw new NotSupportedException("Not Supported Node");
                 }
                 stopper = new Stopper().BindAndWait();
+                
+                // stop
+                switch (CmdLine.I.Node)
+                {
+                    case "switcher": 
+                        Switcher.Switcher.I.Stop();
+                        break;
+                }
             }
             finally
             {

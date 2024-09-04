@@ -68,6 +68,7 @@ namespace {namespaceName}
 {{
     public partial class {kind.Name} : {parent}
     {{
+        [System.Text.Json.Serialization.JsonIgnore]
         public override uint MessageId => {messageId};
         {maxSizeLine}
 {kind.GenConstFields(2)}

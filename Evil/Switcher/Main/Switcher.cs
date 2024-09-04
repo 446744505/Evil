@@ -10,9 +10,18 @@ namespace Evil.Switcher
         public IMessageRegister MessageRegister => m_MessageRegister;
         public void Start(string[] args)
         {
-            CmdLine.Init(args); 
+            CmdLine.Init(args);
+            Etcd.I.Init(CmdLine.I.Etcd);
+            
             Linker.I.Start();
             Provider.I.Start();
+        }
+
+        public void Stop()
+        {
+            Linker.I.Stop();
+            Provider.I.Stop();
+            Etcd.I.Dispose();
         }
     }
 }

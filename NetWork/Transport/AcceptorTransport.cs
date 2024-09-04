@@ -39,6 +39,7 @@ namespace NetWork.Transport
                 
                 var channel = await bootstrap.BindAsync(Config.Port);
                 Log.I.Info($"acceptor start at {Config.Port}");
+                OnStarted0(channel);
                 // 等待关闭
                 await WaitStop();
                 await BaseDispose(channel);

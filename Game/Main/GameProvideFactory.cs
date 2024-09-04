@@ -12,12 +12,7 @@ namespace Game
         {
             return CmdLine.I.Pvid;
         }
-
-        public Provider[] Providers()
-        {
-            return CmdLine.I.Providers;
-        }
-
+        
         public IMessageRegister MessageRegister()
         {
             return Net.I.MessageRegister;

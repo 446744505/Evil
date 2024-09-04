@@ -12,8 +12,11 @@ public class ProvideSessionMgr : ConnectorSessionMgr
         var provide = config.Provide;
         session.SendAsync(new BindProvide
         {
-            pvid = provide.Pvid,
-            type = (int)provide.Type
+            info = new ProvideInfo
+            {
+                pvid = provide.Pvid,
+                type = (int)provide.Type
+            }
         });
     }
 }

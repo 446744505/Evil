@@ -8,6 +8,7 @@ namespace Evil.Switcher
     {
         #region 字段
 
+        private ITransport? m_Transport;
         private readonly LinkerSessions m_Sessions = new();
 
         #endregion
@@ -26,13 +27,18 @@ namespace Evil.Switcher
             StartNetWork();
         }
 
+        internal void Stop()
+        {
+            m_Transport?.Dispose();
+        }
+
         private void StartNetWork()
         {
             var netConfig = new AcceptorTransportConfig();
             netConfig.Port = CmdLine.I.LinkerPort;
             netConfig.NetWorkFactory = new LinkerNetWorkFactory();
-            var acceptor = new AcceptorTransport(netConfig);
-            acceptor.Start();
+            m_Transport = new AcceptorTransport(netConfig);
+            m_Transport.Start();
             Log.I.Info("linker started");
         }
 

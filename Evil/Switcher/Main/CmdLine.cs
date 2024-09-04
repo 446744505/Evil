@@ -6,8 +6,8 @@ namespace Evil.Switcher
     {
         public static CmdLine I = null!;
 
-        [ConfigurationKeyName("pvid")]
-        public ushort Pvid { get; set; } = 0;
+        [ConfigurationKeyName("etcd")]
+        public string Etcd { get; set; } = "https://127.0.0.1:2379";
         /// <summary>
         /// linker 端口
         /// </summary>

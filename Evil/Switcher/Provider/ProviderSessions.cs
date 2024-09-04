@@ -23,6 +23,7 @@ namespace Evil.Switcher
             }
 
             m_Sessions[pvid] = session;
+            Provider.I.Meta.AddProvide(session.ProvideInfo!);
         }
         internal void UnBind(ProviderSession session)
         {
@@ -32,6 +33,7 @@ namespace Evil.Switcher
                 if (session == old)
                 {
                     m_Sessions.Remove(pvid, out _);
+                    Provider.I.Meta.RemoveProvide(pvid);
                 }
                 else
                 {
