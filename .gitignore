@@ -6,6 +6,9 @@
 /Game/obj/
 /Game/bin/
 /Game/Generator/**
+/Map/obj/
+/Map/bin/
+/Map/Generator/**
 /Client/obj/
 /Client/bin/
 /Client/Generator/**

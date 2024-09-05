@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 
-namespace Game
+namespace Map
 {
     public class CmdLine
     {
@@ -9,7 +9,7 @@ namespace Game
 
 
         [ConfigurationKeyName("pvid")] 
-        public ushort Pvid { get; set; } = 1;
+        public ushort Pvid { get; set; } = 2;
         [ConfigurationKeyName("etcd")]
         public string Etcd { get; set; } = "https://127.0.0.1:2379";
 

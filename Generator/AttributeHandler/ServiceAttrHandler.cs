@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Evil.Util;
 using Generator.Context;
 using Generator.Exception;
 using Generator.Factory;
@@ -16,17 +17,30 @@ namespace Generator.AttributeHandler
 {
     class ServiceCreateSyntaxAttrHandler : DefaultCreateSyntaxAttrHandler
     {
+        private readonly string m_ClientNode;
+        private readonly string m_ServerNode;
+
+        public ServiceCreateSyntaxAttrHandler(string clientNode, string serverNode)
+        {
+            m_ClientNode = clientNode;
+            m_ServerNode = serverNode;
+        }
+
         protected override void NewNamespaceSyntax()
         {
             var tc = m_TypeContext;
             // namespace添加Proto
             tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName($"{Namespaces.ProtoNamespace}"))
                 .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
-            tc.NewNamespaceSyntax = tc.NewNamespaceSyntax.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("Client.NetWork")));
+            // 为了简单，不同的node的namespace直接都用Node.NetWork吧(算是一个强制规则)
+            tc.NewNamespaceSyntax = tc.NewNamespaceSyntax.AddUsings(
+                SyntaxFactory.UsingDirective(SyntaxFactory.ParseName($"{m_ClientNode.FirstCharToUpper()}.NetWork")));
         }
     }
     public class ServiceAttrHandler : BaseTypeAttrHandler, ICreateSyntaxAttrHandler
     {
+        private readonly string m_ClientNode;
+        private readonly string m_ServerNode;
         private ICreateNamespaceFactory m_CreateNamespaceFactory = new ProtoCreateNamespaceFactory();
         private ICreateIdentiferFactory m_CreateIdentiferFactory = new ProtoCreateIdentiferFactory();
         private ICreateFieldFactory<ProtoFieldKind> m_CreateFieldFactory = new ProtoCreateFieldFactory();
@@ -35,12 +49,19 @@ namespace Generator.AttributeHandler
         {
             AnalysisUtil.HadAttrArgument(attr, AttributeFields.ServiceClientNode, out var clientNode);
             AnalysisUtil.HadAttrArgument(attr, AttributeFields.ServiceServerNode, out var serverNode);
-            m_CreateSyntaxAttrHandler = new ServiceCreateSyntaxAttrHandler()
+            if (string.IsNullOrEmpty(clientNode))
+                throw new AttributeException($"{TypeContext.OldClassName}的Service特性必须要有clientNode参数");
+            if (string.IsNullOrEmpty(serverNode))
+                throw  new AttributeException($"{TypeContext.OldClassName}的Service特性必须要有serverNode参数");
+            
+            var globalCtx = TypeContext.FileContext.GloableContext;
+            m_ClientNode = globalCtx.ParseNodeName(clientNode);
+            m_ServerNode = globalCtx.ParseNodeName(serverNode);
+            m_CreateSyntaxAttrHandler = new ServiceCreateSyntaxAttrHandler(m_ClientNode, m_ServerNode)
             {
-                IsCreateFile = TypeContext.FileContext.GloableContext.IsNodeAt(clientNode),
+                IsCreateFile = globalCtx.IsNodeAt(m_ClientNode),
             };
-            NeedParse = TypeContext.FileContext.GloableContext.IsNodeAt(clientNode)
-                || TypeContext.FileContext.GloableContext.IsNodeAt(serverNode);
+            NeedParse = globalCtx.IsNodeAt(m_ClientNode) || globalCtx.IsNodeAt(m_ServerNode);
         }
         
         /// <summary>
@@ -55,6 +76,29 @@ namespace Generator.AttributeHandler
             {
                 var method = ParseMethod(m);
                 TypeContext.NewClassSyntax = TypeContext.NewClassSyntax!.AddMembers(method);   
+            }
+        }
+
+        // 是不是服务器之间的通信
+        private bool IsServerChannel()
+        {
+            return !m_ClientNode.Equals(Nodes.Client);
+        }
+
+        private string GetSendLine(string reqName)
+        {
+            return IsServerChannel() ? $"Net.I.SendToProvide(pvid, {reqName});" : "Net.I.Send({reqName});";
+        }
+
+        private string GetAsyncSendLine(string reqName, string ackFullName)
+        {
+            if (IsServerChannel())
+            {
+                return $"return await Net.I.SendToProvideAsync<{ackFullName}>(pvid, {reqName});";
+            }
+            else
+            {
+                return $"return await Net.I.SendAsync<{ackFullName}>({reqName});";
             }
         }
 
@@ -74,6 +118,13 @@ namespace Generator.AttributeHandler
             method = method.AddModifiers(modifiers.ToArray());
             // 拷贝注释
             method = method.WithLeadingTrivia(m.GetLeadingTrivia());
+            // 添加pvid参数
+            if (IsServerChannel())
+            {
+                method = method.AddParameterListParameters(
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier("pvid"))
+                        .WithType(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.UShortKeyword))));
+            }
             // 用来检查协议字段的索引是否重复
             HashSet<string> fieldIndex = new();
             // 每个方法创建一个请求协议
@@ -107,7 +158,7 @@ namespace Generator.AttributeHandler
                     var field = m_CreateFieldFactory.CreateField(
                         new NewFieldContext(Fields.MessageAckFieldName, protoAckVisitor.TypeResult!), ackClassKind);
                     field.Index = 1; // index永远是1
-                    reqClassKind.AddField(field);
+                    ackClassKind.AddField(field);
                     reqClassKind.AckFullName = ackClassKind.FullName();
                 }
                 else
@@ -122,12 +173,12 @@ namespace Generator.AttributeHandler
                             SyntaxFactory.ParseTypeName(reqClassKind.AckFullName)))));
 
                 // 异步发送
-                sendBody.WriteLine($"return await Net.I.SendAsync<{reqClassKind.AckFullName}>({reqName});");
+                sendBody.WriteLine($"{GetAsyncSendLine(reqName, reqClassKind.AckFullName)}");
             }
             else
             {
                 // 直接发送
-                sendBody.WriteLine($"Net.I.Send({reqName});");
+                sendBody.WriteLine($"{GetSendLine(reqName)}");
             }
             // 生成方法体
             var body = new Writer();

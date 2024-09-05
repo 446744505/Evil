@@ -9,9 +9,15 @@ namespace Evil.Provide
 {
     public class ProvideSession : Session
     {
+        private readonly string m_ProviderUrl;
+            
         private readonly ConcurrentDictionary<long, ClientContext> m_ClientContexts = new();
+
+        public string ProviderUrl => m_ProviderUrl;
+        
         public ProvideSession(IChannelHandlerContext context) : base(context)
         {
+            m_ProviderUrl = RemoteAddress();
         }
 
         public ProvideSession AddClient(ClientContext ctx)

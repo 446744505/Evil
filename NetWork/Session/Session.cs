@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using Evil.Util;
@@ -16,6 +17,13 @@ namespace NetWork
         {
             Id = IdGenerator.NextId();
             m_Context = context;
+        }
+
+        public string RemoteAddress()
+        {
+            var endPoint = m_Context.Channel.RemoteAddress;
+            var ipEndPoint = (IPEndPoint)endPoint;
+            return $"{ipEndPoint.Address.MapToIPv4().ToString()}:{ipEndPoint.Port}";
         }
         
         public virtual Task SendAsync(Message msg)

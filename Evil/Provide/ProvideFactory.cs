@@ -1,5 +1,6 @@
 ﻿using NetWork;
 using NetWork.Transport;
+using Proto;
 
 namespace Evil.Provide
 {
@@ -8,6 +9,12 @@ namespace Evil.Provide
         ushort Pvid();
         IMessageRegister MessageRegister();
         ProvideType Type();
+        /// <summary>
+        /// 连接某个provider的providee有变化
+        /// </summary>
+        /// <param name="providerUrl"></param>
+        /// <param name="news"></param>
+        void OnProvideUpdate(string providerUrl, Dictionary<ushort, ProvideInfo> news);
 
         ProvideNetWorkFactory CreateNetWorkFactory()
         {

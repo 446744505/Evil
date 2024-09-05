@@ -1,14 +1,11 @@
 ﻿
-using System.Threading.Tasks;
-using Edb;
 using Evil.Event;
 using Evil.Provide;
 using Evil.Util;
-using Game.NetWork;
 
-namespace Game
+namespace Map
 {
-    public static partial class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
@@ -19,11 +16,11 @@ namespace Game
             Stopper? stopper = null;
             try
             {
-                await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+                // await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
                 
-                var provide = Net.I.Provide = new Provide(new GameProvideFactory());
+                var provide = new Provide(new MapProvideFactory());
                 await provide.Start(CmdLine.I.Etcd);
-                Log.I.Info("server started");
+                Log.I.Info("map started");
 
                 stopper = new Stopper().BindAndWait();
                 
@@ -33,7 +30,7 @@ namespace Game
             finally
             {
                 stopper?.SignalWeakUp();
-                Log.I.Info("server stop");
+                Log.I.Info("map stop");
             }
         }
     }

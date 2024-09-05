@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Concurrent;
+using System.Text.Json;
 using Evil.Util;
 using Proto;
 
@@ -7,7 +8,7 @@ namespace Evil.Switcher
     public class ProviderMeta
     {
         private readonly string m_Url;
-        private List<ProvideInfo> m_Provides = new();
+        private ConcurrentDictionary<ushort, ProvideInfo> m_Provides = new();
 
         public ProviderMeta(string url)
         {
@@ -16,14 +17,16 @@ namespace Evil.Switcher
         
         public void AddProvide(ProvideInfo provideInfo)
         {
-            m_Provides.Add(provideInfo);
+            m_Provides[(ushort)provideInfo.pvid] = provideInfo;
             UpdateEtcd();
         }
         
         public  void RemoveProvide(ushort pvid)
         {
-            m_Provides.RemoveAll(x => x.pvid == pvid);
-            UpdateEtcd();
+            if (m_Provides.TryRemove(pvid, out _))
+            {
+                UpdateEtcd();   
+            }
         }
 
         private (string, string) ToKv()

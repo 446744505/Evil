@@ -44,6 +44,12 @@ namespace Generator.Context
             return Compilation.GetSemanticModel(tree);
         }
 
+        public string ParseNodeName(string nodeAttr)
+        {
+            // attr 格式为: "Node.Client"
+            return nodeAttr.Split(".")[1].TrimStart().TrimEnd().ToLower();
+        }
+
         public bool IsNodeAt(string nodes)
         {
             if (string.IsNullOrEmpty(nodes))
@@ -56,7 +62,14 @@ namespace Generator.Context
             var parsedNodes = new List<string>();
             foreach (var node in nodeArr)
             {
-                parsedNodes.Add(node.Split(".")[1].TrimStart().TrimEnd().ToLower());
+                if (node.Contains('.'))
+                {
+                    parsedNodes.Add(ParseNodeName(node));
+                }
+                else
+                {
+                    parsedNodes.Add(node);   
+                }
             }
             return parsedNodes.Contains(CmdLine.I.Node);
         }

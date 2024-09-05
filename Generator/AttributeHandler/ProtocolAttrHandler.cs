@@ -35,9 +35,8 @@ namespace Generator.AttributeHandler
         {
             // 消息最大字节处理
             AnalysisUtil.HadAttrArgument(Attr, AttributeFields.ProtocolMaxSize, out var maxSize);
-            if (string.IsNullOrEmpty(maxSize))
-                maxSize = "-1"; // 使用网络层默认值
-            ((ProtoClassKind)TypeContext.IdentiferKind!).MaxSize = int.Parse(maxSize);
+            if (!string.IsNullOrEmpty(maxSize))
+                ((ProtoClassKind)TypeContext.IdentiferKind!).MaxSize = int.Parse(maxSize);
             
             var fields = TypeContext.OldTypeSyntax.DescendantNodes().OfType<FieldDeclarationSyntax>();
             // 用来检查协议字段的索引是否重复

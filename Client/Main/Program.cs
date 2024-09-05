@@ -1,5 +1,4 @@
 ﻿
-using System;
 using System.Threading.Tasks;
 using Client.NetWork;
 using Evil.Util;
@@ -17,6 +16,7 @@ namespace Client
             {
                 var config = new ConnectorTransportConfig();
                 config.Port = 10000;
+                config.ReConnectDelay = 0; // 不重连
                 config.NetWorkFactory = new ClientNetWorkFactory();
                 var connector = new ConnectorTransport(config);
                 connector.Start();

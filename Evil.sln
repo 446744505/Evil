@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "Util\Util.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evil", "Evil\Evil.csproj", "{813DF2D3-B12F-4A84-883B-3B56FE80638E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Map", "Map\Map.csproj", "{390A2E66-2BA5-4C95-ADB1-3BA07F12C5DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{813DF2D3-B12F-4A84-883B-3B56FE80638E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{813DF2D3-B12F-4A84-883B-3B56FE80638E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{813DF2D3-B12F-4A84-883B-3B56FE80638E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{390A2E66-2BA5-4C95-ADB1-3BA07F12C5DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{390A2E66-2BA5-4C95-ADB1-3BA07F12C5DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{390A2E66-2BA5-4C95-ADB1-3BA07F12C5DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{390A2E66-2BA5-4C95-ADB1-3BA07F12C5DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

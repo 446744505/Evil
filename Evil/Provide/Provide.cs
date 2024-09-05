@@ -11,8 +11,9 @@ namespace Evil.Provide
         #region 字段
 
         private IProvideFactory m_Factory;
+        private readonly ProvideSessions m_Sessions;
         private readonly ConcurrentDictionary<string, ProvideConnectorTransport> m_Transports = new();
-        private readonly ConcurrentDictionary<string, List<ProvideInfo>> m_Provides = new();
+        private readonly ConcurrentDictionary<string, Dictionary<ushort, ProvideInfo>> m_Provides = new();
 
         #endregion
 
@@ -20,6 +21,7 @@ namespace Evil.Provide
 
         public ushort Pvid { get; set; }
         public ProvideType Type { get; set; }
+        internal ProvideSessions Sessions => m_Sessions;
 
         #endregion
 
@@ -33,6 +35,7 @@ namespace Evil.Provide
             Pvid = factory.Pvid();
             Type = factory.Type();
             m_Factory = factory;
+            m_Sessions = new ProvideSessions(this);
         }
 
         public async Task Start(string etcd)
@@ -45,27 +48,32 @@ namespace Evil.Provide
                 return k.Substring(key.Length);
             }
             
-            void Connect(string url)
+            void Connect(string providerUrl)
             {
-                var hostPort = url.Split(":");
+                var hostPort = providerUrl.Split(":");
                 var config = new ProvideConnectorTransportConfig(this);
                 config.Host = hostPort[0];
                 config.Port = Convert.ToInt32(hostPort[1]);
                 config.Dispatcher = m_Factory.CreateMessageDispatcher(config);
                 config.NetWorkFactory = m_Factory.CreateNetWorkFactory();
                 var transport = new ProvideConnectorTransport(config, innerMsgRegister);
-                m_Transports[url] = transport;
+                m_Transports[providerUrl] = transport;
                 transport.Start();
             }
 
-            void AddOrUpdateProvide(string url, string json)
+            void AddOrUpdateProvide(string providerUrl, string json)
             {
-                var info = JsonSerializer.Deserialize<List<ProvideInfo>>(json);
-                if (m_Provides.TryRemove(url, out var old))
+                var infos = JsonSerializer.Deserialize<Dictionary<ushort, ProvideInfo>>(json)!;
+                if (m_Provides.TryRemove(providerUrl, out var old))
                 {
-                    Log.I.Info($"provider {url} update provides {Strings.ToCustomString(old)} -> {Strings.ToCustomString(info)}");
+                    Log.I.Info($"provider {providerUrl} update provides {Strings.ToCustomString(old)} -> {Strings.ToCustomString(infos)}");
                 }
-                m_Provides[url] = info!;
+                
+                m_Provides[providerUrl] = infos;
+                // 框架内部更新
+                m_Sessions.OnProvideUpdate(providerUrl, infos);
+                // 框架外部自定义更新
+                m_Factory.OnProvideUpdate(providerUrl, infos);
             }
 
             Etcd.I.Init(etcd);
@@ -73,9 +81,9 @@ namespace Evil.Provide
             var kvs = await Etcd.I.GetRangeAsync(key);
             foreach (var kv in kvs)
             {
-                var url = RemovePrefix(kv.Key);
-                Connect(url);
-                AddOrUpdateProvide(url, kv.Value);
+                var providerUrl = RemovePrefix(kv.Key);
+                Connect(providerUrl);
+                AddOrUpdateProvide(providerUrl, kv.Value);
             }
             _ = Etcd.I.WatchRangeAsync(key, events =>
             {
@@ -83,12 +91,12 @@ namespace Evil.Provide
                 var enumerable = events.Where(e => e.Type == Mvccpb.Event.Types.EventType.Put);
                 foreach (var e in enumerable)
                 {
-                    var url = RemovePrefix(e.Key);
-                    if (!m_Transports.ContainsKey(url))
+                    var providerUrl = RemovePrefix(e.Key);
+                    if (!m_Transports.ContainsKey(providerUrl))
                     {
-                        Connect(url);
+                        Connect(providerUrl);
                     }
-                    AddOrUpdateProvide(url, e.Value);
+                    AddOrUpdateProvide(providerUrl, e.Value);
                 }
             }); 
         }

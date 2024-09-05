@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using Evil.Provide;
+﻿using Evil.Provide;
 using Evil.Util;
-using Game.NetWork;
+using Map.NetWork;
 using NetWork;
 using NetWork.Transport;
 using Proto;
 
-namespace Game
+namespace Map
 {
-    public partial class GameProvideFactory : IProvideFactory
+    public class MapProvideFactory : IProvideFactory
     {
         public ushort Pvid()
         {
@@ -22,12 +21,12 @@ namespace Game
 
         public ProvideType Type()
         {
-            return ProvideType.Game;
+            return ProvideType.Map;
         }
 
         public void OnProvideUpdate(string providerUrl, Dictionary<ushort, ProvideInfo> newAll)
         {
-            OnProvideUpdateMap(providerUrl, newAll);
+            
         }
 
         public IMessageDispatcher CreateMessageDispatcher(TransportConfig _)
