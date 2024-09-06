@@ -30,14 +30,14 @@ namespace Generator.Visitor
         {
             // 1、本身就有proto定义，不用生成
             // 2、设置为Message类型
-            m_Gc.AddProtocolMessageName(type.Name);
+            m_Gc.AddProtocolMessageName(type.Name, true);
         }
 
         public void Visit(ClassType type)
         {
             // 1、本身就有proto定义，不用生成
             // 2、设置为Message类型
-            m_Gc.AddProtocolMessageName(type.Name);
+            m_Gc.AddProtocolMessageName(type.Name, true);
         }
 
         public void Visit(ByteType type)
@@ -114,7 +114,7 @@ namespace Generator.Visitor
 
         public void Visit(WaitCompileIdentiferType type)
         {
-            m_Gc.AddProtocolMessageName(type.Name);
+            m_Gc.AddProtocolMessageName(type.Name, true);
         }
     }
 }

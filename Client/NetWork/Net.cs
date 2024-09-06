@@ -19,7 +19,7 @@ namespace Client.NetWork
             msg.Send(m_SessionMgr.Session);
         }
 
-        public async Task<T> SendAsync<T>(Rpc<T> rpc) where T : Message
+        public async Task<T> SendAsync<T>(Rpc<T> rpc) where T : RpcAck
         {
             rpc.InnerPvid = Pvid;
             return await rpc.SendAsync(m_SessionMgr.Session);

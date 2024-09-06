@@ -81,7 +81,7 @@ namespace Generator.AttributeHandler
                 }
             }
             // 设置为Message类型
-            TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName);
+            TypeContext.FileContext.GloableContext.AddProtocolMessageName(TypeContext.OldClassName, false);
         }
 
         public ICreateNamespaceFactory CreateNamespaceFactory => m_CreateKindAttrHandler.CreateNamespaceFactory;

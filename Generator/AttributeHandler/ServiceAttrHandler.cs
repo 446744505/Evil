@@ -29,7 +29,7 @@ namespace Generator.AttributeHandler
         protected override void NewNamespaceSyntax()
         {
             var tc = m_TypeContext;
-            // namespace添加Proto
+            // namespace改为Proto
             tc.NewNamespaceSyntax = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName($"{Namespaces.ProtoNamespace}"))
                 .WithUsings(AnalysisUtil.SkipAttributes(tc.OldNameSpaceSyntax.Usings));
             // 为了简单，不同的node的namespace直接都用Node.NetWork吧(算是一个强制规则)
@@ -135,7 +135,7 @@ namespace Generator.AttributeHandler
                 OriginalNamespaceName = TypeContext.OldNameSpaceName,
             };
             
-            TypeContext.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name);
+            TypeContext.FileContext.GloableContext.AddProtocolMessageName(reqClassKind.Name, false);
             var sendBody = new Writer();
             const string reqName = "req";
             // 可能会创建一个响应协议
@@ -153,7 +153,7 @@ namespace Generator.AttributeHandler
                         TypeContext.FileContext.GetOrCreateNamespaceKind(TypeContext.NewNameSpaceName, m_CreateNamespaceFactory));
                     ackClassKind.Comment = reqClassKind.Comment;
                     ackClassKind.OriginalNamespaceName = TypeContext.OldNameSpaceName;
-                    TypeContext.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name);
+                    TypeContext.FileContext.GloableContext.AddProtocolMessageName(ackClassKind.Name, true);
                     // 字段名永远是data
                     var field = m_CreateFieldFactory.CreateField(
                         new NewFieldContext(Fields.MessageAckFieldName, protoAckVisitor.TypeResult!), ackClassKind);

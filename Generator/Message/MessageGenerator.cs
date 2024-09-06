@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Evil.Util;
 using Generator.Context;
@@ -15,12 +16,23 @@ namespace Generator.Message
         }
         protected override void Generate0()
         {
+            // 所有ack
+            var ackNames = new HashSet<string>();
+            foreach (var pair in Gc.ProtocolMessageNames)
+            {
+                // 记录RpcAck消息
+                if (pair.Value)
+                {
+                    ackNames.Add(pair.Key);
+                }
+            }
+
             var registerBody = new Writer(true, 3);
             // 遍历所有message，每个message生成一个cs文件
-            foreach (var messageName in Gc.ProtocolMessageNames)
+            foreach (var messageName in Gc.ProtocolMessageNames.Keys)
             {
                 var kind = Gc.FindIdentiferKind<ProtoNamespaceKind>(messageName);
-                var registerLine = CreateMessageFile((ProtoClassKind)kind);
+                var registerLine = CreateMessageFile((ProtoClassKind)kind, ackNames);
                 registerBody.WriteLine(registerLine);
             }
 
@@ -45,12 +57,16 @@ namespace {Namespaces.ProtoNamespace}
             File.WriteAllText(registerPath, registerCode);
         }
 
-        private string CreateMessageFile(ProtoClassKind kind)
+        private string CreateMessageFile(ProtoClassKind kind, HashSet<string> ackNames)
         {
             var filePath = Path.Combine(OutPath, $"{kind.Name}{Files.CodeFileSuffix}");
             var namespaceName = $"{kind.NamespaceName()}";
             var messageId = MessageIdGenerator.CalMessageId(kind.Name);
             var parent = "NetWork.Message";
+            if (ackNames.Contains(kind.Name))
+            {
+                parent = "NetWork.RpcAck";
+            }
             // 是rpc req
             if (kind is ReqClassKind reqClassKind && !string.IsNullOrEmpty(reqClassKind.AckFullName))
             {

@@ -18,8 +18,9 @@ namespace Generator.Context
         public List<FileContext> FileContexts { get; } = new();
         /// <summary>
         /// proto里是message(req、ntf、ack)的class name
+        /// value: 是否rpcAck
         /// </summary>
-        public HashSet<string> ProtocolMessageNames { get; } = new();
+        public Dictionary<string, bool> ProtocolMessageNames { get; } = new();
 
         #endregion
         public GloableContext(Project project, string outPath)
@@ -34,9 +35,14 @@ namespace Generator.Context
             FileContexts.Add(fc);
         }
         
-        public void AddProtocolMessageName(string name)
+        public void AddProtocolMessageName(string name, bool isRpcAck)
         {
-            ProtocolMessageNames.Add(name);
+            if (ProtocolMessageNames.TryGetValue(name, out var old))
+            {
+                if (!old) ProtocolMessageNames[name] = isRpcAck;
+                return;
+            }
+            ProtocolMessageNames.Add(name, isRpcAck);
         }
 
         public SemanticModel GetSemanticModel(SyntaxTree tree)
