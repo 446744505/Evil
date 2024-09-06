@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Evil.Provide;
+using Game.NetWork;
 using Proto;
 
 namespace Game
@@ -7,16 +8,32 @@ namespace Game
     public partial class GameProvideFactory
     {
         /// <summary>
-        /// 记录所有的map pvid
+        /// 更新所有可用的map pvid
         /// </summary>
         /// <param name="providerUrl"></param>
         /// <param name="newAll"></param>
-        private void OnProvideUpdateMap(string providerUrl, Dictionary<ushort,ProvideInfo> newAll)
+        private void OnProvideUpdateMap(
+            string providerUrl,
+            Dictionary<ushort, ProvideInfo> newAll, 
+            List<ProvideInfo> added, 
+            List<ProvideInfo> removed)
         {
-            foreach (var pair in newAll)
+            foreach (var info in added)
             {
-                if (pair.Value.type == (int)ProvideType.Map)
-                    Program.Ctx.AddMapPvid(pair.Key);
+                var provide = Net.I.Provide;
+                if (info.type == (int)ProvideType.Map)
+                {
+                    var pvid = (ushort)info.pvid;
+                    if (provide.IsSelfLinkProvide(providerUrl, pvid))
+                    {
+                        Program.Ctx.AddMapPvid(pvid);
+                    }
+                }
+            }
+
+            foreach (var info in removed)
+            {
+                Program.Ctx.RemoveMapPvid((ushort)info.pvid);
             }
         }
     }

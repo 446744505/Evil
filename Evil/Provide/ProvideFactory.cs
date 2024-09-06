@@ -14,7 +14,11 @@ namespace Evil.Provide
         /// </summary>
         /// <param name="providerUrl"></param>
         /// <param name="news"></param>
-        void OnProvideUpdate(string providerUrl, Dictionary<ushort, ProvideInfo> news);
+        void OnProvideUpdate(
+            string providerUrl,
+            Dictionary<ushort, ProvideInfo> newAll, 
+            List<ProvideInfo> added, 
+            List<ProvideInfo> removed);
 
         ProvideNetWorkFactory CreateNetWorkFactory()
         {

@@ -37,6 +37,54 @@ namespace Evil.Provide
             m_Factory = factory;
             m_Sessions = new ProvideSessions(this);
         }
+        
+        private void CalcChangedProvides(
+            Dictionary<ushort, ProvideInfo> newAll,
+            Dictionary<ushort, ProvideInfo>? old,
+            out List<ProvideInfo> added,
+            out List<ProvideInfo> removed)
+        {
+            added = new();
+            removed = new();
+            if (old is null)
+            {
+                foreach (var pair in newAll)
+                {
+                    added.Add(pair.Value);
+                }
+                return;
+            }
+            foreach (var pair in newAll)
+            {
+                if (!old.ContainsKey(pair.Key))
+                {
+                    added.Add(pair.Value);
+                }
+            }
+            foreach (var pair in old)
+            {
+                if (!newAll.ContainsKey(pair.Key))
+                {
+                    removed.Add(pair.Value);
+                }
+            }
+        }
+        
+        private void OnProvidesUpdate(string providerUrl, string json)
+        {
+            var infos = JsonSerializer.Deserialize<Dictionary<ushort, ProvideInfo>>(json)!;
+            if (m_Provides.TryRemove(providerUrl, out var old))
+            {
+                Log.I.Info($"provider {providerUrl} update provides {Strings.ToCustomString(old)} -> {Strings.ToCustomString(infos)}");
+            }
+                
+            CalcChangedProvides(infos, old, out var added, out var removed);
+            m_Provides[providerUrl] = infos;
+            // 框架内部更新
+            m_Sessions.OnProvideUpdate(providerUrl, infos, added, removed);
+            // 框架外部自定义更新
+            m_Factory.OnProvideUpdate(providerUrl, infos, added, removed);
+        }
 
         public async Task Start(string etcd)
         {
@@ -47,7 +95,7 @@ namespace Evil.Provide
             {
                 return k.Substring(key.Length);
             }
-            
+
             void Connect(string providerUrl)
             {
                 var hostPort = providerUrl.Split(":");
@@ -61,21 +109,6 @@ namespace Evil.Provide
                 transport.Start();
             }
 
-            void AddOrUpdateProvide(string providerUrl, string json)
-            {
-                var infos = JsonSerializer.Deserialize<Dictionary<ushort, ProvideInfo>>(json)!;
-                if (m_Provides.TryRemove(providerUrl, out var old))
-                {
-                    Log.I.Info($"provider {providerUrl} update provides {Strings.ToCustomString(old)} -> {Strings.ToCustomString(infos)}");
-                }
-                
-                m_Provides[providerUrl] = infos;
-                // 框架内部更新
-                m_Sessions.OnProvideUpdate(providerUrl, infos);
-                // 框架外部自定义更新
-                m_Factory.OnProvideUpdate(providerUrl, infos);
-            }
-
             Etcd.I.Init(etcd);
             
             var kvs = await Etcd.I.GetRangeAsync(key);
@@ -83,7 +116,7 @@ namespace Evil.Provide
             {
                 var providerUrl = RemovePrefix(kv.Key);
                 Connect(providerUrl);
-                AddOrUpdateProvide(providerUrl, kv.Value);
+                OnProvidesUpdate(providerUrl, kv.Value);
             }
             _ = Etcd.I.WatchRangeAsync(key, events =>
             {
@@ -96,11 +129,11 @@ namespace Evil.Provide
                     {
                         Connect(providerUrl);
                     }
-                    AddOrUpdateProvide(providerUrl, e.Value);
+                    OnProvidesUpdate(providerUrl, e.Value);
                 }
             }); 
         }
-
+        
         public void Dispose()
         {
             foreach (var transport in m_Transports)

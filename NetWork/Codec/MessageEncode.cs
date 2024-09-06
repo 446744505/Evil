@@ -26,7 +26,7 @@ namespace NetWork.Codec
             stream.Position = 0;
             // encode head
             m_Writer.Write(message.MessageId);
-            m_Writer.Write(message.Pvid);
+            m_Writer.Write(message.InnerPvid);
             // encode ext head
             message.Encode(m_Writer);
             // encode body

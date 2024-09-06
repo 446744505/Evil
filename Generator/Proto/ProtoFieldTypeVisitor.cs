@@ -50,7 +50,7 @@ namespace Generator.Visitor
 
         public void Visit(UShortType type)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("协议字段不支持ushort类型");
         }
 
         public void Visit(IntType type)

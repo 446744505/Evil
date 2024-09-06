@@ -7,7 +7,7 @@ namespace Proto
         public override async Task Dispatch()
         {
             var linkerSession = Linker.I.Sessions.GetSession(clientSessionId);
-            if (linkerSession == null)
+            if (linkerSession is null)
             {
                 // TODO 与ClientRspResponse一样处理
             }

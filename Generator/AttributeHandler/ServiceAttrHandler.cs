@@ -87,7 +87,7 @@ namespace Generator.AttributeHandler
 
         private string GetSendLine(string reqName)
         {
-            return IsServerChannel() ? $"Net.I.SendToProvide(pvid, {reqName});" : "Net.I.Send({reqName});";
+            return IsServerChannel() ? $"Net.I.SendToProvide(pvid, {reqName});" : $"Net.I.Send({reqName});";
         }
 
         private string GetAsyncSendLine(string reqName, string ackFullName)

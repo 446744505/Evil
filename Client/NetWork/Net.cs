@@ -15,13 +15,13 @@ namespace Client.NetWork
         
         public void Send(Message msg)
         {
-            msg.Pvid = Pvid;
+            msg.InnerPvid = Pvid;
             msg.Send(m_SessionMgr.Session);
         }
 
         public async Task<T> SendAsync<T>(Rpc<T> rpc) where T : Message
         {
-            rpc.Pvid = Pvid;
+            rpc.InnerPvid = Pvid;
             return await rpc.SendAsync(m_SessionMgr.Session);
         }
     }

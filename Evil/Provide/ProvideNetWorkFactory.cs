@@ -33,12 +33,20 @@ namespace Evil.Provide
         public Message? CreateRpcResponse(object? ctx, long requestId, byte[] data)
         {
             // 是客户端来的rpc
-            if (ctx is ClientMsgBox box)
+            if (ctx is ClientMsgBox clientBox)
             {
-                return new ClientRspResponse
+                return new ClientRpcResponse
                 {
                     requestId = requestId,
-                    clientSessionId = box.clientSessionId,
+                    clientSessionId = clientBox.clientSessionId,
+                    data = data,
+                };
+            } else if (ctx is ProvideMsgBox provideBox)
+            {
+                return new ProvideRpcResponse
+                {
+                    requestId = requestId,
+                    pvid = provideBox.fromPvid,
                     data = data,
                 };
             }

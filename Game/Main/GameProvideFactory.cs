@@ -25,9 +25,13 @@ namespace Game
             return ProvideType.Game;
         }
 
-        public void OnProvideUpdate(string providerUrl, Dictionary<ushort, ProvideInfo> newAll)
+        public void OnProvideUpdate(
+            string providerUrl,
+            Dictionary<ushort, ProvideInfo> newAll, 
+            List<ProvideInfo> added, 
+            List<ProvideInfo> removed)
         {
-            OnProvideUpdateMap(providerUrl, newAll);
+            OnProvideUpdateMap(providerUrl, newAll, added, removed);
         }
 
         public IMessageDispatcher CreateMessageDispatcher(TransportConfig _)

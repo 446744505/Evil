@@ -48,11 +48,15 @@ namespace Evil.Provide
         }
 
         /// <summary>
-        /// 连接某个provider的providee有变化
+        /// 连接某个provider的provide有变化
         /// </summary>
         /// <param name="providerUrl"></param>
         /// <param name="newAll"></param>
-        internal void OnProvideUpdate(string providerUrl, Dictionary<ushort, ProvideInfo> newAll)
+        internal void OnProvideUpdate(
+            string providerUrl,
+            Dictionary<ushort, ProvideInfo> newAll, 
+            List<ProvideInfo> added, 
+            List<ProvideInfo> removed)
         {
             List<ushort> willRemove = new();
             var release = m_Lock.RLock();
@@ -141,7 +145,7 @@ namespace Evil.Provide
                 for (var i = 0; i < shuffle.Length; i++)
                 {
                     var session = shuffle[i];
-                    if (m_Provide.IsProviderLinkProvide(session.ProviderUrl, toPvid))
+                    if (m_Provide.IsSelfLinkProvide(session.ProviderUrl, toPvid))
                     {
                         findIdx = i;
                         break;

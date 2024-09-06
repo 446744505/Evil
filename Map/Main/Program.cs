@@ -1,4 +1,5 @@
 ﻿
+using Edb;
 using Evil.Event;
 using Evil.Provide;
 using Evil.Util;
@@ -16,7 +17,7 @@ namespace Map
             Stopper? stopper = null;
             try
             {
-                // await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+                await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
                 
                 var provide = new Provide(new MapProvideFactory());
                 await provide.Start(CmdLine.I.Etcd);

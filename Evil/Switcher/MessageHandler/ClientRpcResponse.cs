@@ -3,12 +3,12 @@ using NetWork.Proto;
 
 namespace Proto
 {
-    public partial class ClientRspResponse
+    public partial class ClientRpcResponse
     {
         public override async Task Dispatch()
         {
             var linkerSession = Linker.I.Sessions.GetSession(clientSessionId);
-            if (linkerSession == null)
+            if (linkerSession is null)
             {
                 // TODO 与SendToClient一样处理
             }

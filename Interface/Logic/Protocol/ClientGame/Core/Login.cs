@@ -12,5 +12,7 @@ namespace Login
     [Protocol(Node.Client|Node.Game)]
     public class LoginNtf
     {
+        [ProtocolField(1)]
+        private int mapPvid;
     }
 }

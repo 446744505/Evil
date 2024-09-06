@@ -30,7 +30,7 @@ namespace NetWork
         [JsonIgnore]
         public virtual int MaxSize { get; } = 1024 * 1024;
         [JsonIgnore]
-        public ushort Pvid { get; set; }
+        public ushort InnerPvid { get; set; }
         [JsonIgnore]
         public Session Session { get; set; } = null!;
         [JsonIgnore]

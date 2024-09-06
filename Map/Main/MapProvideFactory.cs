@@ -24,7 +24,11 @@ namespace Map
             return ProvideType.Map;
         }
 
-        public void OnProvideUpdate(string providerUrl, Dictionary<ushort, ProvideInfo> newAll)
+        public void OnProvideUpdate(
+            string providerUrl,
+            Dictionary<ushort, ProvideInfo> newAll, 
+            List<ProvideInfo> added, 
+            List<ProvideInfo> removed)
         {
             
         }

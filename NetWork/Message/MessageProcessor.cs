@@ -34,7 +34,7 @@ namespace NetWork
             }
             
             var msg = func();
-            msg.Pvid = header.Pvid;
+            msg.InnerPvid = header.Pvid;
             msg.Session = session;
             var stream = reader.BaseStream;
             // decode ext head
@@ -44,9 +44,9 @@ namespace NetWork
             Serializer.NonGeneric.Deserialize(msg.GetType(), stream, msg, null, len);
             
             // pvid check
-            if (Pvid > 0 && msg.Pvid != Pvid)
+            if (Pvid > 0 && msg.InnerPvid != Pvid)
             {
-                throw new NetWorkException($"msgId:{msgId} pvid:{msg.Pvid} != {Pvid}");
+                throw new NetWorkException($"msgId:{msgId} pvid:{msg.InnerPvid} != {Pvid}");
             }
             
             // 最大传输字节check

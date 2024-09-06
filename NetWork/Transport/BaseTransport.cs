@@ -16,9 +16,10 @@ namespace NetWork.Transport
         protected ISessionMgr m_SessionMgr = null!;
 
         protected volatile bool IsStop;
+        protected volatile bool IsStoping;
         private readonly RpcMgr m_RpcMgr = new();
         private readonly AsyncCountdownEvent m_StopEvent = new(1);
-        public event EventHandler<IChannel> OnStarted;
+        public event EventHandler<IChannel>? OnStarted;
         
         #endregion
 
@@ -52,6 +53,7 @@ namespace NetWork.Transport
 
         protected async Task BaseDispose(IChannel channel)
         {
+            IsStoping = true;
             // 关闭连接
             await channel.CloseAsync();
             // 关闭rpc，上面的连接已经关了，如果这时候client回调处理里还有消息发送？
@@ -68,6 +70,8 @@ namespace NetWork.Transport
             {
                 Thread.Sleep(1000);
             }
+
+            IsStoping = false;
             Log.I.Info("transport stop");
         }
 

@@ -28,23 +28,34 @@ namespace Game.NetWork
         
         public async Task<bool> AddPlayer(long playerId, GameClientContext clientContext)
         {
-            if (m_Players.TryRemove(playerId, out var old))
+            // 如果已经登录，要先踢掉
+            if (!await KickPlayer(playerId, ProvideKick.HadLogin))
             {
-                // 顶号
-                await clientContext.Session.SendAsync(new ProvideKick
-                {
-                    clientSessionId = old.ClientSessionId, 
-                    code = ProvideKick.HadLogin,
-                });
-                Log.I.Warn($"player {playerId} had login, kick old clientSessionId {old.ClientSessionId}");
-                var suc = await LogicOffline(playerId);
-                if (!suc)
-                    return false;
+                return false;
             }
-        
             m_Players[playerId] = clientContext;
             Log.I.Info($"player {playerId} net online");
             return await LogicOnline(playerId);
+        }
+
+        public async Task<bool> KickPlayer(long playerId, int reason)
+        {
+            if (m_Players.TryRemove(playerId, out var old))
+            {
+                var suc = await LogicOffline(playerId);
+                if (!suc)
+                    return false;
+                // 顶号
+                await old.Session.SendAsync(new ProvideKick
+                {
+                    clientSessionId = old.ClientSessionId, 
+                    code = reason,
+                });
+                Log.I.Warn($"kick player {playerId} reason {reason} clientSessionId {old.ClientSessionId}");
+                return true;
+            }
+
+            return true;
         }
 
         public void RemovePlayer(long playerId)

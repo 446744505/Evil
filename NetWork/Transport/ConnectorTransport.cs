@@ -78,7 +78,7 @@ namespace NetWork.Transport
 
         public void TryConnect()
         {
-            if (IsStop)
+            if (IsStop || IsStoping)
             {
                 Log.I.Warn($"transport {this} is stopped, give up reconnect");
                 return;

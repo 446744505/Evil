@@ -8,31 +8,32 @@ namespace Evil.Provide
         public void SendToProvide(ushort pvid, Message msg)
         {
             var session = m_Sessions.FindProvideSession(pvid);
-            msg.Pvid = pvid;
+            msg.InnerPvid = pvid;
             msg.Send(session);
         }
 
         public async Task<T?> SendToProvideAsync<T>(ushort pvid, Rpc<T> rpc) where T : Message
         {
             var session = m_Sessions.FindProvideSession(pvid);
-            rpc.Pvid = pvid;
+            rpc.InnerPvid = pvid;
             return await rpc.SendAsync(session);
         }
         
         /// <summary>
-        /// 某个provider是否连接了某个provide
+        /// 自己是否通过某个provider能连通某个provide
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="pvid"></param>
         /// <returns></returns>
-        public bool IsProviderLinkProvide(string provider, ushort pvid)
+        public bool IsSelfLinkProvide(string provider, ushort pvid)
         {
             if (!m_Provides.TryGetValue(provider, out var infos))
             {
                 return false;
             }
 
-            return infos.ContainsKey(pvid);
+            // 即有对端也有自己
+            return infos.ContainsKey(pvid) && infos.ContainsKey(Pvid);
         }
     }
 }
