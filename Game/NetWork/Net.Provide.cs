@@ -13,7 +13,7 @@ namespace Game.NetWork
             Provide.SendToProvide(pvid, msg);
         }
         
-        public async Task<T?> SendToProvideAsync<T>(ushort pvid, Rpc<T> rpc) where T : Message
+        public async Task<T?> SendToProvideAsync<T>(ushort pvid, Rpc<T> rpc) where T : RpcAck
         {
             return await Provide.SendToProvideAsync(pvid, rpc);
         }

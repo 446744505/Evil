@@ -4,6 +4,7 @@ using Evil.Util;
 using Game;
 using Game.NetWork;
 using Login;
+using NetWork;
 
 namespace Proto
 {
@@ -36,6 +37,11 @@ namespace Proto
 
             var providerUrl = provideSession.ProviderUrl;
             var loginMapAck = await LoginMgr.I.LoginService.LoginToMap(mapPvid, playerId, providerUrl, ctx.clientSessionId);
+            if (loginMapAck.Code != RpcAck.Success)
+            {
+                Log.I.Error($"player {playerId} login to map failed {loginMapAck.Code}");
+                return false;
+            }
             Log.I.Info($"player {playerId} login to map {loginMapAck.data}");
 
             await Net.I.SendToPlayer(playerId,new LoginNtf{mapPvid = loginMapAck.data});

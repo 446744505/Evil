@@ -12,7 +12,7 @@ namespace Evil.Provide
             msg.Send(session);
         }
 
-        public async Task<T?> SendToProvideAsync<T>(ushort pvid, Rpc<T> rpc) where T : Message
+        public async Task<T?> SendToProvideAsync<T>(ushort pvid, Rpc<T> rpc) where T : RpcAck
         {
             var session = m_Sessions.FindProvideSession(pvid);
             rpc.InnerPvid = pvid;
