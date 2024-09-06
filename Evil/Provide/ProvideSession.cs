@@ -23,6 +23,7 @@ namespace Evil.Provide
         public ProvideSession AddClient(ClientContext ctx)
         {
             m_ClientContexts[ctx.ClientSessionId] = ctx;
+            SendAsync(new BindClient{clientSessionId = ctx.ClientSessionId});
             return this;
         }
 
@@ -58,6 +59,15 @@ namespace Evil.Provide
             m_ClientContexts.Clear();
         }
 
+        internal void ClientBroken(long clientSessionId)
+        {
+            var ctx = GetClientContext(clientSessionId);
+            if (ctx is not null)
+            {
+                ctx.OnClientBroken();
+            }
+        }
+        
         public ClientContext? GetClientContext(long clientSessionId)
         {
             return m_ClientContexts.TryGetValue(clientSessionId, out var ctx) ? ctx : null;

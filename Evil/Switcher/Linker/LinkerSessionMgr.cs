@@ -25,7 +25,7 @@ namespace Evil.Switcher
             base.OnRemoveSession(session);
             var linkerSession = (LinkerSession)session;
             Linker.I.Sessions.RemoveSession(linkerSession);
-            // TODO notify provider
+            Provider.I.ClientBroken(linkerSession);
         }
     }
 }

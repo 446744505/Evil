@@ -1,6 +1,7 @@
 ﻿using DotNetty.Transport.Channels;
 using Evil.Util;
 using NetWork.Transport;
+using Proto;
 
 namespace Evil.Switcher
 {
@@ -61,6 +62,18 @@ namespace Evil.Switcher
         private void RegisterToEtcd(object? _, IChannel channel)
         {
             m_Meta.UpdateEtcd();
+        }
+
+        internal void ClientBroken(LinkerSession session)
+        {
+            foreach (var pvid in session.BindProvides)
+            {
+                var providerSession = Sessions.GetSession(pvid);
+                if (providerSession is not null)
+                {
+                    providerSession.SendAsync(new ClientBroken() { clientSessionId = session.Id });
+                }
+            }
         }
     }
 }

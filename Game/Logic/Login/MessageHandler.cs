@@ -13,6 +13,18 @@ namespace Proto
         {
             var provideSession = (ProvideSession)Session;
             var ctx = (ClientMsgBox)Context!;
+            // 找一个地图
+            var mapPvid = Program.Ctx.RandomMapPvid();
+            if (mapPvid == 0)
+            {
+                await Session.SendAsync(new ProvideKick
+                {
+                    clientSessionId = ctx.clientSessionId,
+                    code = ProvideKick.NotMap,
+                });
+                return false;
+            }
+            
             // 设置上下文
             var clientContext = new GameClientContext(ctx.clientSessionId, provideSession, playerId);
             provideSession.AddClient(clientContext);
@@ -20,12 +32,6 @@ namespace Proto
             if (!await Net.I.AddPlayer(playerId, clientContext))
             {
                 return false;
-            }
-            // 找一个地图
-            var mapPvid = Program.Ctx.RandomMapPvid();
-            if (mapPvid == 0)
-            {
-                return await Net.I.KickPlayer(playerId, ProvideKick.NotMap);
             }
 
             var providerUrl = provideSession.ProviderUrl;
