@@ -12,6 +12,7 @@ namespace Map
         {
             Log.I.UnobservedTaskException();
             CmdLine.Init(args);
+            Etcd.I.Init(CmdLine.I.Etcd);
             Event.Start();
             
             Stopper? stopper = null;
@@ -20,11 +21,12 @@ namespace Map
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
                 
                 var provide = new Provide(new MapProvideFactory());
-                await provide.Start(CmdLine.I.Etcd);
+                await provide.Start();
                 Log.I.Info("map started");
 
                 stopper = new Stopper().BindAndWait();
                 
+                Etcd.I.Dispose();
                 provide.Dispose();
                 await Edb.Edb.I.DisposeAsync();
             }

@@ -12,6 +12,9 @@ namespace Evil
         [ConfigurationKeyName("node")]
         public string Node { get; set; } = "switcher";
         
+        [ConfigurationKeyName("etcd")]
+        public string Etcd { get; set; } = "https://127.0.0.1:2379";
+        
         public static void Init(string[] args)
         {
             if (args.Length == 0)

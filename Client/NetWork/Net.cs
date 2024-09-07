@@ -33,7 +33,7 @@ namespace Client.NetWork
             base.OnAddSession(session);
             
             // login
-            Net.I.Send(new LoginReq { playerId = 99 });
+            Net.I.Send(new LoginReq { account = "test3"});
         }
     }
 }

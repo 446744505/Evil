@@ -11,6 +11,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Edb\Edb.csproj" />
       <ProjectReference Include="..\Evil\Evil.csproj" />
+      <ProjectReference Include="..\Util\Util.csproj" />
     </ItemGroup>
 
     <ItemGroup>

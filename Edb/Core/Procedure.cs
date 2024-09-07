@@ -1,5 +1,14 @@
 namespace Edb
 {
+    /// <summary>
+    /// 执行完后可携带结果的Procedure
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public abstract class RProcedure<T> : Procedure
+    {
+        public T R { get; protected set; }
+        public abstract Task<bool> Process();
+    }
     public interface Procedure : IProcedure
     {
         public static readonly Task<bool> FalseTask = Task.FromResult(false);

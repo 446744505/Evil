@@ -11,8 +11,6 @@ namespace Evil.Switcher
         public void Start(string[] args)
         {
             CmdLine.Init(args);
-            Etcd.I.Init(CmdLine.I.Etcd);
-            
             Linker.I.Start();
             Provider.I.Start();
         }
@@ -21,7 +19,6 @@ namespace Evil.Switcher
         {
             Linker.I.Stop();
             Provider.I.Stop();
-            Etcd.I.Dispose();
         }
     }
 }

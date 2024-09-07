@@ -5,9 +5,6 @@ namespace Evil.Switcher
     public class CmdLine
     {
         public static CmdLine I = null!;
-
-        [ConfigurationKeyName("etcd")]
-        public string Etcd { get; set; } = "https://127.0.0.1:2379";
         /// <summary>
         /// linker 端口
         /// </summary>

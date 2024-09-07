@@ -2,7 +2,7 @@
 
 namespace Player
 {
-    [XTable(Node.Map, 500)]
+    [XTable(Node.Map, 500, typeof(MapPlayer),true)]
     public class MapPlayer
     {
         [XColumn(true)]

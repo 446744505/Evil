@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Edb;
 using Evil.Provide;
 using Evil.Util;
+using Game.Logic.Login;
 using NetWork;
 using Proto;
+using XBean;
 
 namespace Game.NetWork
 {
@@ -35,7 +37,7 @@ namespace Game.NetWork
             }
             m_Players[playerId] = clientContext;
             Log.I.Info($"player {playerId} net online");
-            return await LogicOnline(playerId);
+            return (await Procedure.Call(new PLogicOnline(playerId))).IsSuccess;
         }
 
         public async Task<bool> KickPlayer(long playerId, int reason)
@@ -73,12 +75,6 @@ namespace Game.NetWork
         public Task<bool> LogicOffline(long playerId)
         {
             Log.I.Info($"player {playerId} logic offline");
-            return Procedure.TrueTask;
-        }
-
-        public Task<bool> LogicOnline(long playerId)
-        {
-            Log.I.Info($"player {playerId} logic online");
             return Procedure.TrueTask;
         }
     }

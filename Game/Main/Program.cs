@@ -14,6 +14,7 @@ namespace Game
         {
             Log.I.UnobservedTaskException();
             CmdLine.Init(args);
+            Etcd.I.Init(CmdLine.I.Etcd);
             Event.Start();
             
             Stopper? stopper = null;
@@ -22,11 +23,12 @@ namespace Game
                 await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
                 
                 var provide = Net.I.Provide = new Provide(new GameProvideFactory());
-                await provide.Start(CmdLine.I.Etcd);
+                await provide.Start();
                 Log.I.Info("server started");
 
                 stopper = new Stopper().BindAndWait();
                 
+                Etcd.I.Dispose();
                 provide.Dispose();
                 await Edb.Edb.I.DisposeAsync();
             }

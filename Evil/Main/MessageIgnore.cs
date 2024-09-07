@@ -10,7 +10,9 @@ namespace Evil
             MessageHelper.IgnoreMsg(
                 typeof(ClientMsgBox), 
                 typeof(ServerMsgBox),
+                typeof(ProvideMsgBox),
                 typeof(ClientRpcResponse),
+                typeof(ProvideRpcResponse),
                 typeof(SendToClient));
         }
     }

@@ -33,41 +33,61 @@ namespace Generator.Visitor
                 Result = $"new({m_CopyClass}, this, \"{FieldName}\")";
         }
 
+        private bool VisitBase()
+        {
+            if (!string.IsNullOrEmpty(m_CopyClass))
+            {
+                Result = m_CopyClass;
+                return false;
+            }
+                
+            return true;
+        }
+
         public void Visit(ByteType type)
         {
+            VisitBase();
         }
 
         public void Visit(UShortType type)
         {
+            VisitBase();
         }
 
         public void Visit(IntType type)
         {
+            VisitBase();
         }
 
         public void Visit(UIntType type)
         {
+            VisitBase();
         }
 
         public void Visit(LongType type)
         {
+            VisitBase();
         }
 
         public void Visit(BoolType type)
         {
+            VisitBase();
         }
 
         public void Visit(StringType type)
         {
-            Result = "string.Empty";
+            if (VisitBase())
+                Result = "string.Empty";
         }
 
         public void Visit(FloatType type)
         {
+            VisitBase();
         }
 
         public void Visit(DoubleType type)
         {
+            VisitBase();
         }
 
         public void Visit(ArrayType type)

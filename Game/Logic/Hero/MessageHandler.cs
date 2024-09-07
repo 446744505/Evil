@@ -56,7 +56,8 @@ namespace Proto
                 }
             }
 
-            return new Hero();
+            const int heroNotExist = 1;
+            return CreateAck(heroNotExist);
         }
     }
 

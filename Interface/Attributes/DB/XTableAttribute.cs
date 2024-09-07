@@ -10,11 +10,11 @@ namespace Attributes
         private readonly int m_Capacity;
         private readonly bool m_IsMemory;
         
-        public XTableAttribute(Node nodes, int capacity, Type? lockType = null, bool memory = false)
+        public XTableAttribute(Node nodes, int capacity, Type lockType, bool memory = false)
         {
             m_Nodes = nodes;
             m_Capacity = capacity;
-            m_Lock = lockType?.Name ?? string.Empty;
+            m_Lock = lockType.Name;
             m_IsMemory = memory;
         }
     }

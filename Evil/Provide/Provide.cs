@@ -86,7 +86,7 @@ namespace Evil.Provide
             m_Factory.OnProvideUpdate(providerUrl, infos, added, removed);
         }
 
-        public async Task Start(string etcd)
+        public async Task Start()
         {
             const string key = "provider/";
             var innerMsgRegister = new MessageRegister();
@@ -108,8 +108,6 @@ namespace Evil.Provide
                 m_Transports[providerUrl] = transport;
                 transport.Start();
             }
-
-            Etcd.I.Init(etcd);
             
             var kvs = await Etcd.I.GetRangeAsync(key);
             foreach (var kv in kvs)

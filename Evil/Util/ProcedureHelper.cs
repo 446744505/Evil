@@ -37,14 +37,29 @@ namespace Evil.Util
             Transaction.AddSavepointTask(action, null);
         }
         
+        public static void ExecuteWhenCommit(Procedure p)
+        {
+            Transaction.AddSavepointTask(p, null);
+        }
+        
         public static void ExecuteWhenRollback(Action action)
         {
             Transaction.AddSavepointTask(null, action);
         }
         
+        public static void ExecuteWhenRollback(Procedure p)
+        {
+            Transaction.AddSavepointTask(null, p);
+        }
+        
         public static void ExecuteWhenFinish(Action action)
         {
             Transaction.AddSavepointTask(action, action);
+        }
+        
+        public static void ExecuteWhenFinish(Procedure p)
+        {
+            Transaction.AddSavepointTask(p, p);
         }
         
         public class MessageDispatcher : IMessageDispatcher

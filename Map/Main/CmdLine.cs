@@ -10,6 +10,10 @@ namespace Map
 
         [ConfigurationKeyName("pvid")] 
         public ushort Pvid { get; set; } = 2;
+        
+        [ConfigurationKeyName("serverid")] 
+        public int ServerId { get; set; } = 1001;
+        
         [ConfigurationKeyName("etcd")]
         public string Etcd { get; set; } = "https://127.0.0.1:2379";
 

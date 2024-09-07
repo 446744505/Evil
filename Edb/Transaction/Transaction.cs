@@ -152,7 +152,12 @@ namespace Edb
 
         public static void AddSavepointTask(Action? commitTask, Action? rollbackTask)
         {
-            CurrentSavepoint.Add(new TLog(commitTask, rollbackTask));
+            CurrentSavepoint.Add(new TActionLog(commitTask, rollbackTask));
+        }
+        
+        public static void AddSavepointTask(Procedure? commitTask, Procedure? rollbackTask)
+        {
+            CurrentSavepoint.Add(new TProcedureLog(commitTask, rollbackTask));
         }
         
         public static void SetIsolation(IsolationLevel level)
@@ -259,12 +264,34 @@ namespace Edb
             }
         }
         
-        private class TLog : ILog
+        private struct TProcedureLog : ILog
+        {
+            private readonly Procedure? m_Commit;
+            private readonly Procedure? m_Rollback;
+
+            public TProcedureLog(Procedure? commit, Procedure? rollback)
+            {
+                m_Commit = commit;
+                m_Rollback = rollback;
+            }
+
+            public void Commit()
+            {
+                m_Commit?.Execute();
+            }
+
+            public void Rollback()
+            {
+                m_Rollback?.Execute();
+            }
+        }
+        
+        private struct TActionLog : ILog
         {
             private readonly Action? m_Commit;
             private readonly Action? m_Rollback;
 
-            public TLog(Action? commit, Action? rollback)
+            public TActionLog(Action? commit, Action? rollback)
             {
                 m_Commit = commit;
                 m_Rollback = rollback;

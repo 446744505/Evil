@@ -330,6 +330,23 @@ namespace Game.Test
         }
 
         [Fact]
+        public async Task TestWhenCommit()
+        {
+            await Init();
+            await Procedure.Submit(async () =>
+            {
+                var p = await XTable.Player.Update(1);
+                p.Level++;
+                Transaction.AddSavepointTask(async () =>
+                {
+                    var p = await XTable.Player.Update(1);
+                    p.Level++;
+                }, null);
+                return true;
+            });
+        }
+
+        [Fact]
         public async Task TestDeadLock()
         {
             await Init();

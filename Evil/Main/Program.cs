@@ -9,6 +9,7 @@ namespace Evil
             Log.I.UnobservedTaskException();
             MessageIgnore.Init();
             CmdLine.Init(args);
+            Etcd.I.Init(CmdLine.I.Etcd);
             
             Stopper? stopper = null;
             try
@@ -22,9 +23,11 @@ namespace Evil
                     default:
                         throw new NotSupportedException("Not Supported Node");
                 }
+                
                 stopper = new Stopper().BindAndWait();
                 
                 // stop
+                Etcd.I.Dispose();
                 switch (CmdLine.I.Node)
                 {
                     case "switcher": 

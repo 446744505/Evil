@@ -22,11 +22,9 @@ namespace Generator.Visitor
             throw new System.NotImplementedException();
         }
 
-        private void BaseVisit(IType type)
+        private void BaseVisit(IType _)
         {
-            var fullNameVisitor = new FullNameTypeVisitor();
-            type.Accept(fullNameVisitor);
-            Result = fullNameVisitor.Result;
+            Result = m_CopyFieldName;
         }
 
         public void Visit(ClassType type)
