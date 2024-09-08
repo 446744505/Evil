@@ -328,6 +328,25 @@ namespace Game.Test
                 return true;
             });
         }
+        
+        public struct WhenCommit : Procedure
+        {
+            private readonly int m_Num;
+
+            public WhenCommit(int num)
+            {
+                m_Num = num;
+            }
+
+            public async Task<bool> Process()
+            {
+                Log.I.Info($"Start WhenCommit {m_Num}");
+                await Task.Delay(50);
+                // Transaction.AddSavepointTask(new WhenCommit(m_Num+1), null);
+                Log.I.Info($"End WhenCommit {m_Num}");
+                return true;
+            }
+        }
 
         [Fact]
         public async Task TestWhenCommit()
@@ -335,15 +354,14 @@ namespace Game.Test
             await Init();
             await Procedure.Submit(async () =>
             {
-                var p = await XTable.Player.Update(1);
-                p.Level++;
-                Transaction.AddSavepointTask(async () =>
-                {
-                    var p = await XTable.Player.Update(1);
-                    p.Level++;
-                }, null);
+                Log.I.Info($"Start TestWhenCommit");
+                // Transaction.AddSavepointTask(new WhenCommit(1), null);
+                Procedure.Execute(new WhenCommit(1));
+                // Procedure.Execute(new WhenCommit(2));
+                Log.I.Info($"End TestWhenCommit");
                 return true;
             });
+            await Task.Delay(2000);
         }
 
         [Fact]

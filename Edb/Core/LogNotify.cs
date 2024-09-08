@@ -5,25 +5,25 @@ namespace Edb
     internal sealed class LogNotify
     {
         private readonly INote m_Note;
-        private readonly Deque.Deque<LogKey> m_Path = new();
+        private readonly Nito.Collections.Deque<LogKey> m_Path = new();
         
         internal INote Note => m_Note;
-        internal bool IsLast => m_Path.IsEmpty;
+        internal bool IsLast => m_Path.Count == 0;
 
         private LogNotify(LogKey logKey, INote note)
         {
             m_Note = note;
-            m_Path.AddBack(logKey);
+            m_Path.AddToBack(logKey);
         }
 
         internal LogKey Pop()
         {
-            return m_Path.RemoveFront();
+            return m_Path.RemoveFromFront();
         }
         
         internal LogNotify Push(LogKey logKey)
         {
-            m_Path.AddFront(logKey);
+            m_Path.AddToFront(logKey);
             return this;
         }
         

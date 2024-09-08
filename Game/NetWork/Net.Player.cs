@@ -8,7 +8,6 @@ using Evil.Util;
 using Game.Logic.Login;
 using NetWork;
 using Proto;
-using XBean;
 
 namespace Game.NetWork
 {
