@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Edb;
 using Evil.Util;
@@ -332,17 +333,23 @@ namespace Game.Test
         public struct WhenCommit : Procedure
         {
             private readonly int m_Num;
+            private readonly ConcurrentDictionary<long, bool> dict;
 
-            public WhenCommit(int num)
+            public WhenCommit(int num, ConcurrentDictionary<long, bool> dict)
             {
                 m_Num = num;
+                this.dict = dict;
             }
 
             public async Task<bool> Process()
             {
                 Log.I.Info($"Start WhenCommit {m_Num}");
-                await Task.Delay(50);
-                // Transaction.AddSavepointTask(new WhenCommit(m_Num+1), null);
+                await  Task.Delay(100);
+                var p = await XTable.Player.Update(1);
+                p!.Level++;
+                if (!dict.TryAdd(p.Level, true))
+                    throw new Exception($"multiple key {m_Num}");
+                Transaction.AddSavepointTask(new WhenCommit(m_Num+1, dict), null);
                 Log.I.Info($"End WhenCommit {m_Num}");
                 return true;
             }
@@ -355,9 +362,13 @@ namespace Game.Test
             await Procedure.Submit(async () =>
             {
                 Log.I.Info($"Start TestWhenCommit");
-                // Transaction.AddSavepointTask(new WhenCommit(1), null);
-                Procedure.Execute(new WhenCommit(1));
-                // Procedure.Execute(new WhenCommit(2));
+                var p = await XTable.Player.Update(1);
+                p!.Level++;
+                ConcurrentDictionary<long, bool> dict = new();
+                dict.TryAdd(p.Level, true);
+                Transaction.AddSavepointTask(new WhenCommit(1,dict), null);
+                // Procedure.Execute(new WhenCommit(1,dict));
+                // Procedure.Execute(new WhenCommit(2, dict));
                 Log.I.Info($"End TestWhenCommit");
                 return true;
             });

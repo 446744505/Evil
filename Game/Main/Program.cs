@@ -11,7 +11,7 @@ namespace Game
 {
     public static partial class Program
     {
-        public static async Task Main1(string[] args)
+        public static async Task Main(string[] args)
         {
             // Log.I.UnobservedTaskException();
             // CmdLine.Init(args);

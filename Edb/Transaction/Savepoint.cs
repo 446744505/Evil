@@ -1,4 +1,5 @@
-﻿namespace Edb
+﻿
+namespace Edb
 {
     internal sealed class Savepoint
     {
