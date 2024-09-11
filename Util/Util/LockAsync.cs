@@ -48,11 +48,15 @@ namespace Evil.Util
             }
         }
         
+        /// <summary>
+        /// 用超时模拟的try lock，不能用在性能敏感的场景
+        /// </summary>
+        /// <returns></returns>
         public async Task<IDisposable?> RTryLockAsync()
         {
-            // 再用10ms尝试获取锁
+            // 用5ms尝试获取锁
             try {
-                return await RLockAsync(10);
+                return await RLockAsync(5);
             } catch (LockTimeoutException) {
                 return null;
             }
@@ -106,11 +110,15 @@ namespace Evil.Util
             }
         }
         
+        /// <summary>
+        /// 用超时模拟的try lock，不能用在性能敏感的场景
+        /// </summary>
+        /// <returns></returns>
         public async Task<IDisposable?> WTryLockAsync()
         {
-            // 再用10ms尝试获取锁
+            // 用5ms尝试获取锁
             try {
-                return await WLockAsync(10);
+                return await WLockAsync(5);
             } catch (LockTimeoutException) {
                 return null;
             }
