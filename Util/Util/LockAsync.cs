@@ -56,7 +56,7 @@ namespace Evil.Util
         {
             // 用5ms尝试获取锁
             try {
-                return await RLockAsync(5);
+                return await RLockAsync(1);
             } catch (LockTimeoutException) {
                 return null;
             }
@@ -116,9 +116,9 @@ namespace Evil.Util
         /// <returns></returns>
         public async Task<IDisposable?> WTryLockAsync()
         {
-            // 用5ms尝试获取锁
+            // 用1ms尝试获取锁
             try {
-                return await WLockAsync(5);
+                return await WLockAsync(1);
             } catch (LockTimeoutException) {
                 return null;
             }
