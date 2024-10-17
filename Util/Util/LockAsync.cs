@@ -54,7 +54,7 @@ namespace Evil.Util
         /// <returns></returns>
         public async Task<IDisposable?> RTryLockAsync()
         {
-            // 用5ms尝试获取锁
+            // 用1ms尝试获取锁
             try {
                 return await RLockAsync(1);
             } catch (LockTimeoutException) {
