@@ -5,7 +5,7 @@ namespace Edb
     public class TTableCacheLru<TKey, TValue> : TTableCache<TKey, TValue>
         where TKey : notnull where TValue : class
     {
-        private LockAsync m_Lock = new();
+        private LockX m_Lock = new();
         private LruCache<TKey, TRecord<TKey, TValue>> m_Cache = null!;
         private Cleaner m_Cleaner = null!;
 
@@ -13,14 +13,14 @@ namespace Edb
         {
             get
             {
-                var release = m_Lock.WLock();
+                m_Lock.WLock();
                 try
                 {
                     return m_Cache.Count;
                 }
                 finally
                 {
-                    m_Lock.WUnlock(release);
+                    m_Lock.WUnlock();
                 }
             }
         }
@@ -36,18 +36,18 @@ namespace Edb
         }
         
 
-        public override async Task Clear()
+        public override void Clear()
         {
             if (m_Table.PersistenceType != ITable.Persistence.Memory)
                 throw new NotSupportedException();
-            var release = await m_Lock.WLockAsync();
+            m_Lock.WLock();
             try
             {
                 m_Cache.Clear();
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
@@ -55,10 +55,10 @@ namespace Edb
         {
         }
 
-        public override async Task Walk(Query<TKey, TValue> query)
+        public override void Walk(Query<TKey, TValue> query)
         {
             List<TRecord<TKey, TValue>> records = new(); 
-            var release = await m_Lock.WLockAsync();
+            m_Lock.WLock();
             try
             {
                 foreach (var pair in m_Cache)
@@ -68,40 +68,40 @@ namespace Edb
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
-            await Walk0(records, query);
+            Walk0(records, query);
         }
 
         internal override ICollection<TRecord<TKey, TValue>> Values()
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 return m_Cache.Values;
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
         internal override TRecord<TKey, TValue>? Get(TKey key)
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 return m_Cache.Lookup(key);
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
         internal override void AddNoLog(TKey key, TRecord<TKey, TValue> r)
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 if (m_Cache.Contains(key))
@@ -110,13 +110,13 @@ namespace Edb
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
         internal override void Add(TKey key, TRecord<TKey, TValue> r)
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 if (m_Cache.Contains(key))
@@ -126,20 +126,20 @@ namespace Edb
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
         internal override bool Remove(TKey key)
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 return m_Cache.Remove(key);
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
@@ -157,17 +157,17 @@ namespace Edb
             {
                 if (0 == Interlocked.CompareExchange(ref m_Running, 1, 0))
                 {
-                    Edb.I.Executor.ExecuteAsync(Run);
+                    Edb.I.Executor.Execute(Run);
                 }
             }
 
-            private async Task Run()
+            private void Run()
             {
-                var flushRelease = await Edb.I.Tables.FlushLock.RLockAsync();
+                Edb.I.Tables.FlushLock.RLock();
                 try
                 {
                     var eldest = new List<TRecord<TKey, TValue>>();
-                    var release = await m_Lru.m_Lock.WLockAsync();
+                    m_Lru.m_Lock.WLock();
                     try
                     {
                         var capacity = m_Lru.m_Capacity;
@@ -189,16 +189,16 @@ namespace Edb
                     }
                     finally
                     {
-                        m_Lru.m_Lock.WUnlock(release);
+                        m_Lru.m_Lock.WUnlock();
                     }
                     foreach (var record in eldest)
                     {
-                        await m_Lru.TryRemoveRecord(record);
+                        m_Lru.TryRemoveRecord(record);
                     }
                 }
                 finally
                 {
-                    Edb.I.Tables.FlushLock.RUnlock(flushRelease);
+                    Edb.I.Tables.FlushLock.RUnlock();
                     Interlocked.Exchange(ref m_Running, 0);
                 }
             }

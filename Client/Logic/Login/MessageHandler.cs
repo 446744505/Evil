@@ -9,7 +9,7 @@ namespace Proto
     {
         public override Task<bool> Process()
         {
-            Program.Executor.ExecuteAsync(() => HeroMgr.I.Test());
+            Program.Executor.SubmitAsync(() => HeroMgr.I.Test());
             return TrueTask;
         }
     }

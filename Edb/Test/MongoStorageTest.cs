@@ -15,7 +15,7 @@ namespace Edb.Test
         }
         
         [Fact]
-        public async Task TestCore()
+        public void TestCore()
         {
             Init();
             var player = new Player()
@@ -23,24 +23,24 @@ namespace Edb.Test
                 PlayerId = 1,
                 PlayerName = "Alice"
             };
-            await m_Storage.RemoveAsync(player.PlayerId);
-            Assert.False(await m_Storage.ExistsAsync(player.PlayerId));
-            var pb1 = await m_Storage.FindAsync(player.PlayerId);
+            m_Storage.Remove(player.PlayerId);
+            Assert.False(m_Storage.Exists(player.PlayerId));
+            var pb1 = m_Storage.Find(player.PlayerId);
             Assert.Null(pb1);
             var doc = player.ToBsonDocument();
-            var ok1 = await m_Storage.InsertAsync(doc);
+            var ok1 = m_Storage.Insert(doc);
             Assert.True(ok1);
-            Assert.True(await m_Storage.ExistsAsync(player.PlayerId));
-            var ok2 = await m_Storage.InsertAsync(doc);
+            Assert.True(m_Storage.Exists(player.PlayerId));
+            var ok2 = m_Storage.Insert(doc);
             Assert.False(ok2);
-            var pb2 = await m_Storage.FindAsync(player.PlayerId);
+            var pb2 = m_Storage.Find(player.PlayerId);
             var p = BsonSerializer.Deserialize<Player>((BsonDocument)pb2!);
             Assert.Equal(player.PlayerId, p.PlayerId);
             Assert.Equal(player.PlayerName, p.PlayerName);
         }
 
         [Fact]
-        public async Task TestWalk()
+        public void TestWalk()
         {
             Init();
             var player1 = new Player()
@@ -53,14 +53,14 @@ namespace Edb.Test
                 PlayerId = 2,
                 PlayerName = "Bob"
             };
-            await m_Storage.RemoveAsync(player1.PlayerId);
-            await m_Storage.RemoveAsync(player2.PlayerId);
+            m_Storage.Remove(player1.PlayerId);
+            m_Storage.Remove(player2.PlayerId);
             var doc1 = player1.ToBsonDocument();
-            await m_Storage.InsertAsync(doc1);
+            m_Storage.Insert(doc1);
             var doc2 = player2.ToBsonDocument();
-            await m_Storage.InsertAsync(doc2);
+            m_Storage.Insert(doc2);
             List<Player> players = new();
-            await m_Storage.WalkAsync((doc) =>
+            m_Storage.Walk((doc) =>
             {
                 var player = BsonSerializer.Deserialize<Player>(doc);
                 players.Add(player);

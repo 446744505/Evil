@@ -28,7 +28,7 @@ namespace Map
                 
                 Etcd.I.Dispose();
                 provide.Dispose();
-                await Edb.Edb.I.DisposeAsync();
+                await Edb.Edb.I.Dispose();
             }
             finally
             {

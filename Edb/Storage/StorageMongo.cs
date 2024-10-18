@@ -18,14 +18,14 @@ namespace Edb
             m_Collection = logger.Database.GetCollection<BsonDocument>(tableName);
         }
 
-        public async Task<bool> InsertAsync(BsonDocument value)
+        public bool Insert(BsonDocument value)
         {
             try
             {
                 if (m_Transaction)
-                    await m_Collection.InsertOneAsync(m_Logger.Session, value);
+                    m_Collection.InsertOne(m_Logger.Session, value);
                 else
-                    await m_Collection.InsertOneAsync(value);
+                    m_Collection.InsertOne(value);
             }
             catch (Exception)
             {
@@ -35,15 +35,15 @@ namespace Edb
             return true;
         }
 
-        public async Task ReplaceAsync(TKey key, BsonDocument value)
+        public void Replace(TKey key, BsonDocument value)
         {
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
                 if (m_Transaction)
-                    await m_Collection.ReplaceOneAsync(m_Logger.Session, filter, value);
+                    m_Collection.ReplaceOne(m_Logger.Session, filter, value);
                 else
-                    await m_Collection.ReplaceOneAsync(filter, value);
+                    m_Collection.ReplaceOne(filter, value);
             }
             catch (Exception e)
             {
@@ -51,12 +51,12 @@ namespace Edb
             }
         }
 
-        public async Task<BsonDocument?> FindAsync(TKey key)
+        public BsonDocument? Find(TKey key)
         {
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
-                return await m_Collection.Find(filter).FirstOrDefaultAsync();
+                return m_Collection.Find(filter).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -64,15 +64,15 @@ namespace Edb
             }
         }
 
-        public async Task RemoveAsync(TKey key)
+        public void Remove(TKey key)
         {
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
                 if (m_Transaction)
-                    await m_Collection.DeleteOneAsync(m_Logger.Session, filter);
+                    m_Collection.DeleteOne(m_Logger.Session, filter);
                 else
-                    await m_Collection.DeleteOneAsync(filter);
+                    m_Collection.DeleteOne(filter);
             }
             catch (Exception e)
             {
@@ -80,12 +80,12 @@ namespace Edb
             }
         }
 
-        public async Task<bool> ExistsAsync(TKey key)
+        public bool Exists(TKey key)
         {
             try
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
-                return await m_Collection.Find(filter).AnyAsync();
+                return m_Collection.Find(filter).Any();
             }
             catch (Exception e)
             {
@@ -93,12 +93,12 @@ namespace Edb
             }
         }
 
-        public async Task WalkAsync(Action<BsonDocument> walker)
+        public void Walk(Action<BsonDocument> walker)
         {
             try
             {
-                var cursor = await m_Collection.FindAsync(FilterDefinition<BsonDocument>.Empty);
-                while (await cursor.MoveNextAsync())
+                var cursor = m_Collection.FindAsync(FilterDefinition<BsonDocument>.Empty).Result;
+                while (cursor.MoveNext())
                 {
                     foreach (var doc in cursor.Current)
                     {

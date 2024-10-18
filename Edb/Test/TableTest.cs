@@ -7,17 +7,17 @@ namespace Edb.Test
 {
     public class TableTest
     {
-        private async Task Init()
+        private void Init()
         {
             var tables = new List<BaseTable>();
             tables.Add(new TPlayer());
-            await Edb.I.Start(new Config(), tables);
+            Edb.I.Start(new Config(), tables);
         }
         
         [Fact]
         public async Task TestAdd()
         {
-            await Init();
+            Init();
 
             var table = Edb.I.Tables.Get<long, Player>("Player");
             var player = new Player()
@@ -26,29 +26,29 @@ namespace Edb.Test
                 PlayerName = "Alice"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit(() =>
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
+                tp.Delete(player.PlayerId);
+                Assert.Null(tp.Select(player.PlayerId));
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ok = await tp.Insert(player);
+                var ok = tp.Insert(player);
                 Assert.True(ok);
-                var p = await tp.Select(player.PlayerId);
+                var p = tp.Select(player.PlayerId);
                 Assert.NotNull(p);
                 Assert.Equal(player.PlayerId, p.PlayerId);
                 Assert.Equal(player.PlayerName, p.PlayerName);
                 return true;
             });
-            await Edb.I.DisposeAsync();
+            Edb.I.Dispose();
         }
         
         [Fact]
         public async Task TestUpdate()
         {
-            await Init();
+            Init();
 
             var table = Edb.I.Tables.Get<long, Player>("Player");
             var player = new Player()
@@ -57,33 +57,33 @@ namespace Edb.Test
                 PlayerName = "Alice"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit(() =>
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
+                tp.Delete(player.PlayerId);
+                Assert.Null(tp.Select(player.PlayerId));
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ok = await tp.Insert(player);
+                var ok = tp.Insert(player);
                 Assert.True(ok);
-                var up = await tp.Update(player.PlayerId);
+                var up = tp.Update(player.PlayerId);
                 Assert.NotNull(up);
                 up.PlayerName = "Bob";
-                var p = await tp.Select(player.PlayerId);
+                var p = tp.Select(player.PlayerId);
                 Assert.NotNull(p);
                 Assert.Equal(player.PlayerId, p.PlayerId);
                 Assert.Equal("Bob", p.PlayerName);
                 
                 return true;
             });
-            await Edb.I.DisposeAsync();
+            Edb.I.Dispose();
         }
         
         [Fact]
         public async Task TestCallback()
         {
-            await Init();
+            Init();
 
             var table = Edb.I.Tables.Get<long, Player>("Player");
             var player = new Player()
@@ -92,30 +92,30 @@ namespace Edb.Test
                 PlayerName = "Alice"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit(() =>
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
+                tp.Delete(player.PlayerId);
+                Assert.Null(tp.Select(player.PlayerId));
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ok = await tp.Insert(player);
+                var ok = tp.Insert(player);
                 Assert.True(ok);
-                var p = await tp.Select(player.PlayerId);
+                var p = tp.Select(player.PlayerId);
                 Assert.NotNull(p);
                 Assert.Equal(player.PlayerId, p.PlayerId);
                 Assert.Equal("Alice", p.PlayerName);
                 
                 return false;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p = await tp.Select(player.PlayerId);
+                var p = tp.Select(player.PlayerId);
                 Assert.Null(p);
                 return true;
             });
-            await Edb.I.DisposeAsync();
+            Edb.I.Dispose();
         }
         
         public class Player
@@ -159,24 +159,24 @@ namespace Edb.Test
                 return BsonSerializer.Deserialize<Player>(value);
             }
             
-            public async Task<Player?> Select(long key)
+            public Player? Select(long key)
             {
-                return await GetAsync(key, false);
+                return Get(key, false);
             }
             
-            public async Task<bool> Insert(Player player)
+            public bool Insert(Player player)
             {
-                return await AddAsync(player.PlayerId, player);
+                return Add(player.PlayerId, player);
             }
             
-            public async Task<bool> Delete(long key)
+            public bool Delete(long key)
             {
-                return await RemoveAsync(key);
+                return Remove(key);
             }
             
-            public async Task<Player?> Update(long key)
+            public Player? Update(long key)
             {
-                return await GetAsync(key, true);
+                return Get(key, true);
             }
         }
     }

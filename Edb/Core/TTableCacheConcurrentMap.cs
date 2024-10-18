@@ -6,7 +6,7 @@ namespace Edb
         where TKey : notnull where TValue : class
     {
         private readonly ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Cache = new();
-        private Func<Task> m_CleanWorker = null!;
+        private Action m_CleanWorker = null!;
         private bool m_Cleaning;
 
         internal override int Count => m_Cache.Count;
@@ -14,11 +14,11 @@ namespace Edb
         internal override void Initialize(TTable<TKey, TValue> table, TableConfig config)
         {
             base.Initialize(table, config);
-            m_CleanWorker = async () =>
+            m_CleanWorker = () =>
             {
                 if (SetCleaning())
                 {
-                    await CleanNow();
+                    CleanNow();
                     ResetCleaning();
                 }
             };
@@ -49,7 +49,7 @@ namespace Edb
             }
         }
 
-        private async Task CleanNow()
+        private void CleanNow()
         {
             if (m_Capacity <= 0)
                 return;
@@ -69,18 +69,17 @@ namespace Edb
                 }
                 if (ar.m_AccessTime != ar.m_Record.LastAccessTime)
                     continue;
-                var removed = await TryRemoveRecord(ar.m_Record);
+                var removed = TryRemoveRecord(ar.m_Record);
                 if (removed)
                     clenaN--;
             }
         }
 
-        public override Task Clear()
+        public override void Clear()
         {
             if (m_Table.PersistenceType != ITable.Persistence.Memory)
                 throw new NotSupportedException();
             m_Cache.Clear();
-            return Task.CompletedTask;
         }
 
         public override void Clean()
@@ -88,9 +87,9 @@ namespace Edb
             m_CleanWorker();
         }
 
-        public override Task Walk(Query<TKey, TValue> query)
+        public override void Walk(Query<TKey, TValue> query)
         {
-            return Walk0(m_Cache.Values, query);
+            Walk0(m_Cache.Values, query);
         }
 
         internal override ICollection<TRecord<TKey, TValue>> Values()

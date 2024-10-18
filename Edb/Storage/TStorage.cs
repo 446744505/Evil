@@ -9,7 +9,7 @@ namespace Edb
         where TKey : notnull where TValue : class
     {
         private readonly TTable<TKey, TValue> m_Table;
-        private readonly LockAsync m_SnapshotLock = new();
+        private readonly LockX m_SnapshotLock = new();
         private readonly ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Changed = new();
         private ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Marshal = new();
         private ConcurrentDictionary<TKey, TRecord<TKey, TValue>> m_Snapshot = new();
@@ -58,13 +58,13 @@ namespace Edb
             return !m_Changed.ContainsKey(key) && !m_Marshal.ContainsKey(key);
         }
 
-        public async Task<long> MarshalN()
+        public long MarshalN()
         {
             long tryFail = 0;
             List<TKey> removeKeys = new();
             foreach (var r in m_Changed.Values)
             {
-                if (await r.TryMarshalN(() => m_Marshal[r.Key] = r))
+                if (r.TryMarshalN(() => m_Marshal[r.Key] = r))
                 {
                     removeKeys.Add(r.Key);
                 }
@@ -110,21 +110,21 @@ namespace Edb
             return snapshot;
         }
 
-        public async Task<long> FlushAsync()
+        public long FlushAsync()
         {
             var flushed = m_Snapshot.Count;
             foreach (var r in m_Snapshot.Values)
             {
-                await r.FlushAsync(this);
+                r.FlushAsync(this);
             }
             m_CountFlush += flushed;
             return flushed;
         }
 
-        public async Task Cleanup()
+        public void Cleanup()
         {
             ConcurrentDictionary<TKey, TRecord<TKey, TValue>> tmp;
-            var release = await m_SnapshotLock.WLockAsync();
+            m_SnapshotLock.WLock();
             try
             {
                 tmp = m_Snapshot;
@@ -132,7 +132,7 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.WUnlock(release);
+                m_SnapshotLock.WUnlock();
             }
             foreach (var r in tmp.Values)
             {
@@ -140,10 +140,10 @@ namespace Edb
             }
         }
 
-        internal async Task<TValue?> Find(TKey key, TTable<TKey, TValue> table)
+        internal TValue? Find(TKey key, TTable<TKey, TValue> table)
         {
             BsonDocument? value;
-            var release = await m_SnapshotLock.RLockAsync();
+            m_SnapshotLock.RLock();
             try
             {
                 if (m_Snapshot.TryGetValue(key, out var r))
@@ -159,12 +159,12 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.RUnlock(release);
+                m_SnapshotLock.RUnlock();
             }
 
             if (value == null)
             {
-                var value0 = await Engine.FindAsync(key);
+                var value0 = Engine.Find(key);
                 if (value0 == null)
                     return null;
                 value = value0;
@@ -172,9 +172,9 @@ namespace Edb
             return m_Table.UnmarshalValue(value);
         }
 
-        internal async Task<bool> Exist(TKey key, TTable<TKey, TValue> table)
+        internal bool Exist(TKey key, TTable<TKey, TValue> table)
         {
-            var release = await m_SnapshotLock.RLockAsync();
+            m_SnapshotLock.RLock();
             try
             {
                 if (m_Snapshot.TryGetValue(key, out var r))
@@ -184,9 +184,9 @@ namespace Edb
             }
             finally
             {
-                m_SnapshotLock.RUnlock(release);
+                m_SnapshotLock.RUnlock();
             }
-            return await Engine.ExistsAsync(key);
+            return Engine.Exists(key);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Edb
     {
         private TableConfig m_Config = null!;
         private readonly ListenerMap m_ListenerMap = new();
-        private readonly AsyncLocal<LogRecord<TKey, TValue>?> m_LogRecord = new();
+        private readonly ThreadLocal<LogRecord<TKey, TValue>?> m_LogRecord = new();
 
         internal TStorage<TKey, TValue>? Storage { get; set; }
         internal TTableCache<TKey, TValue> Cache { get; set; } = null!;
@@ -52,11 +52,11 @@ namespace Edb
             return m_ListenerMap.Add(name, l);
         }
 
-        public override async Task LogNotify()
+        public override void LogNotify()
         {
             try
             {
-                await LogRecord.LogNotify(m_ListenerMap);
+                LogRecord.LogNotify(m_ListenerMap);
             } catch (Exception e)
             {
                 m_LogRecord.Value = null;

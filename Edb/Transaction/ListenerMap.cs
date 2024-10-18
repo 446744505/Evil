@@ -5,7 +5,7 @@ namespace Edb
     public class ListenerMap
     {
         private readonly Dictionary<string, HashSet<IListener>?> m_Listeners = new();
-        private readonly LockAsync m_Lock = new();
+        private readonly LockX m_Lock = new();
         private volatile Dictionary<string, HashSet<IListener>?> m_ListenersCopy = new();
         
         private void SetListenersCopy()
@@ -19,14 +19,14 @@ namespace Edb
         
         internal Action Add(string name, IListener listener)
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 m_Listeners.ComputeIfAbsent(name, _ => new HashSet<IListener>())!.Add(listener);
                 SetListenersCopy();
                 return () =>
                 {
-                    var r = m_Lock.WLock();
+                    m_Lock.WLock();
                     try
                     {
                         m_Listeners.ComputeIfPresent(name, (k, v) =>
@@ -37,12 +37,12 @@ namespace Edb
                         });
                     } finally
                     {
-                        m_Lock.WUnlock(r);
+                        m_Lock.WUnlock();
                     }
                 };
             } finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
@@ -58,22 +58,22 @@ namespace Edb
             return localCopy.ContainsKey(fullVarName);
         }
 
-        internal async Task NotifyChanged(string fullVarName, object key, object value)
+        internal void NotifyChanged(string fullVarName, object key, object value)
         {
-            await Notify(ChangeKind.ChangedAll, fullVarName, key, value, null);
+            Notify(ChangeKind.ChangedAll, fullVarName, key, value, null);
         }
         
-        internal async Task NotifyChanged(string fullVarName, object key, object value, INote? note)
+        internal void NotifyChanged(string fullVarName, object key, object value, INote? note)
         {
-            await Notify(ChangeKind.ChangedNote, fullVarName, key, value, note);
+            Notify(ChangeKind.ChangedNote, fullVarName, key, value, note);
         }
         
-        internal async Task NotifyRemoved(string fullVarName, object key, object value)
+        internal void NotifyRemoved(string fullVarName, object key, object value)
         {
-            await Notify(ChangeKind.Removed, fullVarName, key, value, null);
+            Notify(ChangeKind.Removed, fullVarName, key, value, null);
         }
 
-        private async Task Notify(ChangeKind kind, string fullVarName, object key, object value, INote? note)
+        private void Notify(ChangeKind kind, string fullVarName, object key, object value, INote? note)
         {
             var localCopy = m_ListenersCopy;
             if (!localCopy.TryGetValue(fullVarName, out var listeners))
@@ -89,13 +89,13 @@ namespace Edb
                     switch (kind)
                     {
                         case ChangeKind.ChangedAll:
-                            await l.OnChanged(key, value);
+                            l.OnChanged(key, value);
                             break;
                         case ChangeKind.ChangedNote:
-                            await l.OnChanged(key, value, fullVarName, note);
+                            l.OnChanged(key, value, fullVarName, note);
                             break;
                         case ChangeKind.Removed:
-                            await l.OnRemoved(key, value);
+                            l.OnRemoved(key, value);
                             break;
                     }
                 }

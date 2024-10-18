@@ -32,13 +32,13 @@ namespace Edb
                 _ => new LogR<TKey, TValue>(r, m_Seed.Copy())) : null;
         }
 
-        internal async Task LogNotify(ListenerMap listenerMap)
+        internal void LogNotify(ListenerMap listenerMap)
         {
             foreach (var pair in m_Changed)
             {
                 var k = pair.Key;
                 var lr = pair.Value;
-                await lr.m_Listenable.LogNotify<TKey, TValue>(k, lr.m_Record.Value!, lr.RecordState, listenerMap);
+                lr.m_Listenable.LogNotify<TKey, TValue>(k, lr.m_Record.Value!, lr.RecordState, listenerMap);
                 m_Changed.Clear();
                 m_HasListener = null;
             }

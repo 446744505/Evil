@@ -7,17 +7,17 @@ namespace Edb.Test
 {
     public class CacheTest
     {
-        private async Task Init()
+        private void Init()
         {
             var tables = new List<BaseTable>();
             tables.Add(new TPlayer());
-            await Edb.I.Start(new Config(), tables);
+            Edb.I.Start(new Config(), tables);
         }
         
         [Fact]
         public async Task Test()
         {
-            await Init();
+            Init();
 
             var table = Edb.I.Tables.Get<long, Player>("Player");
             var player1 = new Player()
@@ -31,18 +31,18 @@ namespace Edb.Test
                 PlayerName = "Bob"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit( () =>
             {
-                await tp.Insert(player1);
-                Assert.NotNull(await tp.Select(player1.PlayerId));
-                await tp.Insert(player2);
-                Assert.NotNull(await tp.Select(player2.PlayerId));
+                tp.Insert(player1);
+                Assert.NotNull(tp.Select(player1.PlayerId));
+                tp.Insert(player2);
+                Assert.NotNull(tp.Select(player2.PlayerId));
                 return true;
             });
-            await Procedure.Submit( async () =>
+            await Procedure.Submit( () =>
             {
                 tp.Cache.Clean();
-                Assert.Null(await tp.Select(player1.PlayerId));
+                Assert.Null(tp.Select(player1.PlayerId));
                 return true;
             });
         }
@@ -85,24 +85,24 @@ namespace Edb.Test
                 return BsonSerializer.Deserialize<Player>(value);
             }
             
-            public async Task<Player?> Select(long key)
+            public Player? Select(long key)
             {
-                return await GetAsync(key, false);
+                return Get(key, false);
             }
             
-            public async Task<bool> Insert(Player player)
+            public bool Insert(Player player)
             {
-                return await AddAsync(player.PlayerId, player);
+                return Add(player.PlayerId, player);
             }
             
             public async Task<bool> Delete(long key)
             {
-                return await RemoveAsync(key);
+                return Remove(key);
             }
             
-            public async Task<Player?> Update(long key)
+            public Player Update(long key)
             {
-                return await GetAsync(key, true);
+                return Get(key, true);
             }
         }
     }

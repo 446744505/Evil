@@ -17,15 +17,15 @@ namespace Edb
             {
                 m_Procedure = procedure;
                 m_Done = done;
+                Launch();
             }
 
-            public async Task Launch()
+            private void Launch()
             {
                 Interlocked.CompareExchange(ref m_CompletionSource, new TaskCompletionSource<IProcedure.IResult>(),
                     null);
-               
-                // 用edb的任务接口执行，保证任务不会丢失
-                await Edb.I.Executor.ExecuteAsync(Start);
+                
+                Edb.I.Executor.Execute(Start);
             }
 
             private void Done()
@@ -43,13 +43,13 @@ namespace Edb
                 }
             }
 
-            private async Task Start()
+            private void Start()
             {
                 try
                 {
                     try
                     {
-                        await Transaction.Create().Perform(m_Procedure);
+                        Transaction.Create().Perform(m_Procedure);
                     }
                     finally
                     {

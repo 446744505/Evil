@@ -22,24 +22,24 @@ namespace Edb
         {
         }
 
-        public async Task BeforeFlush()
+        public void BeforeFlush()
         {
             if (!m_Transaction)
                 return;
             
-            Session = await m_Client.StartSessionAsync();
+            Session = m_Client.StartSession();
             Session.StartTransaction();
         }
         
-        public async Task AfterFlush(bool success)
+        public void AfterFlush(bool success)
         {
             if (!m_Transaction)
                 return;
             
             if (success)
-                await Session!.CommitTransactionAsync();
+                Session!.CommitTransaction();
             else
-                await Session!.AbortTransactionAsync();
+                Session!.AbortTransaction();
             
             Session.Dispose();
             Session = null;

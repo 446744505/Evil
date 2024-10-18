@@ -13,7 +13,7 @@ namespace Edb
         public virtual string Name => null!;
         public virtual TableConfig Config { get; set; } = null!;
         public virtual ITable.Persistence PersistenceType => ITable.Persistence.Db;
-        public abstract Task LogNotify();
+        public abstract void LogNotify();
         internal abstract IStorage? Open(TableConfig config, ILoggerEngine logger);
         public abstract void Dispose();
     }

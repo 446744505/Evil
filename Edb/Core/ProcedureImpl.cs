@@ -34,14 +34,14 @@ namespace Edb
             IsolationLevel = Transaction.IsolationLevel;
         }
 
-        internal async Task<bool> Call()
+        internal bool Call()
         {
             var savepoint = Transaction.Savepoint();
             try
             {
                 if (m_Process is Procedure procedure)
                 {
-                    if (await procedure.Process())
+                    if (procedure.Process())
                     {
                         m_Exception = null;
                         m_Success = true;
@@ -69,7 +69,7 @@ namespace Edb
             return false;
         }
 
-        internal static async Task<IProcedure.IResult> Call(TP p)
+        internal static IProcedure.IResult Call(TP p)
         {
             var impl = new ProcedureImpl<TP>(p);
             if (Transaction.Current == null)
@@ -79,7 +79,7 @@ namespace Edb
                     Transaction.Create();
                     for (var retry = 0;;)
                     {
-                        if (await Perform(impl))
+                        if (Perform(impl))
                             break;
                         retry++;
                         if (retry > impl.RetryTimes)
@@ -87,7 +87,7 @@ namespace Edb
                         if (retry == impl.RetryTimes && impl.RetrySerial)
                             impl.IsolationLevel = IsolationLevel.Level3;
 
-                        await Task.Delay(impl.CalcDelay());
+                        Task.Delay(impl.CalcDelay()).Wait();
                     }
                 }
                 finally
@@ -97,7 +97,7 @@ namespace Edb
             }
             else
             {
-                await impl.Call();
+                impl.Call();
             }
 
             return impl.Result;
@@ -107,24 +107,12 @@ namespace Edb
         {
             if (Transaction.Current != null)
                 throw new ThreadStateException("can not submit procedure in transaction");
-            var pt = new ProcedureTask(new ProcedureImpl<TP>(p));
-            pt.Launch().ContinueWith(task =>
-            {
-                if (task.IsFaulted)
-                    Log.I.Error(task.Exception);
-            
-            });
-            return pt.PTask;
+            return new ProcedureTask(new ProcedureImpl<TP>(p)).PTask;
         }
 
         internal static void Execute(TP p, Action<TP,IProcedure.IResult>? done)
         {
-            new ProcedureTask(new ProcedureImpl<TP>(p), done).Launch().ContinueWith(task =>
-            {
-                if (task.IsFaulted)
-                    Log.I.Error(task.Exception);
-            
-            });
+            var _ = new ProcedureTask(new ProcedureImpl<TP>(p), done);
         }
 
         internal int CalcDelay()
@@ -132,11 +120,11 @@ namespace Edb
             return Edb.I.Random.Next(RetryDelay>>1, RetryDelay<<1);
         }
 
-        private static async Task<bool> Perform(ProcedureImpl<TP> p)
+        private static bool Perform(ProcedureImpl<TP> p)
         {
             try
             {
-                await Transaction.Current!.Perform(p);
+                Transaction.Current!.Perform(p);
             }
             catch (LockTimeoutException)
             {

@@ -40,7 +40,7 @@ namespace Game
             // }
 
             await new TransactionTest().TestWhenCommit();
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
     }
 }

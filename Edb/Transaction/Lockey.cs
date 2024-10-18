@@ -8,7 +8,7 @@ namespace Edb
         private readonly int m_Index;
         private readonly object m_Key;
         private readonly int m_HashCode;
-        private volatile LockAsync m_RWLock = null!;
+        private volatile LockX m_RWLock = null!;
         
         internal object Key => m_Key;
         
@@ -21,43 +21,43 @@ namespace Edb
 
         internal Lockey Alloc()
         {
-            m_RWLock = new LockAsync();
+            m_RWLock = new LockX();
             return this;
         }
         
-        internal async Task<IDisposable?> RTryLock()
+        internal bool RTryLock()
         {
-            return await m_RWLock.RTryLockAsync();
+            return m_RWLock.RTryLock();
         }
         
-        internal async Task<IDisposable> RLock(int timeoutMills)
+        internal void RLock(int timeoutMills)
         {
-            return await m_RWLock.RLockAsync(timeoutMills);
+            m_RWLock.RLock(timeoutMills);
         }
         
-        internal async Task<IDisposable> RLock()
+        internal void RLock()
         {
-            return await m_RWLock.RLockAsync();
+            m_RWLock.RLock();
         }
         
-        internal void RUnlock(IDisposable release)
+        internal void RUnlock()
         {
-            m_RWLock.RUnlock(release);
+            m_RWLock.RUnlock();
         }
 
-        internal async Task<IDisposable?> WTryLock()
+        internal bool WTryLock()
         {
-            return await m_RWLock.WTryLockAsync();
+            return m_RWLock.WTryLock();
         }
         
-        internal async Task<IDisposable> WLock(int timeoutMills)
+        internal void WLock(int timeoutMills)
         {
-            return await m_RWLock.WLockAsync(timeoutMills);
+            m_RWLock.WLock(timeoutMills);
         }
 
-        internal void WUnlock(IDisposable release)
+        internal void WUnlock()
         {
-            m_RWLock.WUnlock(release);
+            m_RWLock.WUnlock();
         }
         
         public int CompareTo(Lockey? other)

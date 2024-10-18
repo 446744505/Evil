@@ -31,12 +31,12 @@ namespace Edb
             m_RemoveHandler = handler;
         }
 
-        internal async Task Walk0(ICollection<TRecord<TKey, TValue>> records, Query<TKey, TValue> query)
+        internal void Walk0(ICollection<TRecord<TKey, TValue>> records, Query<TKey, TValue> query)
         {
             foreach (var r in records)
             {
                 var lock0 = r.Lockey;
-                var release = await lock0.RLock();
+                lock0.RLock();
                 try 
                 {
                     var value = r.Value;
@@ -47,7 +47,7 @@ namespace Edb
                 }
                 finally
                 {
-                    lock0.RUnlock(release);
+                    lock0.RUnlock();
                 }
             }
         }
@@ -57,11 +57,11 @@ namespace Edb
             Transaction.CurrentSavepoint.Add(r.CreateLogKey(), new LogAddRemove0(this, key, r));
         }
 
-        internal async Task<bool> TryRemoveRecord(TRecord<TKey, TValue> r)
+        internal bool TryRemoveRecord(TRecord<TKey, TValue> r)
         {
             var lock0 = r.Lockey;
-            var release = await lock0.WTryLock();
-            if (release == null)
+            
+            if (!lock0.WTryLock())
                 return false;
             try
             {
@@ -72,7 +72,7 @@ namespace Edb
                    Remove(key);
                    if (m_RemoveHandler != null)
                    {
-                       _ = Edb.I.Executor.ExecuteAsync(() => m_RemoveHandler.OnRemoved(key, r.Value!));
+                       Edb.I.Executor.Execute(() => m_RemoveHandler.OnRemoved(key, r.Value!));
                    }
 
                    return true;
@@ -88,13 +88,13 @@ namespace Edb
             }
             finally
             {
-                lock0.WUnlock(release);
+                lock0.WUnlock();
             }
         }
 
-        public abstract Task Clear();
+        public abstract void Clear();
         public abstract void Clean();
-        public abstract Task Walk(Query<TKey, TValue> query);
+        public abstract void Walk(Query<TKey, TValue> query);
         internal abstract ICollection<TRecord<TKey, TValue>> Values();
         internal abstract TRecord<TKey, TValue>? Get(TKey key);
         internal abstract void AddNoLog(TKey key, TRecord<TKey, TValue> r);

@@ -10,7 +10,7 @@ namespace Edb
         private long m_NextMarshalTime;
         private long m_NextCheckpointTime;
         private volatile bool m_CheckpointNow;
-        private readonly LockAsync m_CheckpointLock = new();
+        
         private readonly Elapse m_Elapse = new();
 
         #region Mertics
@@ -40,63 +40,57 @@ namespace Edb
             Edb.I.Executor.Tick(() => Checkpoint0(Time.Now, Edb.I.Config), 0, m_SchedPeriod);
         }
 
-        public async Task CheckpointNow()
+        public void CheckpointNow()
         {
             m_CheckpointNow = true;
             // 用edb的任务接口执行，保证任务不会丢失
-            await Edb.I.Executor.ExecuteAsync(() => Checkpoint0(Time.Now, Edb.I.Config));
+            Edb.I.Executor.Execute(() => Checkpoint0(Time.Now, Edb.I.Config));
         }
         
-        private async Task Checkpoint0(long now, Config config)
+        private void Checkpoint0(long now, Config config)
         {
-            var release = await m_CheckpointLock.WLockAsync();
-            try
+            lock (this)
             {
-                if (config.MarshalPeriod >= 0 && m_NextMarshalTime <= now)
+                try
                 {
-                    m_NextMarshalTime = now + config.MarshalPeriod;
-                    var start = Time.Now;
-                    long countMarshalN = 0;
-                    foreach (var storage in m_Tables.Storages)
+                    if (config.MarshalPeriod >= 0 && m_NextMarshalTime <= now)
                     {
-                        countMarshalN += await storage.MarshalN();
+                        m_NextMarshalTime = now + config.MarshalPeriod;
+                        var start = Time.Now;
+                        long countMarshalN = 0;
+                        foreach (var storage in m_Tables.Storages)
+                        {
+                            countMarshalN += storage.MarshalN();
+                        }
+                        Interlocked.Add(ref m_MarshalNCount, countMarshalN);
+                        Interlocked.Add(ref m_MarshalNTotalTime, Time.Now - start);
+                        Log.I.Info($"marshalN=*/{countMarshalN}");
                     }
-                    Interlocked.Add(ref m_MarshalNCount, countMarshalN);
-                    Interlocked.Add(ref m_MarshalNTotalTime, Time.Now - start);
-                    Log.I.Info($"marshalN=*/{countMarshalN}");
+                    var checkpointPeriod = config.CheckpointPeriod;
+                    if (checkpointPeriod >= 0 && (m_CheckpointNow || m_NextCheckpointTime <= now))
+                    {
+                        m_CheckpointNow = false;
+                        m_NextCheckpointTime = now + checkpointPeriod;
+                        Checkpoint0(config);
+                    }
                 }
-                var checkpointPeriod = config.CheckpointPeriod;
-                if (checkpointPeriod >= 0 && (m_CheckpointNow || m_NextCheckpointTime <= now))
+                catch (Exception e)
                 {
-                    m_CheckpointNow = false;
-                    m_NextCheckpointTime = now + checkpointPeriod;
-                    await Checkpoint0(config, true);
-                }
-            }
-            catch (Exception e)
-            {
-                Log.I.Fatal(e);
-                Environment.Exit(-1);
-            }
-            finally
-            {
-                m_CheckpointLock.WUnlock(release);
+                    Log.I.Fatal(e);
+                    Environment.Exit(-1);
+                }   
             }
         }
 
-        private async Task Checkpoint0(Config config, bool locked)
+        private void Checkpoint0(Config config)
         {
-            Log.I.Info("--------------- begin checkpoint ---------------");
-            var storages = m_Tables.Storages;
-            if (config.MarshalN < 1)
-                Log.I.Warn("marshalN disabled");
-
-            IDisposable? checkRelease = null;
-            if (!locked)
-                checkRelease = await m_CheckpointLock.WLockAsync();
-            
-            try
+            lock (this)
             {
+                Log.I.Info("--------------- begin checkpoint ---------------");
+                var storages = m_Tables.Storages;
+                if (config.MarshalN < 1)
+                    Log.I.Warn("marshalN disabled");
+            
                 // marshalN
                 m_Elapse.Reset();
                 for (var i = 1; i <= config.MarshalN; i++)
@@ -104,7 +98,7 @@ namespace Edb
                     long countMarshalN = 0;
                     foreach (var storage in storages)
                     {
-                        countMarshalN += await storage.MarshalN();
+                        countMarshalN += storage.MarshalN();
                     }
                     Interlocked.Add(ref m_MarshalNCount, countMarshalN);
                     Log.I.Info($"marshalN={i}/{countMarshalN}");
@@ -114,7 +108,7 @@ namespace Edb
                 // marshal0 + snapshot
                 long countSnapshot = 0;
                 long countMarshal0 = 0;
-                var flushRelease = await m_Tables.FlushLock.WLockAsync();
+                m_Tables.FlushLock.WLock();
                 m_Elapse.Reset();
                 try
                 {
@@ -126,7 +120,7 @@ namespace Edb
                 }
                 finally
                 {
-                    m_Tables.FlushLock.WUnlock(flushRelease);
+                    m_Tables.FlushLock.WUnlock();
                 }
                 var snapshotTime = m_Elapse.ElapsedAndReset();
                 if (snapshotTime > config.SnapshotFatalTime)
@@ -141,21 +135,21 @@ namespace Edb
                 while (true)
                 {
                     var success = false;
-                    await m_Tables.Logger!.BeforeFlush();
+                    m_Tables.Logger!.BeforeFlush();
                     try
                     {
                         foreach (var storage in storages)
-                            countFlush += await storage.FlushAsync();
+                            countFlush += storage.FlushAsync();
                         success = true;
                         if (countFlush > 0)
                         {
-                            await m_Tables.Logger!.AfterFlush(success);
+                            m_Tables.Logger!.AfterFlush(success);
                             foreach (var storage in storages)
-                                await storage.Cleanup();
+                                storage.Cleanup();
                         }
                     } finally
                     {
-                        await m_Tables.Logger!.AfterFlush(success);
+                        m_Tables.Logger!.AfterFlush(success);
                     }
 
                     break;
@@ -173,17 +167,12 @@ namespace Edb
                 Interlocked.Increment(ref m_CheckpointCount);
                 Log.I.Info("--------------- end checkpoint ---------------");
             }
-            finally
-            {
-                if (checkRelease != null)
-                    m_CheckpointLock.WUnlock(checkRelease);
-            }
         }
 
-        internal async Task Cleanup()
+        internal void Cleanup()
         {
             Log.I.Info("final checkpoint begin");
-            await Checkpoint0(Edb.I.Config, false);
+            Checkpoint0(Edb.I.Config);
             Log.I.Info("final checkpoint end");
         }
     }

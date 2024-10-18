@@ -21,26 +21,26 @@ namespace Edb
             return null;
         }
 
-        internal async Task RAddLockey(Lockey lockey)
+        internal void RAddLockey(Lockey lockey)
         {
             if (m_Locks.ContainsKey(lockey))
                 return;
-            var release = await lockey.RLock(Edb.I.Config.LockTimeoutMills);
-            m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Read, release);
+            lockey.RLock(Edb.I.Config.LockTimeoutMills);
+            m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Read);
         }
 
-        internal async Task WAddLockey(Lockey lockey)
+        internal void WAddLockey(Lockey lockey)
         {
             if (!m_Locks.TryGetValue(lockey, out var holder))
             {
-                var release = await lockey.WLock(Edb.I.Config.LockTimeoutMills);
-                m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Write, release);
+                lockey.WLock(Edb.I.Config.LockTimeoutMills);
+                m_Locks[lockey] = new LockeyHolder(lockey, LockeyHolderType.Write);
             } else if (holder.m_Type == LockeyHolderType.Read)
             {
-                holder.m_Lockey.RUnlock(holder.m_Release);
+                holder.m_Lockey.RUnlock();
                 try
                 {
-                    await holder.m_Lockey.WLock(Edb.I.Config.LockTimeoutMills);
+                    holder.m_Lockey.WLock(Edb.I.Config.LockTimeoutMills);
                 }
                 catch (LockTimeoutException)
                 {
@@ -62,21 +62,19 @@ namespace Edb
         {
             internal readonly Lockey m_Lockey;
             internal LockeyHolderType m_Type;
-            internal readonly IDisposable m_Release;
-            
-            internal LockeyHolder(Lockey lockey, LockeyHolderType type, IDisposable release)
+
+            internal LockeyHolder(Lockey lockey, LockeyHolderType type)
             {
                 m_Lockey = lockey;
                 m_Type = type;
-                m_Release = release;
             }
 
             internal void Cleanup()
             {
                 if (m_Type == LockeyHolderType.Write)
-                    m_Lockey.WUnlock(m_Release);
+                    m_Lockey.WUnlock();
                 else
-                    m_Lockey.RUnlock(m_Release);
+                    m_Lockey.RUnlock();
             }
 
             public int CompareTo(LockeyHolder? other)

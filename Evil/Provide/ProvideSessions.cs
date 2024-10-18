@@ -7,7 +7,7 @@ namespace Evil.Provide
     public class ProvideSessions
     {
         private readonly Provide m_Provide;
-        private readonly LockAsync m_Lock = new();
+        private readonly LockX m_Lock = new();
         private readonly List<ProvideSession> m_Sessions = new();
         /// <summary>
         /// 记录了当前节点到每个pvid发送消息的通道，用于保证消息顺序

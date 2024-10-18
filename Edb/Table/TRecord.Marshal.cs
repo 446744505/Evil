@@ -9,10 +9,9 @@ namespace Edb
         private BsonDocument? m_SnapshotValue;
         private State? m_SnapshotState;
 
-        internal async Task<bool> TryMarshalN(Action action)
+        internal bool TryMarshalN(Action action)
         {
-            var release = await m_Lockey.RTryLock();
-            if (release == null)
+            if (!m_Lockey.RTryLock())
                 return false;
 
             try
@@ -22,7 +21,7 @@ namespace Edb
             }
             finally
             {
-                m_Lockey.RUnlock(release);
+                m_Lockey.RUnlock();
             }
 
             return true;
@@ -72,20 +71,20 @@ namespace Edb
             }
         }
 
-        internal async Task<bool> FlushAsync(TStorage<TKey, TValue> storage)
+        internal bool FlushAsync(TStorage<TKey, TValue> storage)
         {
             switch (m_SnapshotState)
             {
                 case State.InDbAdd:
                 case State.InDbGet:
-                    await storage.Engine.ReplaceAsync(m_SnapshotKey!, m_SnapshotValue!);
+                    storage.Engine.Replace(m_SnapshotKey!, m_SnapshotValue!);
                     return true;
                 case State.Add:
-                    if (!await storage.Engine.InsertAsync(m_SnapshotValue!))
+                    if (!storage.Engine.Insert(m_SnapshotValue!))
                         throw new XError("insert fail");
                     return true;
                 case State.InDbRemove:
-                    await storage.Engine.RemoveAsync(m_SnapshotKey!);
+                    storage.Engine.Remove(m_SnapshotKey!);
                     return true;
                 case State.Remove:
                     break;

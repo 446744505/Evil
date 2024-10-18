@@ -18,9 +18,9 @@ namespace Edb
 
         #region Static
 
-        private static readonly AsyncLocal<Transaction?> ThreadLocal = new();
-        private static readonly AsyncLocal<bool> Isolation = new();
-        private static readonly LockAsync IsolationLock = new();
+        private static readonly ThreadLocal<Transaction?> ThreadLocal = new();
+        private static readonly ThreadLocal<bool> Isolation = new();
+        private static readonly LockX IsolationLock = new();
         internal static Transaction? Current => ThreadLocal.Value;
         public static IsolationLevel IsolationLevel => Isolation.Value ? IsolationLevel.Level3 : IsolationLevel.Level2;
         public static bool IsActive => Current != null;
@@ -93,25 +93,24 @@ namespace Edb
             m_LastCommitActions.Add(action);
         }
 
-        internal async Task Perform<TP>(ProcedureImpl<TP> p) where TP : IProcedure
+        internal void Perform<TP>(ProcedureImpl<TP> p) where TP : IProcedure
         {
-            IDisposable isolationRelease = null!;
             if (p.IsolationLevel == IsolationLevel.Level3)
-                isolationRelease = await IsolationLock.WLockAsync();
+                IsolationLock.WLock();
             else 
-                isolationRelease = await IsolationLock.RLockAsync();
+                IsolationLock.RLock();
             try
             {
                 Interlocked.Increment(ref TotalCount);
                 var flushLock = Edb.I.Tables.FlushLock;
-                var flushRelease = await flushLock.RLockAsync();
+                flushLock.RLock();
                 try
                 {
-                    if (await p.Call())
+                    if (p.Call())
                     {
                         if (_real_commit_(p.Name) > 0)
                         {
-                            await LogNotify(p);
+                            LogNotify(p);
                         }
                         m_LastCommitActions.ForEach(cb => cb());
                     }
@@ -130,7 +129,7 @@ namespace Edb
                 {
                     m_LastCommitActions.Clear();
                     Finish();
-                    flushLock.RUnlock(flushRelease);
+                    flushLock.RUnlock();
                 }
             }
             catch (Exception e)
@@ -144,9 +143,9 @@ namespace Edb
             finally
             {
                 if (p.IsolationLevel == IsolationLevel.Level3)
-                    IsolationLock.WUnlock(isolationRelease);
+                    IsolationLock.WUnlock();
                 else
-                    IsolationLock.RUnlock(isolationRelease);
+                    IsolationLock.RUnlock();
             }
         }
 
@@ -189,7 +188,7 @@ namespace Edb
             m_CachedTRecords.Clear();
         }
 
-        private async Task LogNotify<TP>(ProcedureImpl<TP> p) where TP : IProcedure
+        private void LogNotify<TP>(ProcedureImpl<TP> p) where TP : IProcedure
         {
             try
             {
@@ -200,7 +199,7 @@ namespace Edb
                     m_LogNotifyTables = new();
                     foreach (var table in curLogNotifyTables.Values)
                     {
-                        await table.LogNotify();
+                        table.LogNotify();
                     }
 
                     if (_real_commit_(p.Name) == 0)

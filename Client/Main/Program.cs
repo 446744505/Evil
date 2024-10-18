@@ -25,7 +25,7 @@ namespace Client
                 stopper = new Stopper().BindAndWait();
                 
                 connector.Dispose();
-                await Executor.DisposeAsync();
+                await Executor.Dispose();
             } finally
             {
                 stopper?.SignalWeakUp();

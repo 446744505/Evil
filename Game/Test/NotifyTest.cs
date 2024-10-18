@@ -67,7 +67,7 @@ namespace Game.Test
                 return true;
             });
 
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Game.Test
                 return true;
             });
 
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
 
         public class PlayerEventHandler : IEventHandler

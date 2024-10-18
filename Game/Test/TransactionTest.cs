@@ -65,7 +65,7 @@ namespace Game.Test
                 Assert.Equal(2, p1!.Level);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
         
         [Fact]
@@ -84,7 +84,7 @@ namespace Game.Test
                 Assert.Equal(1, p1!.Level);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Game.Test
                 Assert.Equal(2, h.Skills[1].CfgId);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
         
         [Fact]
@@ -139,7 +139,7 @@ namespace Game.Test
                 Assert.Equal(1, ph.Heroes[1].Star);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
 
         [Fact]
@@ -177,7 +177,7 @@ namespace Game.Test
                 Assert.Equal(1, ph!.Heroes.Count);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
 
         [Fact]
@@ -202,7 +202,7 @@ namespace Game.Test
                 Assert.Equal(2, ph.Heroes[2].Star);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
         
         [Fact]
@@ -228,7 +228,7 @@ namespace Game.Test
                 Assert.Equal(1, ph.Heroes[1].Star);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
         
         [Fact]
@@ -255,7 +255,7 @@ namespace Game.Test
                 Assert.Equal(1, ph!.Heroes[1].Star);
                 return true;
             });
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
 
         [Fact]
@@ -412,7 +412,7 @@ namespace Game.Test
                 return true;
             });
             await Task.WhenAll(t1, t2);
-            await Edb.Edb.I.DisposeAsync();
+            await Edb.Edb.I.Dispose();
         }
     }
 }

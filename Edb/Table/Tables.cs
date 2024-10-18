@@ -5,10 +5,10 @@ namespace Edb
     internal class Tables : IDisposable
     {
         private readonly Dictionary<string, BaseTable> m_Tables = new();
-        private readonly LockAsync m_FlushLock = new();
+        private readonly LockX m_FlushLock = new();
         private readonly List<IStorage> m_Storages = new();
         
-        internal LockAsync FlushLock => m_FlushLock;
+        internal LockX FlushLock => m_FlushLock;
         internal List<IStorage> Storages => m_Storages;
         internal ILoggerEngine? Logger { get; set; }
 

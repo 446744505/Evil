@@ -4,11 +4,11 @@ namespace Edb
 {
     public interface IStorageEngine<TKey> where TKey : notnull
     {
-        Task<bool> InsertAsync(BsonDocument value);
-        Task ReplaceAsync(TKey key, BsonDocument value);
-        Task<BsonDocument?> FindAsync(TKey key);
-        Task RemoveAsync(TKey key);
-        Task<bool> ExistsAsync(TKey key);
-        Task WalkAsync(Action<BsonDocument> walker);
+        bool Insert(BsonDocument value);
+        void Replace(TKey key, BsonDocument value);
+        BsonDocument? Find(TKey key);
+        void Remove(TKey key);
+        bool Exists(TKey key);
+        void Walk(Action<BsonDocument> walker);
     }
 }

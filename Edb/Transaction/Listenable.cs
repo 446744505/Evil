@@ -28,7 +28,7 @@ namespace Edb
             }
         }
 
-        internal abstract Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
+        internal abstract void LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
             where TKey : notnull where TValue : class;
         internal abstract Listenable Copy();
         internal abstract void SetChanged<TKey, TValue>(LogNotify ln) 
@@ -44,19 +44,19 @@ namespace Edb
                 m_VarName = varName;
             }
 
-            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
+            internal override void LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
             {
                 switch (rs)
                 {
                     case RecordState.Added:
-                        await listenerMap.NotifyChanged(m_VarName, key, value);
+                        listenerMap.NotifyChanged(m_VarName, key, value);
                         break;
                     case RecordState.Removed:
-                        await listenerMap.NotifyRemoved(m_VarName, key, value);
+                        listenerMap.NotifyRemoved(m_VarName, key, value);
                         break;
                     case RecordState.Changed:
                         if (m_Changed)
-                            await listenerMap.NotifyChanged(m_VarName, key, value, null);
+                            listenerMap.NotifyChanged(m_VarName, key, value, null);
                         break;
                 }
                 m_Changed = false;
