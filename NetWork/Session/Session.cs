@@ -1,5 +1,4 @@
 using System.Net;
-using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using Evil.Util;
 using NetWork.Transport;
