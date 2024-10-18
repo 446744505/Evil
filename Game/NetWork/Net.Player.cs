@@ -27,27 +27,27 @@ namespace Game.NetWork
             return ((GameClientContext)clientContext).PlayerId;
         }
         
-        public async Task<bool> AddPlayer(long playerId, GameClientContext clientContext)
+        public bool AddPlayer(long playerId, GameClientContext clientContext)
         {
             // 如果已经登录，要先踢掉
-            if (!await KickPlayer(playerId, ProvideKick.HadLogin))
+            if (!KickPlayer(playerId, ProvideKick.HadLogin))
             {
                 return false;
             }
             m_Players[playerId] = clientContext;
             Log.I.Info($"player {playerId} net online");
-            return (await Procedure.Call(new PLogicOnline(playerId))).IsSuccess;
+            return (Procedure.Call(new PLogicOnline(playerId))).IsSuccess;
         }
 
-        public async Task<bool> KickPlayer(long playerId, int reason)
+        public bool KickPlayer(long playerId, int reason)
         {
             if (m_Players.TryRemove(playerId, out var old))
             {
-                var suc = await LogicOffline(playerId);
+                var suc = LogicOffline(playerId);
                 if (!suc)
                     return false;
                 // 顶号
-                await old.Session.SendAsync(new ProvideKick
+                old.Session.Send(new ProvideKick
                 {
                     clientSessionId = old.ClientSessionId, 
                     code = reason,
@@ -71,10 +71,10 @@ namespace Game.NetWork
                 Log.I.Error($"net remove player but not found {playerId}");
             }
         }
-        public Task<bool> LogicOffline(long playerId)
+        public bool LogicOffline(long playerId)
         {
             Log.I.Info($"player {playerId} logic offline");
-            return Procedure.TrueTask;
+            return true;
         }
     }
 }

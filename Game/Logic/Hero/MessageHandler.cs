@@ -6,10 +6,10 @@ namespace Proto
 {
     public partial class ListHeroes
     {
-        public override async Task<PlayerHero> OnRequest()
+        public override PlayerHero OnRequest()
         {
             var playerId = Net.I.PlayerId(this);
-            var ph = await XTable.PlayerHero.Update(playerId);
+            var ph = XTable.PlayerHero.Update(playerId);
             if (ph == null)
             {
                 var hero = new XBean.Hero()
@@ -36,7 +36,7 @@ namespace Proto
                         { hero.HeroId, hero }
                     }
                 };
-                await XTable.PlayerHero.Insert(ph);
+                XTable.PlayerHero.Insert(ph);
             }
 
             return ph.ToProto();
@@ -44,10 +44,10 @@ namespace Proto
     }
     public partial class GetHero
     {
-        public override async Task<Hero> OnRequest()
+        public override Hero OnRequest()
         {
             var playerId = Net.I.PlayerId(this);
-            var ph = await XTable.PlayerHero.Select(playerId);
+            var ph = XTable.PlayerHero.Select(playerId);
             if (ph != null)
             {
                 if (ph.Heroes.TryGetValue(heroId, out var hero))
@@ -63,10 +63,10 @@ namespace Proto
 
     public partial class HeroStar
     {
-        public override async Task<bool> Process()
+        public override bool Process()
         {
             var playerId = Net.I.PlayerId(this);
-            var ph = await XTable.PlayerHero.Update(playerId);
+            var ph = XTable.PlayerHero.Update(playerId);
             if (ph != null)
             {
                 if (ph.Heroes.TryGetValue(heroId, out var hero))

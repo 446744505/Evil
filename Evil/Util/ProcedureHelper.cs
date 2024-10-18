@@ -64,9 +64,9 @@ namespace Evil.Util
         
         public class MessageDispatcher : IMessageDispatcher
         {
-            public Task Dispatch(Message msg)
+            public void Dispatch(Message msg)
             {
-                return Procedure.Submit(msg.Process);
+                Procedure.Execute(msg.Process);
             }
         }
     }

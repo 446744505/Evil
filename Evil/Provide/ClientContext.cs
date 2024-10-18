@@ -20,9 +20,9 @@ namespace Evil.Provide
         /// 发送消息到对应的客户端
         /// </summary>
         /// <param name="msg"></param>
-        public async Task SendAsync(Message msg)
+        public void Send(Message msg)
         {
-            await m_Session.SendToClientAsync(m_ClientSessionId, msg);
+            m_Session.SendToClient(m_ClientSessionId, msg);
         }
 
         public abstract void OnClientBroken();

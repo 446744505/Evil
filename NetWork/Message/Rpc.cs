@@ -24,8 +24,8 @@ namespace NetWork
         private static readonly Lazy<T> SessionIsNull = new (() => CreateAck(RpcAck.SessionIsNull));
         private static readonly Lazy<T> Timeout = new (() => CreateAck(RpcAck.Timeout));
         private static readonly Lazy<T> Exception = new (() => CreateAck(RpcAck.Exception));
-        
-        private static readonly Task<T> NotImplementException = Task.FromException<T>(new NotImplementedException());
+
+        private static readonly Exception NotImplementException = new NotImplementedException();
         
         private long m_RequestId = IdGenerator.NextId();
 
@@ -60,7 +60,7 @@ namespace NetWork
                     cts.Cancel(); // 取消超时定时器
                 });
 
-                await session.SendAsync(this);
+                session.Send(this);
                 await Task.WhenAny(timeoutTask, completionSource.Task);
 
                 try
@@ -80,9 +80,9 @@ namespace NetWork
             }
         }
 
-        public override async Task<bool> Process()
+        public override bool Process()
         {
-            var result = await OnRequest();
+            var result = OnRequest();
             Message? rsp;
             using (var stream = new MemoryStream())
             {
@@ -95,7 +95,7 @@ namespace NetWork
                 }
             }
 
-            await Session.SendAsync(rsp);
+            Session.Send(rsp);
             return true;
         }
 
@@ -111,9 +111,9 @@ namespace NetWork
             m_RequestId = reader.ReadInt64();
         }
 
-        public virtual Task<T> OnRequest()
+        public virtual T OnRequest()
         {
-            return NotImplementException;
+            throw NotImplementException;
         }
     }
 }

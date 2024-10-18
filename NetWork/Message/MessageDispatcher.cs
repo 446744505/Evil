@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿
+using System;
 using Evil.Util;
 
 namespace NetWork
 {
     public interface IMessageDispatcher
     {
-        Task Dispatch(Message msg);
+        void Dispatch(Message msg);
     }
     
     public class MessageDispatcher : IMessageDispatcher
@@ -17,9 +18,19 @@ namespace NetWork
             m_Executor = executor;
         }
 
-        public Task Dispatch(Message msg)
+        public void Dispatch(Message msg)
         {
-            return m_Executor.ExecuteAsync(msg.Process);
+            m_Executor.Execute(() =>
+            {
+                try
+                {
+                    msg.Process();
+                }
+                catch (Exception e)
+                {
+                    Log.I.Error($"process msg {msg}", e);
+                }
+            });
         }
     }
 }

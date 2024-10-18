@@ -8,17 +8,17 @@ namespace Game.NetWork
     {
         public void SendToPlayerWhenCommit(long playerId, Message msg)
         {
-            ProcedureHelper.ExecuteWhenCommit(async () => await SendToPlayer(playerId, msg));
+            ProcedureHelper.ExecuteWhenCommit(() => SendToPlayer(playerId, msg));
         }
         
-        public async Task SendToPlayer(long playerId, Message msg)
+        public void SendToPlayer(long playerId, Message msg)
         {
             if (!m_Players.TryGetValue(playerId, out var ctx))
             {
                 return;
             }
 
-            await ctx.SendAsync(msg);
+            ctx.Send(msg);
         }
     }
 }

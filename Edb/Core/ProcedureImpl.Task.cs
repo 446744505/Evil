@@ -79,7 +79,7 @@ namespace Edb
                 catch (Exception e)
                 {
                     Done();
-                    throw new XError("", e);
+                    Log.I.Error(e);
                 }
             }
         }

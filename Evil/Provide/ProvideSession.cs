@@ -23,18 +23,18 @@ namespace Evil.Provide
         public ProvideSession AddClient(ClientContext ctx)
         {
             m_ClientContexts[ctx.ClientSessionId] = ctx;
-            SendAsync(new BindClient{clientSessionId = ctx.ClientSessionId});
+            Send(new BindClient{clientSessionId = ctx.ClientSessionId});
             return this;
         }
 
-        public async Task SendToClientAsync(long clientSessionId, Message msg)
+        public void SendToClient(long clientSessionId, Message msg)
         {
             MessageHelper.OnSendMsg(clientSessionId, msg, "client");
             // 考虑优化，现在是在逻辑线程同步编码
             using var stream = new MemoryStream();
             Serializer.Serialize(stream, msg);
 
-            await SendAsync(new SendToClient
+            Send(new SendToClient
             {
                 clientSessionId = clientSessionId,
                 messageId = msg.MessageId,

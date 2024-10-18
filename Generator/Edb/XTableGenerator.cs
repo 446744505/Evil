@@ -123,24 +123,24 @@ namespace Table
             return new {valueFullName}().Unmarshal(value);
         }}
 
-        public async Task<{valueFullName}> Select({idFullName} key)
+        public {valueFullName} Select({idFullName} key)
         {{
-            return await GetAsync(key, false);
+            return Get(key, false);
         }}
 
-        public async Task<bool> Insert({valueFullName} value)
+        public bool Insert({valueFullName} value)
         {{
-            return await AddAsync(value.{idField.Name.FirstCharToUpper()}, value);
+            return Add(value.{idField.Name.FirstCharToUpper()}, value);
         }}
 
-        public async Task<bool> Delete({idFullName} key)
+        public bool Delete({idFullName} key)
         {{
-            return await RemoveAsync(key);
+            return Remove(key);
         }}
 
-        public async Task<{valueFullName}> Update({idFullName} key)
+        public {valueFullName} Update({idFullName} key)
         {{
-            return await GetAsync(key, true);
+            return Get(key, true);
         }}
     }}
 }}
@@ -149,24 +149,24 @@ namespace XTable
 {{
     public static class {tableKind.Name}
     {{
-        public static async Task<{valueFullName}> Select({idFullName} key)
+        public static {valueFullName} Select({idFullName} key)
         {{
-            return await Tables.{tableKind.Name}.Select(key);
+            return Tables.{tableKind.Name}.Select(key);
         }}
 
-        public static async Task<bool> Insert({valueFullName} value)
+        public static bool Insert({valueFullName} value)
         {{
-            return await Tables.{tableKind.Name}.Insert(value);
+            return Tables.{tableKind.Name}.Insert(value);
         }}
 
-        public static async Task<bool> Delete({idFullName} key)
+        public static bool Delete({idFullName} key)
         {{
-            return await Tables.{tableKind.Name}.Delete(key);
+            return Tables.{tableKind.Name}.Delete(key);
         }}
 
-        public static async Task<{valueFullName}> Update({idFullName} key)
+        public static {valueFullName} Update({idFullName} key)
         {{
-            return await Tables.{tableKind.Name}.Update(key);
+            return Tables.{tableKind.Name}.Update(key);
         }}
     }}
 }}

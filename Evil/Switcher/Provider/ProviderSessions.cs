@@ -12,12 +12,12 @@ namespace Evil.Switcher
             return m_Sessions.TryGetValue(pvid, out var session) ? session : null;
         }
         
-        internal async Task Bind(ProviderSession session)
+        internal void Bind(ProviderSession session)
         {
             var pvid = session.Pvid;
             if (m_Sessions.TryGetValue(pvid, out var old))
             {
-                await session.CloseAsync();
+                session.Close();
                 Log.I.Error($"bind provide {pvid} failed, old session {old} is still alive");
                 return;
             }

@@ -12,10 +12,10 @@ namespace Game.Test
     {
         private async Task Init()
         {
-            await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-            await Procedure.Submit(async () =>
+            Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+            await Procedure.Submit(() =>
             {
-                await XTable.Player.Delete(1);
+                XTable.Player.Delete(1);
                 
                 var p = new Player()
                 {
@@ -23,9 +23,9 @@ namespace Game.Test
                     Level = 1,
                     PlayerName = "player1",
                 };
-                Assert.True(await XTable.Player.Insert(p));
+                Assert.True(XTable.Player.Insert(p));
 
-                await XTable.PlayerHero.Delete(1);
+                XTable.PlayerHero.Delete(1);
                 var skill = new XBean.HeroSkill()
                 {
                     CfgId = 1,
@@ -43,7 +43,7 @@ namespace Game.Test
                 };
                 
                 ph.Heroes[hero.HeroId] = hero;
-                Assert.True(await XTable.PlayerHero.Insert(ph));
+                Assert.True(XTable.PlayerHero.Insert(ph));
 
                 return true;
             });
@@ -53,47 +53,47 @@ namespace Game.Test
         public async Task TestBaseCommit()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p = await XTable.Player.Update(1);
+                var p = XTable.Player.Update(1);
                 p!.Level++;
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p1 = await XTable.Player.Select(1);
+                var p1 = XTable.Player.Select(1);
                 Assert.Equal(2, p1!.Level);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
         
         [Fact]
         public async Task TestBaseRollback()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p = await XTable.Player.Update(1);
+                var p = XTable.Player.Update(1);
                 p!.Level++;
                 return false;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p1 = await XTable.Player.Select(1);
+                var p1 = XTable.Player.Select(1);
                 Assert.Equal(1, p1!.Level);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
 
         [Fact]
         public async Task TestListCommit()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Update(1);
+                var ph = XTable.PlayerHero.Update(1);
                 ph!.Heroes[1].Star++;
                 var skill = new XBean.HeroSkill()
                 {
@@ -103,9 +103,9 @@ namespace Game.Test
                 ph.Heroes[1].Skills.Add(skill);
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 var h = ph!.Heroes[1];
                 Assert.Equal(2, h.Skills.Count);
                 Assert.Equal(2, ph.Heroes[1].Star);
@@ -113,16 +113,16 @@ namespace Game.Test
                 Assert.Equal(2, h.Skills[1].CfgId);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
         
         [Fact]
         public async Task TestListRollback()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Update(1);
+                var ph = XTable.PlayerHero.Update(1);
                 ph!.Heroes[1].Star++;
                 var h = new XBean.Hero()
                 {
@@ -132,23 +132,23 @@ namespace Game.Test
                 ph.Heroes[h.HeroId] = h;
                 return false;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 Assert.Equal(1, ph!.Heroes.Count);
                 Assert.Equal(1, ph.Heroes[1].Star);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
 
         [Fact]
         public async Task TestParentBean()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 var h = new XBean.Hero()
                 {
                     HeroId = 2,
@@ -171,22 +171,22 @@ namespace Game.Test
 
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 Assert.Equal(1, ph!.Heroes.Count);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
 
         [Fact]
         public async Task TestMapCommit()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Update(1);
+                var ph = XTable.PlayerHero.Update(1);
                 var h = new XBean.Hero()
                 {
                     HeroId = 2,
@@ -195,23 +195,23 @@ namespace Game.Test
                 ph!.Heroes[h.HeroId] = h;
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 Assert.Equal(2, ph!.Heroes.Count);
                 Assert.Equal(2, ph.Heroes[2].Star);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
         
         [Fact]
         public async Task TestMapRollback()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Update(1);
+                var ph = XTable.PlayerHero.Update(1);
                 ph.Heroes[1].Star++;
                 var h = new XBean.Hero()
                 {
@@ -221,23 +221,23 @@ namespace Game.Test
                 ph.Heroes[h.HeroId] = h;
                 return false;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 Assert.Equal(1, ph!.Heroes.Count);
                 Assert.Equal(1, ph.Heroes[1].Star);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
         
         [Fact]
         public async Task TestVerify()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 try
                 {
                     ph.Heroes[1].Star++;
@@ -249,34 +249,34 @@ namespace Game.Test
 
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var ph = await XTable.PlayerHero.Select(1);
+                var ph = XTable.PlayerHero.Select(1);
                 Assert.Equal(1, ph!.Heroes[1].Star);
                 return true;
             });
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
 
         [Fact]
         public async Task TestCallCommitCommit()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p = await XTable.Player.Update(1);
+                var p = XTable.Player.Update(1);
                 p!.Level++;
-                var subR = await Procedure.Call(async () =>
+                var subR = Procedure.Call(() =>
                 {
-                    var p1 = await XTable.Player.Update(1);
+                    var p1 = XTable.Player.Update(1);
                     p1!.Level++;
                     return true;
                 });
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p1 = await XTable.Player.Select(1);
+                var p1 = XTable.Player.Select(1);
                 Assert.Equal(3, p1!.Level);
                 return true;
             });
@@ -286,21 +286,21 @@ namespace Game.Test
         public async Task TestCallCommitRollback()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p = await XTable.Player.Update(1);
+                var p = XTable.Player.Update(1);
                 p!.Level++;
-                var subR = await Procedure.Call(async () =>
+                var subR = Procedure.Call(() =>
                 {
-                    var p1 = await XTable.Player.Update(1);
+                    var p1 = XTable.Player.Update(1);
                     p1!.Level++;
                     return false;
                 });
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p1 = await XTable.Player.Select(1);
+                var p1 = XTable.Player.Select(1);
                 Assert.Equal(2, p1!.Level);
                 return true;
             });
@@ -310,21 +310,21 @@ namespace Game.Test
         public async Task TestCallRollbackCommit()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p = await XTable.Player.Update(1);
+                var p = XTable.Player.Update(1);
                 p!.Level++;
-                var subR = await Procedure.Call(async () =>
+                var subR = Procedure.Call(() =>
                 {
-                    var p1 = await XTable.Player.Update(1);
+                    var p1 = XTable.Player.Update(1);
                     p1!.Level++;
                     return true;
                 });
                 return false;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p1 = await XTable.Player.Select(1);
+                var p1 = XTable.Player.Select(1);
                 Assert.Equal(1, p1!.Level);
                 return true;
             });
@@ -341,11 +341,11 @@ namespace Game.Test
                 this.dict = dict;
             }
 
-            public async Task<bool> Process()
+            public bool Process()
             {
                 Log.I.Info($"Start WhenCommit {m_Num}");
-                await  Task.Delay(100);
-                var p = await XTable.Player.Update(1);
+                Task.Delay(100).Wait();
+                var p = XTable.Player.Update(1);
                 p!.Level++;
                 if (!dict.TryAdd(p.Level, true))
                     throw new Exception($"multiple key {m_Num}");
@@ -359,10 +359,10 @@ namespace Game.Test
         public async Task TestWhenCommit()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
                 Log.I.Info($"Start TestWhenCommit");
-                var p = await XTable.Player.Update(1);
+                var p = XTable.Player.Update(1);
                 p!.Level++;
                 ConcurrentDictionary<long, bool> dict = new();
                 dict.TryAdd(p.Level, true);
@@ -379,40 +379,40 @@ namespace Game.Test
         public async Task TestDeadLock()
         {
             await Init();
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                await XTable.Player.Delete(2);
+                XTable.Player.Delete(2);
                 var p = new XBean.Player()
                 {
                     PlayerId = 2,
                     Level = 2,
                     PlayerName = "player2",
                 };
-                await XTable.Player.Insert(p);
+                XTable.Player.Insert(p);
                 return true;
             });
-            var t1= Procedure.Submit(async () =>
+            var t1= Procedure.Submit(() =>
             {
                 Log.I.Info("t1 start");
-                var p1 = await XTable.Player.Update(1);
-                var p2 = await XTable.Player.Update(2);
+                var p1 = XTable.Player.Update(1);
+                var p2 = XTable.Player.Update(2);
                 p1!.Level++;
                 p2!.Level++;
                 Log.I.Info("t1 end");
                 return true;
             });
-            var t2 = Procedure.Submit(async () =>
+            var t2 = Procedure.Submit(() =>
             {
                 Log.I.Info("t2 start");
-                var p1 = await XTable.Player.Update(2);
-                var p2 = await XTable.Player.Update(1);
+                var p1 = XTable.Player.Update(2);
+                var p2 = XTable.Player.Update(1);
                 p1!.Level++;
                 p2!.Level++;
                 Log.I.Info("t2 end");
                 return true;
             });
             await Task.WhenAll(t1, t2);
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
     }
 }

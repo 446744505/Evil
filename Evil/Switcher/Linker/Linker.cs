@@ -47,11 +47,11 @@ namespace Evil.Switcher
             return m_Sessions.Count < CmdLine.I.MaxSessionCount;
         }
 
-        internal async Task CloseSession(LinkerSession session, int code)
+        internal void CloseSession(LinkerSession session, int code)
         {
             Log.I.Info($"close client session {session}, code {code}");
-            await session.SendAsync(new SessionError { code = code });
-            await session.CloseAsync();
+            session.Send(new SessionError { code = code });
+            session.Close();
         }
     }
 }

@@ -21,20 +21,20 @@ namespace Evil.Provide
 
         public void Add(ProvideSession session)
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 m_Sessions.Add(session);
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
         public void Remove(ProvideSession session)
         {
-            var release = m_Lock.WLock();
+            m_Lock.WLock();
             try
             {
                 m_Sessions.Remove(session);
@@ -43,7 +43,7 @@ namespace Evil.Provide
             }
             finally
             {
-                m_Lock.WUnlock(release);
+                m_Lock.WUnlock();
             }
         }
 
@@ -59,7 +59,7 @@ namespace Evil.Provide
             List<ProvideInfo> removed)
         {
             List<ushort> willRemove = new();
-            var release = m_Lock.RLock();
+            m_Lock.RLock();
             try
             {
                 // 看看是否有已经建立的通道被影响了
@@ -77,12 +77,12 @@ namespace Evil.Provide
             }
             finally
             {
-                m_Lock.RUnlock(release);
+                m_Lock.RUnlock();
             }
 
             if (willRemove.Count > 0)
             {
-                release = m_Lock.WLock();
+                m_Lock.WLock();
                 try
                 {
                     foreach (var pvid in willRemove)
@@ -93,7 +93,7 @@ namespace Evil.Provide
                 }
                 finally
                 {
-                    m_Lock.WUnlock(release);
+                    m_Lock.WUnlock();
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace Evil.Provide
         {
             ProvideSession[] shuffle;
             var findIdx = -1;
-            var release = m_Lock.RLock();
+            m_Lock.RLock();
             try
             {
                 if (m_Dispatcher.TryGetValue(toPvid, out var find))
@@ -154,12 +154,12 @@ namespace Evil.Provide
             }
             finally
             {
-                m_Lock.RUnlock(release);
+                m_Lock.RUnlock();
             }
 
             if (findIdx > -1)
             {
-                release = m_Lock.WLock();
+                m_Lock.WLock();
                 try
                 {
                     var find = shuffle[findIdx];
@@ -169,7 +169,7 @@ namespace Evil.Provide
                 }
                 finally
                 {
-                    m_Lock.WUnlock(release);
+                    m_Lock.WUnlock();
                 }
             }
             

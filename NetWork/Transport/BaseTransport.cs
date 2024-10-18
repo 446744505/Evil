@@ -59,7 +59,7 @@ namespace NetWork.Transport
             // 关闭rpc，上面的连接已经关了，如果这时候client回调处理里还有消息发送？
             await RpcMgr.DisposeAsync();
             // 最后关闭线程池
-            await Config.Executor.Dispose();
+            Config.Executor.Dispose();
         }
     
         public void Dispose()

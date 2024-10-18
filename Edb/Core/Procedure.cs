@@ -75,22 +75,5 @@ namespace Edb
                 return m_Func();
             }
         }
-        
-        private struct ProcedureInnerAsync : Procedure
-        {
-            private readonly string m_Name;
-            private readonly Func<bool> m_Func;
-
-            public ProcedureInnerAsync(Func<bool> func, string name)
-            {
-                m_Func = func;
-                m_Name = string.IsNullOrEmpty(name) ? GetType().Name : name;
-            }
-
-            public bool Process()
-            {
-                return m_Func();
-            }
-        }
     }
 }

@@ -16,17 +16,17 @@ namespace NetWork.Proto
         [ProtoMember(2)] 
         public byte[] Data { get; set; } = null!;
 
-        public override Task<bool> Process()
+        public override bool Process()
         {
             var cb = Session.Transport.RpcMgr().RemovePending(RequestId);
             if (cb == null)
             {
-                return FalseTask;
+                return false;
             }
 
             using var stream = new MemoryStream(Data);
             cb.Invoke(stream);
-            return TrueTask;
+            return true;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Evil.Switcher
                 data = data,
                 fromPvid = fromPvid,
             };
-            toSession.SendAsync(box);
+            toSession.Send(box);
             return null;
         }
     }

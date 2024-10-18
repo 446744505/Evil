@@ -16,14 +16,14 @@ namespace Game.Logic.Login
             m_PlayerId = playerId;
         }
 
-        public async Task<bool> Process()
+        public bool Process()
         {
-            var server = await XTable.Server.Update(m_ServerId);
+            var server = XTable.Server.Update(m_ServerId);
             if (server is null)
             {
                 server = new Server();
                 server.ServerId = m_ServerId;
-                await XTable.Server.Insert(server);
+                XTable.Server.Insert(server);
             }
 
             server.PlayerIds.Add(m_PlayerId);

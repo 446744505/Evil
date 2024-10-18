@@ -5,10 +5,10 @@ namespace Proto
 {
     public partial class BindProvide
     {
-        public override async Task Dispatch()
+        public override void Dispatch()
         {
             var providerSession = (ProviderSession)Session;
-            await providerSession.Process(this);
+            providerSession.Process(this);
         }
     }
 }

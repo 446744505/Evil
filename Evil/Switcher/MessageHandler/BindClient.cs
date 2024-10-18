@@ -4,7 +4,7 @@ namespace Proto
 {
     public partial class BindClient
     {
-        public override Task<bool> Process()
+        public override bool Process()
         {
             var linkerSession = Linker.I.Sessions.GetSession(clientSessionId);
             if (linkerSession is not null)
@@ -13,7 +13,7 @@ namespace Proto
                 linkerSession.BindProvide(providerSession.Pvid);
             }
 
-            return TrueTask;
+            return true;
         }
     }
 }

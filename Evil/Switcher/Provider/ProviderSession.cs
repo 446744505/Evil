@@ -25,7 +25,7 @@ namespace Evil.Switcher
         {
         }
 
-        public override Task SendAsync(Message msg)
+        public override void Send(Message msg)
         {
             if (msg.InnerPvid == 0)
             {
@@ -33,18 +33,18 @@ namespace Evil.Switcher
                 if (pvid == 0)
                 {
                     Log.I.Error($"not bind provide {this} msg {msg}");
-                    return Task.CompletedTask;
+                    return;
                 }
                 msg.InnerPvid = pvid;
             }
-            return base.SendAsync(msg);
+            base.Send(msg);
         }
 
-        public async Task Process(BindProvide bp)
+        public void Process(BindProvide bp)
         {
             ProvideInfo = bp.info;
 
-            await Provider.I.Sessions.Bind(this);
+            Provider.I.Sessions.Bind(this);
             Log.I.Info($"bind provide {bp}");
         }
         

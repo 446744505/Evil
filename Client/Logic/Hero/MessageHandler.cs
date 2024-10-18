@@ -5,10 +5,10 @@ namespace Proto
 {
     public partial class HeroStarNtf
     {
-        public override Task<bool> Process()
+        public override bool Process()
         {
             Log.I.Info($"hero star ntf {heroId} star:{star}");
-            return TrueTask;
+            return true;
         }
     }
 }

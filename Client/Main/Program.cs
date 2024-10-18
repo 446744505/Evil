@@ -9,7 +9,7 @@ namespace Client
     public static class Program
     {
         public static Executor Executor { get; } = new();
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             Stopper? stopper = null;
             try
@@ -25,7 +25,7 @@ namespace Client
                 stopper = new Stopper().BindAndWait();
                 
                 connector.Dispose();
-                await Executor.Dispose();
+                Executor.Dispose();
             } finally
             {
                 stopper?.SignalWeakUp();

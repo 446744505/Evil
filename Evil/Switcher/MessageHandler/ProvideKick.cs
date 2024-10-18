@@ -5,7 +5,7 @@ namespace Proto
 {
     public partial class ProvideKick
     {
-        public override Task Dispatch()
+        public override void Dispatch()
         {
             var linkerSession = Linker.I.Sessions.GetSession(clientSessionId);
             if (linkerSession != null)
@@ -15,12 +15,11 @@ namespace Proto
                     linkerSession = Linker.I.Sessions.GetSession(clientSessionId);
                     if (linkerSession != null)
                     {
-                        Linker.I.CloseSession(linkerSession, code).Wait();
+                        Linker.I.CloseSession(linkerSession, code);
                         Log.I.Info($"provide {Session} kick {linkerSession} reason {code}");
                     }
                 }
             }
-            return Task.CompletedTask;
         }
     }
 }

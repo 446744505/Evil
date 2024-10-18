@@ -5,7 +5,7 @@ namespace Proto
 {
     public partial class ProvideMsgBox
     {
-        public override async Task Dispatch()
+        public override void Dispatch()
         {
             var header = new MessageHeader
             {
@@ -18,7 +18,7 @@ namespace Proto
                 var msg = Session.Config.MessageProcessor.CreateMessage(Session, header, data.Length, reader);
                 msg!.Context = this;
                 MessageHelper.OnReceiveMsg(Session, msg, $"provide{fromPvid}");
-                await msg.Dispatch();
+                msg.Dispatch();
             }
             catch (Exception e)
             {

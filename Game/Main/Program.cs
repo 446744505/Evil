@@ -13,34 +13,31 @@ namespace Game
     {
         public static async Task Main(string[] args)
         {
-            // Log.I.UnobservedTaskException();
-            // CmdLine.Init(args);
-            // Etcd.I.Init(CmdLine.I.Etcd);
-            // Event.Start();
-            //
-            // Stopper? stopper = null;
-            // try
-            // {
-            //     await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-            //     
-            //     var provide = Net.I.Provide = new Provide(new GameProvideFactory());
-            //     await provide.Start();
-            //     Log.I.Info("server started");
-            //
-            //     stopper = new Stopper().BindAndWait();
-            //     
-            //     Etcd.I.Dispose();
-            //     provide.Dispose();
-            //     await Edb.Edb.I.DisposeAsync();
-            // }
-            // finally
-            // {
-            //     stopper?.SignalWeakUp();
-            //     Log.I.Info("server stop");
-            // }
-
-            await new TransactionTest().TestWhenCommit();
-            await Edb.Edb.I.Dispose();
+            Log.I.UnobservedTaskException();
+            CmdLine.Init(args);
+            Etcd.I.Init(CmdLine.I.Etcd);
+            Event.Start();
+            
+            Stopper? stopper = null;
+            try
+            {
+                Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+                
+                var provide = Net.I.Provide = new Provide(new GameProvideFactory());
+                await provide.Start();
+                Log.I.Info("server started");
+            
+                stopper = new Stopper().BindAndWait();
+                
+                Etcd.I.Dispose();
+                provide.Dispose();
+                Edb.Edb.I.Dispose();
+            }
+            finally
+            {
+                stopper?.SignalWeakUp();
+                Log.I.Info("server stop");
+            }
         }
     }
 }

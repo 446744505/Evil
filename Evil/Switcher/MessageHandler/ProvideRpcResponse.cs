@@ -6,7 +6,7 @@ namespace Proto
 {
     public partial class ProvideRpcResponse
     {
-        public override async Task Dispatch()
+        public override void Dispatch()
         {
             var providerSession = Provider.I.Sessions.GetSession((ushort)pvid);
             if (providerSession is null)
@@ -15,7 +15,7 @@ namespace Proto
                 return;
             }
 
-            await providerSession.SendAsync(new RpcResponse
+            providerSession.Send(new RpcResponse
             {
                 RequestId = requestId,
                 Data = data,

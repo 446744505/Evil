@@ -14,7 +14,7 @@ public class ProvideSessionMgr : ConnectorSessionMgr
         var provideSession = (ProvideSession)session;
         provide.Sessions.Add(provideSession);
         
-        session.SendAsync(new BindProvide
+        session.Send(new BindProvide
         {
             info = new ProvideInfo
             {

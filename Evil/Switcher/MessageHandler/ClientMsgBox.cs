@@ -5,7 +5,7 @@ namespace Proto
 {
     public partial class ClientMsgBox
     {
-        public override async Task Dispatch()
+        public override void Dispatch()
         {
             var header = new MessageHeader
             {
@@ -18,11 +18,11 @@ namespace Proto
                 var msg = Session.Config.MessageProcessor.CreateMessage(Session, header, data.Length, reader);
                 msg!.Context = this;
                 MessageHelper.OnReceiveMsg(clientSessionId, msg, "client");
-                await msg.Dispatch();
+                msg.Dispatch();
             }
             catch (Exception e)
             {
-                await Session.SendAsync(new ProvideKick(){clientSessionId = clientSessionId, code = ProvideKick.Exception});
+                Session.Send(new ProvideKick(){clientSessionId = clientSessionId, code = ProvideKick.Exception});
                 Log.I.Error($"dispatch msg header {header} client session {Session.Id} error", e);
             }
             finally

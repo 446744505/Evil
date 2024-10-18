@@ -71,7 +71,7 @@ namespace Evil.Switcher
                 var providerSession = Sessions.GetSession(pvid);
                 if (providerSession is not null)
                 {
-                    providerSession.SendAsync(new ClientBroken() { clientSessionId = session.Id });
+                    providerSession.Send(new ClientBroken() { clientSessionId = session.Id });
                 }
             }
         }

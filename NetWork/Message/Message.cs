@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -22,9 +23,6 @@ namespace NetWork
     }
     public abstract class Message
     {
-        protected static readonly Task<bool> FalseTask = Task.FromResult(false);
-        protected static readonly Task<bool> TrueTask = Task.FromResult(true);
-        
         [JsonIgnore]
         public virtual uint MessageId { get; } = 0;
         [JsonIgnore]
@@ -42,32 +40,30 @@ namespace NetWork
             {
                 throw new NetWorkException("session is null");
             }
-            session.SendAsync(this);
+            session.Send(this);
         }
         
         /// <summary>
         /// 在网络线程中执行，保证顺序
         /// </summary>
         /// <returns></returns>
-        public virtual Task Dispatch()
+        public virtual void Dispatch()
         {
-            // 因为外面没有await，所以这里要用ContinueWith打印异常
-            Session.Config.Dispatcher!.Dispatch(this).ContinueWith(task =>
+            try
             {
-                if (task.IsFaulted)
-                {
-                    Log.I.Error($"Message.Dispatch {this}", task.Exception);
-                }
-            });
-            return Task.CompletedTask;
+                Session.Config.Dispatcher!.Dispatch(this);   
+            } catch (Exception e)
+            {
+                Log.I.Error($"dispatch msg {this}", e);
+            }
         }
 
         /// <summary>
         /// 异步执行，不保证顺序
         /// </summary>
-        public virtual Task<bool> Process()
+        public virtual bool Process()
         {
-            return FalseTask;
+            return false;
         }
 
         public virtual void Decode(BinaryReader reader)

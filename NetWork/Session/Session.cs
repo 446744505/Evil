@@ -26,18 +26,18 @@ namespace NetWork
             return $"{ipEndPoint.Address.MapToIPv4().ToString()}:{ipEndPoint.Port}";
         }
         
-        public virtual Task SendAsync(Message msg)
+        public virtual void Send(Message msg)
         {
-            return m_Context.WriteAndFlushAsync(msg);
+            m_Context.WriteAndFlushAsync(msg).Wait();
         }
 
         public virtual void OnClose()
         {
         }
 
-        public async Task CloseAsync()
+        public void Close()
         {
-            await m_Context.CloseAsync();
+            m_Context.CloseAsync().Wait();
         }
 
         public override string ToString()

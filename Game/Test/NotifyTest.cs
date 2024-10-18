@@ -13,10 +13,10 @@ namespace Game.Test
     {
         private async Task Init()
         {
-            await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
-            await Procedure.Submit(async () =>
+            Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+            await Procedure.Submit(() =>
             {
-                await XTable.Player.Delete(1);
+                XTable.Player.Delete(1);
 
                 var p = new Player()
                 {
@@ -24,9 +24,9 @@ namespace Game.Test
                     Level = 1,
                     PlayerName = "player1",
                 };
-                Assert.True(await XTable.Player.Insert(p));
+                Assert.True(XTable.Player.Insert(p));
 
-                await XTable.PlayerHero.Delete(1);
+                XTable.PlayerHero.Delete(1);
                 var skill = new XBean.HeroSkill()
                 {
                     CfgId = 1,
@@ -43,7 +43,7 @@ namespace Game.Test
                     PlayerId = 1,
                 };
                 ph.Heroes[hero.HeroId] = hero;
-                Assert.True(await XTable.PlayerHero.Insert(ph));
+                Assert.True(XTable.PlayerHero.Insert(ph));
 
                 return true;
             });
@@ -52,22 +52,22 @@ namespace Game.Test
         [Fact]
         public async Task TestInsert()
         {
-            await Edb.Edb.I.Start(new Config(), XTable.Tables.All);
+            Edb.Edb.I.Start(new Config(), XTable.Tables.All);
             XTable.Tables.Player.AddListener(new PlayerLevelListener(), "level");
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                await XTable.Player.Delete(1);
+                XTable.Player.Delete(1);
                 var p = new Player()
                 {
                     PlayerId = 1,
                     Level = 1,
                     PlayerName = "player1",
                 };
-                Assert.True(await XTable.Player.Insert(p));
+                Assert.True(XTable.Player.Insert(p));
                 return true;
             });
 
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
 
         [Fact]
@@ -76,10 +76,10 @@ namespace Game.Test
             await Init();
             XTable.Tables.Player.AddListener(new PlayerLevelListener(), "level");
             XTable.Tables.PlayerHero.AddListener(new PlayerHeroHeroesListener(), "heroes");
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(() =>
             {
-                var p = await XTable.Player.Update(1);
-                var ph = await XTable.PlayerHero.Update(1);
+                var p = XTable.Player.Update(1);
+                var ph = XTable.PlayerHero.Update(1);
                 p.Level++;
                 var h = new XBean.Hero()
                 {
@@ -92,7 +92,7 @@ namespace Game.Test
                 return true;
             });
 
-            await Edb.Edb.I.Dispose();
+            Edb.Edb.I.Dispose();
         }
 
         public class PlayerEventHandler : IEventHandler

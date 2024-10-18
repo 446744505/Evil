@@ -4,12 +4,12 @@ namespace Proto
 {
     public partial class SendToClient
     {
-        public override async Task Dispatch()
+        public override void Dispatch()
         {
             var linkerSession = Linker.I.Sessions.GetSession(clientSessionId);
             if (linkerSession is not null)
             {
-                await linkerSession.SendAsync(new ServerMsgBox
+                linkerSession.Send(new ServerMsgBox
                 {
                     messageId = messageId,
                     data = data,

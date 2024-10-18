@@ -7,10 +7,10 @@ namespace Proto
 {
     public partial class LoginNtf
     {
-        public override Task<bool> Process()
+        public override bool Process()
         {
             Program.Executor.SubmitAsync(() => HeroMgr.I.Test());
-            return TrueTask;
+            return true;
         }
     }
 }

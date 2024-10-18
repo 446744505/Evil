@@ -12,7 +12,7 @@ namespace Evil.Switcher
             if (!linker.CanAddSession())
             {
                 // 连接数超限
-                _ = linker.CloseSession(linkerSession, SessionError.OverMaxSession);
+                linker.CloseSession(linkerSession, SessionError.OverMaxSession);
                 return;
             }
             base.OnAddSession(session);

@@ -5,7 +5,7 @@ namespace Proto
 {
     public partial class LoginToMap
     {
-        public override async Task<LoginToMapAck> OnRequest()
+        public override LoginToMapAck OnRequest()
         {
             Log.I.Info($"player {playerId} login");
             return new LoginToMapAck()

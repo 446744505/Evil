@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿
 using Edb;
 using Evil.Util;
 using XBean;
@@ -14,15 +14,15 @@ namespace Game.Logic.Login
             m_Account = account;
         }
 
-        public override async Task<bool> Process()
+        public override bool Process()
         {
             // TODO 放到au里去
-            var user = await XTable.User.Update(m_Account);
+            var user = XTable.User.Update(m_Account);
             if (user is null)
             {
                 user = new User();
                 user.Account = m_Account;
-                await XTable.User.Insert(user);
+                XTable.User.Insert(user);
                 Log.I.Info($"create user {m_Account}");
             }
 

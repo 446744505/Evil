@@ -27,7 +27,7 @@ namespace Evil.Switcher
             return m_Sessions.TryGetValue(sid, out var session) ? session : null;
         }
 
-        internal async Task CheckAlive()
+        internal void CheckAlive()
         {
             foreach (var session in m_Sessions.Values)
             {
@@ -35,7 +35,7 @@ namespace Evil.Switcher
                 {
                     if (!session.IsAlive())
                     {
-                        await Linker.I.CloseSession(session, SessionError.PingTimeout);
+                        Linker.I.CloseSession(session, SessionError.PingTimeout);
                         Log.I.Warn($"client {session} is time out");
                     }
                 } catch (Exception e)

@@ -14,7 +14,7 @@ namespace Evil.Switcher
             var providerSession = provider.Sessions.GetSession(pvid);
             if (providerSession == null)
             {
-                session.SendAsync(new ServerError{pvid = pvid, code = ServerError.NotExistProvide});
+                session.Send(new ServerError{pvid = pvid, code = ServerError.NotExistProvide});
                 Log.I.Error($"client to provide, no provide {pvid} exist");
                 return null;
             }
@@ -33,7 +33,7 @@ namespace Evil.Switcher
                 pvid = header.Pvid,
                 data = data
             };
-            providerSession.SendAsync(box);
+            providerSession.Send(box);
             
             return null;
         }
