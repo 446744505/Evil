@@ -36,43 +36,11 @@ namespace Evil.Util
             return m_EventLoopGroup.SubmitAsync(func);
         }
         
-        // public Task<T?> ExecuteAsync<T>(Func<Task<T>> func)
-        // {
-        //     var tcs = new TaskCompletionSource<T?>();
-        //     m_EventLoopGroup.Execute(async () =>
-        //     {
-        //         try
-        //         {
-        //             tcs.SetResult(await func());
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             tcs.SetException(e);
-        //         }
-        //     });
-        //     return tcs.Task;
-        // }
-        
         public IScheduledTask Delay(Action cb, int delay)
         {
             return m_EventLoopGroup.Schedule(cb, TimeSpan.FromMilliseconds(delay));
         }
         
-        // public IScheduledTask Delay(Func<Task> cb, int delay)
-        // {
-        //     return m_EventLoopGroup.Schedule(async () =>
-        //     {
-        //         try
-        //         {
-        //             await cb();
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             
-        //         }
-        //     }, TimeSpan.FromMilliseconds(delay));
-        // }
-
         private long NextTick(Action cb, int delay, int period, long id)
         {
             var isNew = id == 0;
@@ -117,6 +85,7 @@ namespace Evil.Util
         public void Dispose()
         {
             Log.I.Info("executor start stop");
+            // 这里停止会等待15s，好像是dot netty的bug?
             m_EventLoopGroup.ShutdownGracefullyAsync().Wait();
             m_Tickers.Clear();
             Log.I.Info("executor end stop");

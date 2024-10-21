@@ -47,15 +47,22 @@ namespace Proto
             }
 
             var providerUrl = provideSession.ProviderUrl;
-            var loginMapAck = LoginMgr.I.LoginService.LoginToMap(mapPvid, playerId, providerUrl, ctx.clientSessionId).Result;
-            if (loginMapAck.Code != RpcAck.Success)
-            {
-                Log.I.Error($"player {playerId} login to map failed {loginMapAck.Code}");
-                return false;
-            }
-            Log.I.Info($"player {playerId} login to map {loginMapAck.data}");
+            // TODO 这里的ContinueWith要换成框架内的，且能自带edb事务
+            LoginMgr.I.LoginService.LoginToMap(mapPvid, playerId, providerUrl, ctx.clientSessionId).ContinueWith(
+                task =>
+                {
+                    var loginMapAck = task.Result;
+                    if (loginMapAck.Code != RpcAck.Success)
+                    {
+                        Log.I.Error($"player {playerId} login to map failed {loginMapAck.Code}");
+                        return false;
+                    }
+                    Log.I.Info($"player {playerId} login to map {loginMapAck.data}");
 
-            Net.I.SendToPlayer(playerId,new LoginNtf{mapPvid = loginMapAck.data});
+                    Net.I.SendToPlayer(playerId,new LoginNtf{mapPvid = loginMapAck.data});
+                    return true;
+                });
+            
             return true;
         }
     }
