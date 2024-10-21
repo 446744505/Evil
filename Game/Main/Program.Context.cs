@@ -16,6 +16,10 @@ namespace Game
 
         internal void AddMapPvid(ushort pvid)
         {
+            if (m_MapPvids.Contains(pvid))
+            {
+                return;
+            }
             m_MapPvids = m_MapPvids.Add(pvid);
             Log.I.Info($"add map pvid: {pvid}");
         }

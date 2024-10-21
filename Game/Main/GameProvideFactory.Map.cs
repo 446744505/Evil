@@ -18,7 +18,7 @@ namespace Game
             List<ProvideInfo> added, 
             List<ProvideInfo> removed)
         {
-            foreach (var info in added)
+            foreach (var info in newAll.Values)
             {
                 var provide = Net.I.Provide;
                 if (info.type == (int)ProvideType.Map)
