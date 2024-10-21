@@ -85,7 +85,7 @@ namespace Evil.Util
         public void Dispose()
         {
             Log.I.Info("executor start stop");
-            // 这里停止会等待15s，好像是dot netty的bug?
+            // TODO 这里停止会等待15s，好像是dot netty的bug?
             m_EventLoopGroup.ShutdownGracefullyAsync().Wait();
             m_Tickers.Clear();
             Log.I.Info("executor end stop");
