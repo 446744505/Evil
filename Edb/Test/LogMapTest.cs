@@ -9,9 +9,9 @@ namespace Edb.Test
         
         private void Init()
         {
-            Transaction.Create();
-            Transaction.Savepoint();
-            xBean = new XBeanTest();
+            var ctx = TransactionCtx.Create().Start();
+            _ = ctx.Current!.Savepoint;
+            xBean = new XBeanTest(ctx);
             
             var logMap = xBean.Map;
             Assert.Contains(1, logMap);
@@ -114,14 +114,15 @@ namespace Edb.Test
         private class XBeanTest : XBean
         {
             private Dictionary<int, int> m_Map = new();
-            public XBeanTest() : base(null, null!)
+            public XBeanTest(TransactionCtx ctx) : base(null, null!)
             {
+                Map = Logs.LogMap<int, int>(this, "m_Map", DoNothing, ctx);
                 Map.Add(1, 1);
                 Map.Add(2, 2);
                 Map.Add(3, 3);
             }
-            
-            public IDictionary<int, int> Map => Logs.LogMap<int, int>(this, "m_Map", DoNothing);
+
+            public IDictionary<int, int> Map;
         }
     }
 }

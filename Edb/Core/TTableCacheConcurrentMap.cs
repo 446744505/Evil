@@ -109,11 +109,11 @@ namespace Edb
                 throw new XError("cache.AddNoLog duplicate record");
         }
 
-        internal override void Add(TKey key, TRecord<TKey, TValue> r)
+        internal override void Add(TKey key, TRecord<TKey, TValue> r, TransactionCtx ctx)
         {
             if (!m_Cache.TryAdd(key, r))
                 throw new XError("cache.Add duplicate record");
-            LogAddRemove(key, r);
+            LogAddRemove(key, r, ctx);
         }
 
         internal override bool Remove(TKey key)

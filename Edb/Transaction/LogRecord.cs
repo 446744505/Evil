@@ -20,33 +20,33 @@ namespace Edb
                 : m_Cache.GetOrAdd(o.GetType(), _ => Listenable.Create(o));
         }
         
-        private LogR<TKey, TValue>? GetOrCreateLogR(TRecord<TKey, TValue> r)
+        private LogR<TKey, TValue>? GetOrCreateLogR(TRecord<TKey, TValue> r, TransactionCtx ctx)
         {
             if (m_HasListener == null)
             {
                 m_HasListener = m_Table.HasListener;
-                Transaction.Current!.RecordLogNotifyTTable(m_Table);
+                ctx.Current!.RecordLogNotifyTTable(m_Table);
             }
             
             return m_HasListener.Value ? m_Changed.ComputeIfAbsent(r.Key, 
                 _ => new LogR<TKey, TValue>(r, m_Seed.Copy())) : null;
         }
 
-        internal async Task LogNotify(ListenerMap listenerMap)
+        internal async Task LogNotify(ListenerMap listenerMap, TransactionCtx ctx)
         {
             foreach (var pair in m_Changed)
             {
                 var k = pair.Key;
                 var lr = pair.Value;
-                await lr.m_Listenable.LogNotify<TKey, TValue>(k, lr.m_Record.Value!, lr.RecordState, listenerMap);
+                await lr.m_Listenable.LogNotify<TKey, TValue>(k, lr.m_Record.Value!, lr.RecordState, listenerMap, ctx);
                 m_Changed.Clear();
                 m_HasListener = null;
             }
         }
 
-        internal void OnChanged(TRecord<TKey,TValue> record, LogNotify ln)
+        internal void OnChanged(TRecord<TKey,TValue> record, LogNotify ln, TransactionCtx ctx)
         {
-            var lr = GetOrCreateLogR(record);
+            var lr = GetOrCreateLogR(record, ctx);
             if (lr != null)
             {
                 ln.Pop();
@@ -54,9 +54,9 @@ namespace Edb
             }
         }
 
-        internal void OnChanged(TRecord<TKey,TValue> record, bool cc, TRecord<TKey,TValue>.State ss)
+        internal void OnChanged(TRecord<TKey,TValue> record, bool cc, TRecord<TKey,TValue>.State ss, TransactionCtx ctx)
         {
-            var lr = GetOrCreateLogR(record);
+            var lr = GetOrCreateLogR(record, ctx);
             if (lr != null && lr.m_Ss == null)
             {
                 lr.m_Cc = cc;

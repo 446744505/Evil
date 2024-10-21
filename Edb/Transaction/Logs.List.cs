@@ -4,10 +4,10 @@ namespace Edb
 {
     public partial class Logs
     {
-        public static IList<T> LogList<T>(XBean xBean, string varName, Action verify)
+        public static IList<T> LogList<T>(XBean xBean, string varName, Action verify, TransactionCtx ctx)
         {
             var key = new LogKey(xBean, varName);
-            var wrappers = Transaction.Current!.Wrappers;
+            var wrappers = ctx.Current!.Wrappers;
             if (!wrappers.TryGetValue(key, out var log))
             {
                 wrappers[key] = log = new LogList<T>(key, (key.Value as List<T>)!);
@@ -32,19 +32,19 @@ namespace Edb
             m_Wrapped = wrapped;
         }
 
-        protected virtual void BeforeChange()
+        protected virtual void BeforeChange(TransactionCtx ctx)
         {
-            m_Root!.BeforeChange();
+            m_Root!.BeforeChange(ctx);
         }
 
-        protected virtual void AfterAdd(T item)
+        protected virtual void AfterAdd(T item, TransactionCtx ctx)
         {
-            m_Root!.AfterAdd(item);
+            m_Root!.AfterAdd(item, ctx);
         }
         
-        protected virtual void BeforeRemove(T item)
+        protected virtual void BeforeRemove(T item, TransactionCtx ctx)
         {
-            m_Root!.BeforeRemove(item);
+            m_Root!.BeforeRemove(item, ctx);
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -58,16 +58,16 @@ namespace Edb
             return GetEnumerator();
         }
 
-        public void Add(T item)
+        public void Add(T item, TransactionCtx ctx)
         {
-            BeforeChange();
+            BeforeChange(ctx);
             m_Wrapped.Add(item);
-            AfterAdd(item);
+            AfterAdd(item, ctx);
         }
 
-        public void Clear()
+        public void Clear(TransactionCtx ctx)
         {
-            BeforeChange();
+            BeforeChange(ctx);
             foreach (var e in m_Wrapped)
             {
                 BeforeRemove(e);
@@ -85,12 +85,12 @@ namespace Edb
             m_Wrapped.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(T item)
+        public bool Remove(T item, TransactionCtx ctx)
         {
             var idx = IndexOf(item);
             if (idx < 0)
                 return false;
-            RemoveAt(idx);
+            RemoveAt(idx, ctx);
             return true;
         }
         
@@ -99,17 +99,17 @@ namespace Edb
             return m_Wrapped.IndexOf(item);
         }
 
-        public void Insert(int index, T item)
+        public void Insert(int index, T item, TransactionCtx ctx)
         {
-            BeforeChange();
+            BeforeChange(ctx);
             m_Wrapped.Insert(index, item);
-            AfterAdd(item);
+            AfterAdd(item, ctx);
         }
 
-        public void RemoveAt(int index)
+        public void RemoveAt(int index, TransactionCtx ctx)
         {
-            BeforeChange();
-            BeforeRemove(m_Wrapped[index]);
+            BeforeChange(ctx);
+            BeforeRemove(m_Wrapped[index], ctx);
             m_Wrapped.RemoveAt(index);
         }
 
@@ -118,10 +118,10 @@ namespace Edb
             get => m_Wrapped[index];
             set
             {
-                BeforeChange();
-                BeforeRemove(m_Wrapped[index]);
+                BeforeChange(ctx);
+                BeforeRemove(m_Wrapped[index], ctx);
                 m_Wrapped[index] = value;
-                AfterAdd(value);
+                AfterAdd(value, ctx);
             }
         }
 
@@ -141,9 +141,9 @@ namespace Edb
             m_LogKey = logKey;
         }
 
-        private MyLog GetOrCreateMyLog()
+        private MyLog GetOrCreateMyLog(TransactionCtx ctx)
         {
-            var sp = Transaction.CurrentSavepoint;
+            var sp = ctx.Current!.CurrentSavepoint;
             var log = sp.Get(m_LogKey);
             if (log != null) 
                 return (MyLog)log;
@@ -154,20 +154,20 @@ namespace Edb
             return (MyLog)log;
         }
 
-        protected override void BeforeChange()
+        protected override void BeforeChange(TransactionCtx ctx)
         {
             m_Verify();
-            GetOrCreateMyLog().BeforeChange();
+            GetOrCreateMyLog(ctx).BeforeChange();
         }
         
-        protected override void AfterAdd(T item)
+        protected override void AfterAdd(T item, TransactionCtx ctx)
         {
-            Logs.Link(item, m_LogKey.XBean, m_LogKey.VarName);
+            Logs.Link(item, m_LogKey.XBean, m_LogKey.VarName, ctx);
         }
         
-        protected override void BeforeRemove(T item)
+        protected override void BeforeRemove(T item, TransactionCtx ctx)
         {
-            Logs.Link(item, null, null!);
+            Logs.Link(item, null, null!, ctx);
         }
         
         public LogList<T> SetVerify(Action verify)
@@ -186,10 +186,10 @@ namespace Edb
                 m_LogList = logList;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
                 if (m_SavedOnWrite != null)
-                    LogNotify.Notify(m_LogList.m_LogKey, this);
+                    LogNotify.Notify(m_LogList.m_LogKey, this, ctx);
             }
 
             public void Rollback()

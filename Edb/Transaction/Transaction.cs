@@ -2,6 +2,27 @@ using Evil.Util;
 
 namespace Edb
 {
+    public struct TransactionCtx
+    {
+        private Transaction? m_Transaction;
+        public Transaction? Current => m_Transaction;
+
+        public static TransactionCtx Create()
+        {
+            return new TransactionCtx();
+        }
+        
+        public TransactionCtx Start()
+        {
+            m_Transaction = new Transaction();
+            return this;
+        }
+
+        public void Destroy()
+        {
+            m_Transaction = null;
+        }
+    }
     public sealed partial class Transaction
     {
         #region Fields
@@ -14,16 +35,11 @@ namespace Edb
         internal Dictionary<LogKey, object> Wrappers => m_Wrappers;
 
         #endregion
-       
 
         #region Static
-
-        private static readonly AsyncLocal<Transaction?> ThreadLocal = new();
-        private static readonly AsyncLocal<bool> Isolation = new();
+        
         private static readonly LockAsync IsolationLock = new();
-        internal static Transaction? Current => ThreadLocal.Value;
-        public static IsolationLevel IsolationLevel => Isolation.Value ? IsolationLevel.Level3 : IsolationLevel.Level2;
-        public static bool IsActive => Current != null;
+        // public static bool IsActive => Current != null;
 
         #endregion
        
@@ -36,18 +52,18 @@ namespace Edb
 
         #endregion
         
-        internal static Transaction Create()
-        {
-            var self = Current;
-            if (self == null)
-                ThreadLocal.Value = self = new Transaction();
-            return self;
-        }
+        // internal static Transaction Create()
+        // {
+        //     var self = Current;
+        //     if (self == null)
+        //         ThreadLocal.Value = self = new Transaction();
+        //     return self;
+        // }
         
-        internal static void Destroy()
-        {
-            ThreadLocal.Value = null;
-        }
+        // internal static void Destroy()
+        // {
+        //     ThreadLocal.Value = null;
+        // }
 
         internal void RecordLogNotifyTTable<TKey, TValue>(TTable<TKey, TValue> table)
             where TKey : notnull where TValue : class
@@ -93,9 +109,9 @@ namespace Edb
             m_LastCommitActions.Add(action);
         }
 
-        internal async Task Perform<TP>(ProcedureImpl<TP> p) where TP : IProcedure
+        internal async Task Perform<TP>(ProcedureImpl<TP> p, TransactionCtx ctx) where TP : IProcedure
         {
-            IDisposable isolationRelease = null!;
+            IDisposable isolationRelease;
             if (p.IsolationLevel == IsolationLevel.Level3)
                 isolationRelease = await IsolationLock.WLockAsync();
             else 
@@ -107,11 +123,11 @@ namespace Edb
                 var flushRelease = await flushLock.RLockAsync();
                 try
                 {
-                    if (await p.Call())
+                    if (await p.Call(ctx))
                     {
-                        if (_real_commit_(p.Name) > 0)
+                        if (_real_commit_(p.Name, ctx) > 0)
                         {
-                            await LogNotify(p);
+                            await LogNotify(p, ctx);
                         }
                         m_LastCommitActions.ForEach(cb => cb());
                     }
@@ -150,32 +166,19 @@ namespace Edb
             }
         }
 
-        public static void AddSavepointTask(Action? commitTask, Action? rollbackTask)
+        public static void AddSavepointTask(Action? commitTask, Action? rollbackTask, TransactionCtx ctx)
         {
-            CurrentSavepoint.Add(new TActionLog(commitTask, rollbackTask));
+            ctx.Current!.CurrentSavepoint.Add(new TActionLog(commitTask, rollbackTask));
         }
         
-        public static void AddSavepointTask(Procedure? commitTask, Procedure? rollbackTask)
+        public static void AddSavepointTask(Procedure? commitTask, Procedure? rollbackTask, TransactionCtx ctx)
         {
-            CurrentSavepoint.Add(new TProcedureLog(commitTask, rollbackTask));
-        }
-        
-        public static void SetIsolation(IsolationLevel level)
-        {
-            switch (level)
-            {
-                case IsolationLevel.Level2:
-                    Isolation.Value = false;
-                    break;
-                case IsolationLevel.Level3:
-                    Isolation.Value = true;
-                    break;
-            }
+            ctx.Current!.CurrentSavepoint.Add(new TProcedureLog(commitTask, rollbackTask));
         }
 
-        public static void Rollback(int savepoint)
+        public static void Rollback(int savepoint, TransactionCtx ctx)
         {
-            Current!._rollback(savepoint);
+            ctx.Current!._rollback(savepoint);
         }
 
         private void Finish()
@@ -189,7 +192,7 @@ namespace Edb
             m_CachedTRecords.Clear();
         }
 
-        private async Task LogNotify<TP>(ProcedureImpl<TP> p) where TP : IProcedure
+        private async Task LogNotify<TP>(ProcedureImpl<TP> p, TransactionCtx ctx) where TP : IProcedure
         {
             try
             {
@@ -200,10 +203,10 @@ namespace Edb
                     m_LogNotifyTables = new();
                     foreach (var table in curLogNotifyTables.Values)
                     {
-                        await table.LogNotify();
+                        await table.LogNotify(ctx);
                     }
 
-                    if (_real_commit_(p.Name) == 0)
+                    if (_real_commit_(p.Name, ctx) == 0)
                     {
                         return;
                     }
@@ -246,14 +249,14 @@ namespace Edb
             }
         }
 
-        private int _real_commit_(string pName)
+        private int _real_commit_(string pName, TransactionCtx ctx)
         {
             try
             {
                 var count = 0;
                 foreach (var sp in m_Savepoints)
                 {
-                    count += sp.Commit();
+                    count += sp.Commit(ctx);
                 }
                 m_Savepoints.Clear();
                 return count;
@@ -275,7 +278,7 @@ namespace Edb
                 m_Rollback = rollback;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
                 m_Commit?.Execute();
             }
@@ -297,7 +300,7 @@ namespace Edb
                 m_Rollback = rollback;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
                 m_Commit?.Invoke();
             }

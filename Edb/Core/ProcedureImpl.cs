@@ -28,20 +28,20 @@ namespace Edb
             set => m_Exception = value;
         }
         
-        private ProcedureImpl(TP p)
+        private ProcedureImpl(TP p, TransactionCtx ctx = default)
         {
             m_Process = p;
-            IsolationLevel = Transaction.IsolationLevel;
+            IsolationLevel = ctx.Current == null ? IsolationLevel.Level3 : IsolationLevel.Level2;
         }
 
-        internal async Task<bool> Call()
+        internal async Task<bool> Call(TransactionCtx ctx)
         {
-            var savepoint = Transaction.Savepoint();
+            var savepoint = ctx.Current!.Savepoint;
             try
             {
                 if (m_Process is Procedure procedure)
                 {
-                    if (await procedure.Process())
+                    if (await procedure.Process(ctx))
                     {
                         m_Exception = null;
                         m_Success = true;
@@ -64,22 +64,22 @@ namespace Edb
                 Log.I.Error(e);
             }
 
-            Transaction.Rollback(savepoint);
+            Transaction.Rollback(savepoint, ctx);
             m_Success = false;
             return false;
         }
 
-        internal static async Task<IProcedure.IResult> Call(TP p)
+        internal static async Task<IProcedure.IResult> Call(TP p, TransactionCtx ctx)
         {
-            var impl = new ProcedureImpl<TP>(p);
-            if (Transaction.Current == null)
+            var impl = new ProcedureImpl<TP>(p, ctx);
+            if (ctx.Current == null)
             {
                 try
                 {
-                    Transaction.Create();
+                    ctx.Start();
                     for (var retry = 0;;)
                     {
-                        if (await Perform(impl))
+                        if (await Perform(impl, ctx))
                             break;
                         retry++;
                         if (retry > impl.RetryTimes)
@@ -92,12 +92,12 @@ namespace Edb
                 }
                 finally
                 {
-                    Transaction.Destroy();
+                    ctx.Destroy();
                 }
             }
             else
             {
-                await impl.Call();
+                await impl.Call(ctx);
             }
 
             return impl.Result;
@@ -105,8 +105,6 @@ namespace Edb
 
         internal static Task<IProcedure.IResult> Submit(TP p)
         {
-            if (Transaction.Current != null)
-                throw new ThreadStateException("can not submit procedure in transaction");
             var pt = new ProcedureTask(new ProcedureImpl<TP>(p));
             pt.Launch().ContinueWith(task =>
             {
@@ -132,11 +130,11 @@ namespace Edb
             return Edb.I.Random.Next(RetryDelay>>1, RetryDelay<<1);
         }
 
-        private static async Task<bool> Perform(ProcedureImpl<TP> p)
+        private static async Task<bool> Perform(ProcedureImpl<TP> p, TransactionCtx ctx)
         {
             try
             {
-                await Transaction.Current!.Perform(p);
+                await ctx.Current!.Perform(p, ctx);
             }
             catch (LockTimeoutException)
             {

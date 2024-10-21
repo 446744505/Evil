@@ -52,11 +52,11 @@ namespace Edb
             return m_ListenerMap.Add(name, l);
         }
 
-        public override async Task LogNotify()
+        public override async Task LogNotify(TransactionCtx ctx)
         {
             try
             {
-                await LogRecord.LogNotify(m_ListenerMap);
+                await LogRecord.LogNotify(m_ListenerMap, ctx);
             } catch (Exception e)
             {
                 m_LogRecord.Value = null;
@@ -71,16 +71,16 @@ namespace Edb
             Storage?.OnRecordChanged(r);
         }
 
-        internal void OnRecordChanged(TRecord<TKey, TValue> r, LogNotify ln)
+        internal void OnRecordChanged(TRecord<TKey, TValue> r, LogNotify ln, TransactionCtx ctx)
         {
-            LogRecord.OnChanged(r, ln);
-            Transaction.Current!.AddLastCommitAction(() => OnRecordChanged(r));
+            LogRecord.OnChanged(r, ln, ctx);
+            ctx.Current!.AddLastCommitAction(() => OnRecordChanged(r));
         }
         
-        internal void OnRecordChanged(TRecord<TKey, TValue> r, bool cc, TRecord<TKey, TValue>.State ss)
+        internal void OnRecordChanged(TRecord<TKey, TValue> r, bool cc, TRecord<TKey, TValue>.State ss, TransactionCtx ctx)
         {
-            LogRecord.OnChanged(r, cc, ss);
-            Transaction.Current!.AddLastCommitAction(() => OnRecordChanged(r));
+            LogRecord.OnChanged(r, cc, ss, ctx);
+            ctx.Current!.AddLastCommitAction(() => OnRecordChanged(r));
         }
 
         public override void Dispose()

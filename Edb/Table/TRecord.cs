@@ -34,11 +34,11 @@ namespace Edb
         #endregion
         
 
-        internal TRecord(TTable<TKey, TValue> table, TValue? value, Lockey lockey, State state) : base(null, RecordVarName)
+        internal TRecord(TTable<TKey, TValue> table, TValue? value, Lockey lockey, State state, TransactionCtx ctx) : base(null, RecordVarName)
         {
             m_Table = table;
             if (value != null)
-                Logs.Link(value, this, RecordVarName, State.InDbGet != state);
+                Logs.Link(value, this, RecordVarName, ctx, State.InDbGet != state);
             m_Value = value;
             m_Lockey = lockey;
             m_State = state;
@@ -50,9 +50,9 @@ namespace Edb
             return this;
         }
 
-        internal override void Notify(LogNotify notify)
+        internal override void Notify(LogNotify notify, TransactionCtx ctx)
         {
-            m_Table.OnRecordChanged(this, notify);
+            m_Table.OnRecordChanged(this, notify, ctx);
         }
         
         internal LogKey CreateLogKey()

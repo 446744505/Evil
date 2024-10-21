@@ -8,9 +8,9 @@ namespace Edb.Test
         
         private void Init()
         {
-            Transaction.Create();
-            Transaction.Savepoint();
-            xBean = new XBeanTest();
+            var ctx = TransactionCtx.Create().Start();
+            _ = ctx.Current!.Savepoint;
+            xBean = new XBeanTest(ctx);
             
             var logList = xBean.List;
             Assert.Contains(1, logList);
@@ -101,14 +101,15 @@ namespace Edb.Test
         private class XBeanTest : XBean
         {
             private List<int> m_List = new();
-            public XBeanTest() : base(null, null!)
+            public XBeanTest(TransactionCtx ctx) : base(null, null!)
             {
+                List = Logs.LogList<int>(this, "m_List", DoNothing, ctx);
                 List.Add(1);
                 List.Add(2);
                 List.Add(3);
             }
-            
-            public IList<int> List => Logs.LogList<int>(this, "m_List", DoNothing);
+
+            public IList<int> List;
         }
     }
 }

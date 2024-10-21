@@ -11,6 +11,6 @@ namespace Edb
         public string Name { get; }
         public Persistence PersistenceType { get; }
 
-        Task LogNotify();
+        Task LogNotify(TransactionCtx ctx);
     }
 }

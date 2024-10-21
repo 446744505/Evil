@@ -19,14 +19,14 @@ namespace Edb
             }
         }
 
-        public static Lockey GetLockey(int lockId, object key)
+        public static Lockey GetLockey(int lockId, object key, TransactionCtx ctx)
         {
-            return I.Get(new Lockey(lockId, key));
+            return I.Get(new Lockey(lockId, key), ctx);
         }
 
-        private Lockey Get(Lockey lockey)
+        private Lockey Get(Lockey lockey, TransactionCtx ctx)
         {
-            var transaction = Transaction.Current;
+            var transaction = ctx.Current;
             if (transaction != null)
             {
                 var lockey0 = transaction.Get(lockey);

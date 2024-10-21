@@ -52,9 +52,9 @@ namespace Edb
             }
         }
 
-        internal void LogAddRemove(TKey key, TRecord<TKey, TValue> r)
+        internal void LogAddRemove(TKey key, TRecord<TKey, TValue> r, TransactionCtx ctx)
         {
-            Transaction.CurrentSavepoint.Add(r.CreateLogKey(), new LogAddRemove0(this, key, r));
+            ctx.Current!.CurrentSavepoint.Add(r.CreateLogKey(), new LogAddRemove0(this, key, r));
         }
 
         internal async Task<bool> TryRemoveRecord(TRecord<TKey, TValue> r)
@@ -98,7 +98,7 @@ namespace Edb
         internal abstract ICollection<TRecord<TKey, TValue>> Values();
         internal abstract TRecord<TKey, TValue>? Get(TKey key);
         internal abstract void AddNoLog(TKey key, TRecord<TKey, TValue> r);
-        internal abstract void Add(TKey key, TRecord<TKey, TValue> r);
+        internal abstract void Add(TKey key, TRecord<TKey, TValue> r, TransactionCtx ctx);
         internal abstract bool Remove(TKey key);
 
         private class LogAddRemove0 : ILog
@@ -116,9 +116,9 @@ namespace Edb
                 m_State = r.Stat;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
-                m_Cache.m_Table.OnRecordChanged(m_Record, true, m_State);
+                m_Cache.m_Table.OnRecordChanged(m_Record, true, m_State, ctx);
             }
 
             public void Rollback()

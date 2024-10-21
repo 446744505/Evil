@@ -58,22 +58,22 @@ namespace Edb
             return localCopy.ContainsKey(fullVarName);
         }
 
-        internal async Task NotifyChanged(string fullVarName, object key, object value)
+        internal async Task NotifyChanged(string fullVarName, object key, object value, TransactionCtx ctx)
         {
-            await Notify(ChangeKind.ChangedAll, fullVarName, key, value, null);
+            await Notify(ChangeKind.ChangedAll, fullVarName, key, value, null, ctx);
         }
         
-        internal async Task NotifyChanged(string fullVarName, object key, object value, INote? note)
+        internal async Task NotifyChanged(string fullVarName, object key, object value, INote? note, TransactionCtx ctx)
         {
-            await Notify(ChangeKind.ChangedNote, fullVarName, key, value, note);
+            await Notify(ChangeKind.ChangedNote, fullVarName, key, value, note, ctx);
         }
         
-        internal async Task NotifyRemoved(string fullVarName, object key, object value)
+        internal async Task NotifyRemoved(string fullVarName, object key, object value, TransactionCtx ctx)
         {
-            await Notify(ChangeKind.Removed, fullVarName, key, value, null);
+            await Notify(ChangeKind.Removed, fullVarName, key, value, null, ctx);
         }
 
-        private async Task Notify(ChangeKind kind, string fullVarName, object key, object value, INote? note)
+        private async Task Notify(ChangeKind kind, string fullVarName, object key, object value, INote? note, TransactionCtx ctx)
         {
             var localCopy = m_ListenersCopy;
             if (!localCopy.TryGetValue(fullVarName, out var listeners))
@@ -81,7 +81,7 @@ namespace Edb
             
             foreach (var l in listeners!)
             {
-                var transaction = Transaction.Current!;
+                var transaction = ctx.Current!;
                 var spBefore = transaction.CurrentSavepointId;
                 var spBeforeAccess = spBefore > 0 ? transaction.GetSavepoint(spBefore)!.Access : 0;
                 try

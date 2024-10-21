@@ -114,14 +114,14 @@ namespace Edb
             }
         }
 
-        internal override void Add(TKey key, TRecord<TKey, TValue> r)
+        internal override void Add(TKey key, TRecord<TKey, TValue> r, TransactionCtx ctx)
         {
             var release = m_Lock.WLock();
             try
             {
                 if (m_Cache.Contains(key))
                     throw new XError("cache.Add duplicate record");
-                LogAddRemove(key, r);
+                LogAddRemove(key, r, ctx);
                 m_Cache.Add(key, r);
             }
             finally

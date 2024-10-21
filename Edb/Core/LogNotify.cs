@@ -27,9 +27,9 @@ namespace Edb
             return this;
         }
         
-        internal static void Notify(LogKey logKey, INote note)
+        internal static void Notify(LogKey logKey, INote note, TransactionCtx ctx)
         {
-            logKey.XBean.Notify(new LogNotify(logKey, note));
+            logKey.XBean.Notify(new LogNotify(logKey, note), ctx);
         }
 
         public override string ToString()

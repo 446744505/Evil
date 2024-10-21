@@ -17,7 +17,7 @@
             m_VarName = varName;
         }
 
-        internal void Link(XBean? parent, string varName, bool log)
+        internal void Link(XBean? parent, string varName, bool log, TransactionCtx ctx)
         {
             if (parent != null)
             {
@@ -34,15 +34,15 @@
             }
 
             if (log)
-                Transaction.CurrentSavepoint.AddIfAbsent(new LogKey(this, "m_Parent"), new LogParent(this));
+                ctx.Current!.CurrentSavepoint.AddIfAbsent(new LogKey(this, "m_Parent"), new LogParent(this));
             
             m_Parent = parent;
             m_VarName = varName;
         }
 
-        internal virtual void Notify(LogNotify notify)
+        internal virtual void Notify(LogNotify notify, TransactionCtx ctx)
         {
-            m_Parent?.Notify(notify.Push(new LogKey(m_Parent, m_VarName)));
+            m_Parent?.Notify(notify.Push(new LogKey(m_Parent, m_VarName)), ctx);
         }
 
         private ITRecord? GetRecord()
@@ -58,11 +58,11 @@
             return null;
         }
         
-        protected Action VerifyStandaloneOrLockHeld(string methodName, bool readOnly)
+        protected Action VerifyStandaloneOrLockHeld(string methodName, bool readOnly, TransactionCtx ctx)
         {
             if (!Edb.I.Config.Verify)
                 return DoNothing;
-            var transaction = Transaction.Current;
+            var transaction = ctx.Current;
             if (transaction == null)
                 return DoNothing;
             var record = GetRecord();
@@ -99,7 +99,7 @@
                 m_VarName = xBean.m_VarName;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
             }
 

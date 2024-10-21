@@ -5,27 +5,27 @@ namespace Edb
     internal partial class TRecord<TKey, TValue> : XBean
         where TKey : notnull where TValue : class
     {
-        private void Remove0()
+        private void Remove0(TransactionCtx ctx)
         {
-            Logs.Link(m_Value, null, null!);
-            Transaction.CurrentSavepoint.AddIfAbsent(CreateLogKey(), new LogAddRemove<TKey, TValue>(this));
+            Logs.Link(m_Value, null, null!, ctx);
+            ctx.Current!.CurrentSavepoint.AddIfAbsent(CreateLogKey(), new LogAddRemove<TKey, TValue>(this));
             m_Value = null;
         }
 
-        internal bool Remove()
+        internal bool Remove(TransactionCtx ctx)
         {
             switch (m_State)
             {
                 case State.InDbGet:
-                    Remove0();
+                    Remove0(ctx);
                     m_State = State.InDbRemove;
                     return true;
                 case State.InDbAdd:
-                    Remove0();
+                    Remove0(ctx);
                     m_State = State.InDbRemove;
                     return true;
                 case State.Add:
-                    Remove0();
+                    Remove0(ctx);
                     m_State = State.Remove;
                     return true;
                 default:
@@ -33,23 +33,23 @@ namespace Edb
             }
         }
 
-        private void Add0(TValue value)
+        private void Add0(TValue value, TransactionCtx ctx)
         {
-            Logs.Link(value, this, RecordVarName);
-            Transaction.CurrentSavepoint.AddIfAbsent(CreateLogKey(), new LogAddRemove<TKey, TValue>(this));
+            Logs.Link(value, this, RecordVarName, ctx);
+            ctx.Current!.CurrentSavepoint.AddIfAbsent(CreateLogKey(), new LogAddRemove<TKey, TValue>(this));
             m_Value = value;
         }
 
-        internal bool Add(TValue value)
+        internal bool Add(TValue value, TransactionCtx ctx)
         {
             switch (m_State)
             {
                 case State.InDbRemove:
-                    Add0(value);
+                    Add0(value, ctx);
                     m_State = State.InDbAdd;
                     return true;
                 case State.Remove:
-                    Add0(value);
+                    Add0(value, ctx);
                     m_State = State.Add;
                     return true;
                 default:
@@ -102,9 +102,9 @@ namespace Edb
                 m_SavedState = record.Stat;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
-                m_Record.m_Table.OnRecordChanged(m_Record, false, m_SavedState);
+                m_Record.m_Table.OnRecordChanged(m_Record, false, m_SavedState, ctx);
             }
 
             public void Rollback()

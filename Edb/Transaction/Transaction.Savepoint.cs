@@ -6,13 +6,10 @@ namespace Edb
         
         internal int CurrentSavepointId => m_Savepoints.Count;
         
-        internal static Savepoint CurrentSavepoint => Current!.m_Savepoints[^1];
+        internal Savepoint CurrentSavepoint => m_Savepoints[^1];
 
-        public static int Savepoint()
-        {
-            return Current!.Savepoint0();
-        }
-        
+        public int Savepoint => Savepoint0();
+
         internal Savepoint? GetSavepoint(int savepoint)
         {
             if (savepoint < 1 || savepoint > m_Savepoints.Count)

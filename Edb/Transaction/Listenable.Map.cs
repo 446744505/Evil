@@ -13,22 +13,22 @@ namespace Edb
                 m_VarName = varName;
             }
             
-            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
+            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap, TransactionCtx ctx)
             {
                 switch (rs)
                 {
                     case RecordState.Added:
-                        await listenerMap.NotifyChanged(m_VarName, key, value);
+                        await listenerMap.NotifyChanged(m_VarName, key, value, ctx);
                         break;
                     case RecordState.Removed:
-                        await listenerMap.NotifyRemoved(m_VarName, key, value);
+                        await listenerMap.NotifyRemoved(m_VarName, key, value, ctx);
                         break;
                     case RecordState.Changed:
                         if ((m_Note != null || m_Changed != null) && listenerMap.HasListener(m_VarName))
                         {
                             var nMap = m_Note == null ? new NoteMap<TKey, XBean>() : (INoteMap)m_Note;
                             nMap.SetChanged(m_Changed!, XBeanInfo.GetValue((XBean)value, m_VarName)!);
-                            await listenerMap.NotifyChanged(m_VarName, key, value, nMap);
+                            await listenerMap.NotifyChanged(m_VarName, key, value, nMap, ctx);
                         }
                         break;
                 }

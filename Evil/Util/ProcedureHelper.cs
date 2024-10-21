@@ -5,23 +5,23 @@ namespace Evil.Util
 {
     public class ProcedureHelper
     {
-        public static void SendWhenCommit(Session session, Message msg)
+        public static void SendWhenCommit(Session session, Message msg, TransactionCtx ctx)
         {
             Transaction.AddSavepointTask(() =>
             {
                 msg.Send(session);
-            }, null);
+            }, null, ctx);
         }
         
-        public static void SendWhenRollback(Session session, Message msg)
+        public static void SendWhenRollback(Session session, Message msg, TransactionCtx ctx)
         {
             Transaction.AddSavepointTask(null, () =>
             {
                 msg.Send(session);
-            });
+            }, ctx);
         }
         
-        public static void SendWhenFinish(Session session, Message msg)
+        public static void SendWhenFinish(Session session, Message msg, TransactionCtx ctx)
         {
             Transaction.AddSavepointTask(() =>
             {
@@ -29,37 +29,37 @@ namespace Evil.Util
             }, () =>
             {
                 msg.Send(session);
-            });
+            }, ctx);
         }
         
-        public static void ExecuteWhenCommit(Action action)
+        public static void ExecuteWhenCommit(Action action, TransactionCtx ctx)
         {
-            Transaction.AddSavepointTask(action, null);
+            Transaction.AddSavepointTask(action, null, ctx);
         }
         
-        public static void ExecuteWhenCommit(Procedure p)
+        public static void ExecuteWhenCommit(Procedure p, TransactionCtx ctx)
         {
-            Transaction.AddSavepointTask(p, null);
+            Transaction.AddSavepointTask(p, null, ctx);
         }
         
-        public static void ExecuteWhenRollback(Action action)
+        public static void ExecuteWhenRollback(Action action, TransactionCtx ctx)
         {
-            Transaction.AddSavepointTask(null, action);
+            Transaction.AddSavepointTask(null, action, ctx);
         }
         
-        public static void ExecuteWhenRollback(Procedure p)
+        public static void ExecuteWhenRollback(Procedure p, TransactionCtx ctx)
         {
-            Transaction.AddSavepointTask(null, p);
+            Transaction.AddSavepointTask(null, p, ctx);
         }
         
-        public static void ExecuteWhenFinish(Action action)
+        public static void ExecuteWhenFinish(Action action, TransactionCtx ctx)
         {
-            Transaction.AddSavepointTask(action, action);
+            Transaction.AddSavepointTask(action, action, ctx);
         }
         
-        public static void ExecuteWhenFinish(Procedure p)
+        public static void ExecuteWhenFinish(Procedure p, TransactionCtx ctx)
         {
-            Transaction.AddSavepointTask(p, p);
+            Transaction.AddSavepointTask(p, p, ctx);
         }
         
         public class MessageDispatcher : IMessageDispatcher

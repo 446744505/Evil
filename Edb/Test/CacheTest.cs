@@ -31,18 +31,18 @@ namespace Edb.Test
                 PlayerName = "Bob"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit( async ctx =>
             {
-                await tp.Insert(player1);
-                Assert.NotNull(await tp.Select(player1.PlayerId));
-                await tp.Insert(player2);
-                Assert.NotNull(await tp.Select(player2.PlayerId));
+                await tp.Insert(player1, ctx);
+                Assert.NotNull(await tp.Select(player1.PlayerId, ctx));
+                await tp.Insert(player2, ctx);
+                Assert.NotNull(await tp.Select(player2.PlayerId, ctx));
                 return true;
             });
-            await Procedure.Submit( async () =>
+            await Procedure.Submit( async (ctx) =>
             {
                 tp.Cache.Clean();
-                Assert.Null(await tp.Select(player1.PlayerId));
+                Assert.Null(await tp.Select(player1.PlayerId, ctx));
                 return true;
             });
         }
@@ -85,24 +85,24 @@ namespace Edb.Test
                 return BsonSerializer.Deserialize<Player>(value);
             }
             
-            public async Task<Player?> Select(long key)
+            public async Task<Player?> Select(long key, TransactionCtx ctx)
             {
-                return await GetAsync(key, false);
+                return await GetAsync(key, false, ctx);
             }
             
-            public async Task<bool> Insert(Player player)
+            public async Task<bool> Insert(Player player, TransactionCtx ctx)
             {
-                return await AddAsync(player.PlayerId, player);
+                return await AddAsync(player.PlayerId, player, ctx);
             }
             
-            public async Task<bool> Delete(long key)
+            public async Task<bool> Delete(long key, TransactionCtx ctx)
             {
-                return await RemoveAsync(key);
+                return await RemoveAsync(key, ctx);
             }
             
-            public async Task<Player?> Update(long key)
+            public async Task<Player?> Update(long key, TransactionCtx ctx)
             {
-                return await GetAsync(key, true);
+                return await GetAsync(key, true, ctx);
             }
         }
     }

@@ -6,10 +6,10 @@ namespace Edb
 {
     public partial class Logs
     {
-        public static IDictionary<TKey, TValue> LogMap<TKey, TValue>(XBean xBean, string varName, Action verify) where TKey : notnull
+        public static IDictionary<TKey, TValue> LogMap<TKey, TValue>(XBean xBean, string varName, Action verify, TransactionCtx ctx) where TKey : notnull
         {
             var key = new LogKey(xBean, varName);
-            var wrappers = Transaction.Current!.Wrappers;
+            var wrappers = ctx.Current!.Wrappers;
             if (!wrappers.TryGetValue(key, out var log))
             {
                 wrappers[key] = log = new LogMap<TKey, TValue, Dictionary<TKey, TValue>>(key, (key.Value as Dictionary<TKey, TValue>)!);
@@ -42,9 +42,9 @@ namespace Edb
             return this;
         }
         
-        private MyLog GetOrCreateMyLog()
+        private MyLog GetOrCreateMyLog(TransactionCtx ctx)
         {
-            var sp = Transaction.CurrentSavepoint;
+            var sp = ctx.Current!.CurrentSavepoint;
             var log = sp.Get(m_LogKey);
             if (log != null) 
                 return (MyLog)log;
@@ -66,17 +66,17 @@ namespace Edb
             return GetEnumerator();
         }
 
-        public void Add(KeyValuePair<TKey, TValue> pair)
+        public void Add(KeyValuePair<TKey, TValue> pair, TransactionCtx ctx)
         {
-            Add(pair.Key, pair.Value);
+            Add(pair.Key, pair.Value, ctx);
         }
 
-        public void Clear()
+        public void Clear(TransactionCtx ctx)
         {
             m_Verify();
-            var myLog = GetOrCreateMyLog();
+            var myLog = GetOrCreateMyLog(ctx);
             foreach (var pair in m_Wrapped)
-                myLog.BeforeRemove(pair.Key, pair.Value);
+                myLog.BeforeRemove(pair.Key, pair.Value, ctx);
             m_Wrapped.Clear();
         }
 
@@ -91,14 +91,14 @@ namespace Edb
             id.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(KeyValuePair<TKey, TValue> pair)
+        public bool Remove(KeyValuePair<TKey, TValue> pair, TransactionCtx ctx)
         {
             if (!m_Wrapped.TryGetValue(pair.Key, out var value) || !EqualityComparer<TValue>.Default.Equals(value, pair.Value))
                 return false;
-            return Remove(pair.Key);
+            return Remove(pair.Key, ctx);
         }
         
-        public void Add(TKey key, TValue value)
+        public void Add(TKey key, TValue value, TransactionCtx ctx)
         {
             m_Verify();
             if (key == null || value == null)
@@ -106,9 +106,9 @@ namespace Edb
             var hadOrigin = m_Wrapped.TryGetValue(key, out var origin);
             if (hadOrigin)
                 throw new ArgumentException($"key={key} already exists in dictionary");
-            Logs.Link(value, m_LogKey.XBean, m_LogKey.VarName);
+            Logs.Link(value, m_LogKey.XBean, m_LogKey.VarName, ctx);
             m_Wrapped[key] = value;
-            GetOrCreateMyLog().AfterPut(key, origin, hadOrigin);
+            GetOrCreateMyLog(ctx).AfterPut(key, origin, hadOrigin, ctx);
         }
 
         public bool ContainsKey(TKey key)
@@ -116,12 +116,12 @@ namespace Edb
             return m_Wrapped.ContainsKey(key);
         }
 
-        public bool Remove(TKey key)
+        public bool Remove(TKey key, TransactionCtx ctx)
         {
             m_Verify();
             if (m_Wrapped.Remove(key, out var value))
             {
-                GetOrCreateMyLog().AfterRemove(key, value!);
+                GetOrCreateMyLog(ctx).AfterRemove(key, value!, ctx);
                 return true;
             }
             return false;
@@ -140,9 +140,9 @@ namespace Edb
                 m_Verify();
                 if (key == null || value == null)
                     throw new NullReferenceException();
-                Logs.Link(value, m_LogKey.XBean, m_LogKey.VarName);
+                Logs.Link(value, m_LogKey.XBean, m_LogKey.VarName, ctx);
                 var hadOrigin = m_Wrapped.PutAndReturnValue(key, value, out var origin);
-                GetOrCreateMyLog().AfterPut(key, origin, hadOrigin);
+                GetOrCreateMyLog(ctx).AfterPut(key, origin, hadOrigin, ctx);
             }
         }
 
@@ -170,10 +170,10 @@ namespace Edb
                 m_LogMap = logMap;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
                 if (IsMapChanged)
-                    LogNotify.Notify(m_LogMap.m_LogKey, this);
+                    LogNotify.Notify(m_LogMap.m_LogKey, this, ctx);
             }
 
             public void Rollback()
@@ -188,23 +188,23 @@ namespace Edb
                 Clear();
             }
             
-            internal void BeforeRemove(TKey key, TValue value)
+            internal void BeforeRemove(TKey key, TValue value, TransactionCtx ctx)
             {
-                Logs.Link(value, null, null!);
+                Logs.Link(value, null, null!, ctx);
                 LogRemove(key, value);
             }
             
-            internal void AfterRemove(TKey key, TValue value)
+            internal void AfterRemove(TKey key, TValue value, TransactionCtx ctx)
             {
                 LogRemove(key, value);
-                Logs.Link(value, null, null!);
+                Logs.Link(value, null, null!, ctx);
             }
             
-            public void AfterPut(TKey key, TValue? origin, bool hadOrigin)
+            public void AfterPut(TKey key, TValue? origin, bool hadOrigin, TransactionCtx ctx)
             {
                 LogPut(key, origin, hadOrigin);
                 if (origin != null)
-                    Logs.Link(origin, null, null!);
+                    Logs.Link(origin, null, null!, ctx);
             }
         }
     }

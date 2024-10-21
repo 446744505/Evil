@@ -9,11 +9,11 @@ namespace Edb
         
         internal int Access => m_Access;
 
-        internal int Commit()
+        internal int Commit(TransactionCtx ctx)
         {
             foreach (var log in m_AddOrder)
             {
-                log.Commit();
+                log.Commit(ctx);
             }
 
             return m_AddOrder.Count;

@@ -45,15 +45,16 @@ namespace Edb
 
             private async Task Start()
             {
+                var ctx = TransactionCtx.Create().Start();
                 try
                 {
                     try
                     {
-                        await Transaction.Create().Perform(m_Procedure);
+                        await ctx.Current!.Perform(m_Procedure, ctx);
                     }
                     finally
                     {
-                        Transaction.Destroy();
+                        ctx.Destroy();
                     }
                     
                     Done();

@@ -8,9 +8,9 @@ namespace Edb.Test
         
         private void Init()
         {
-            Transaction.Create();
-            Transaction.Savepoint();
-            xBean = new XBeanTest();
+            var ctx = TransactionCtx.Create().Start();
+            _ = ctx.Current!.Savepoint;
+            xBean = new XBeanTest(ctx);
             
             var logSet = xBean.Set;
             Assert.Contains(1, logSet);
@@ -63,14 +63,15 @@ namespace Edb.Test
         private class XBeanTest : XBean
         {
             private HashSet<int> m_Set = new();
-            public XBeanTest() : base(null, null)
+            public XBeanTest(TransactionCtx ctx) : base(null, null)
             {
+                Set = Logs.LogSet<int>(this, "m_Set", DoNothing, ctx);
                 Set.Add(1);
                 Set.Add(2);
                 Set.Add(3);
             }
-            
-            public ISet<int> Set => Logs.LogSet<int>(this, "m_Set", DoNothing);
+
+            public ISet<int> Set;
         }
     }
 }

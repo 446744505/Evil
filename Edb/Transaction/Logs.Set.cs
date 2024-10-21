@@ -5,10 +5,10 @@ namespace Edb
 {
     public partial class Logs
     {
-        public static ISet<T> LogSet<T>(XBean xBean, string varName, Action verify)
+        public static ISet<T> LogSet<T>(XBean xBean, string varName, Action verify, TransactionCtx ctx)
         {
             var key = new LogKey(xBean, varName);
-            var wrappers = Transaction.Current!.Wrappers;
+            var wrappers = ctx.Current!.Wrappers;
             if (!wrappers.TryGetValue(key, out var log))
             {
                 wrappers[key] = log = new LogSet<T>(key, (key.Value as HashSet<T>)!);
@@ -39,9 +39,9 @@ namespace Edb
             return this;
         }
 
-        private MyLog<T> GetOrCreateMyLog()
+        private MyLog<T> GetOrCreateMyLog(TransactionCtx ctx)
         {
-            var sp = Transaction.CurrentSavepoint;
+            var sp = ctx.Current!.CurrentSavepoint;
             var log = sp.Get(m_LogKey);
             if (log != null) 
                 return (MyLog<T>)log;
@@ -63,22 +63,22 @@ namespace Edb
             return GetEnumerator();
         }
 
-        private bool AddIfNotPresent(T item)
+        private bool AddIfNotPresent(T item, TransactionCtx ctx)
         {
             m_Verify();
             if (m_Wrapped.Add(item))
             {
-                GetOrCreateMyLog().AfterAdd(item);
-                Logs.Link(item, m_LogKey.XBean, m_LogKey.VarName);
+                GetOrCreateMyLog(ctx).AfterAdd(item);
+                Logs.Link(item, m_LogKey.XBean, m_LogKey.VarName, ctx);
                 return true;
             }
 
             return false;
         }
         
-        void ICollection<T>.Add(T item)
+        void ICollection<T>.Add(T item, TransactionCtx ctx)
         {
-            AddIfNotPresent(item);
+            AddIfNotPresent(item, ctx);
         }
 
         public void ExceptWith(IEnumerable<T> other)
@@ -135,17 +135,17 @@ namespace Edb
             throw new NotImplementedException();
         }
 
-        bool ISet<T>.Add(T item)
+        bool ISet<T>.Add(T item, TransactionCtx ctx)
         {
-            return AddIfNotPresent(item);
+            return AddIfNotPresent(item, ctx);
         }
 
-        public void Clear()
+        public void Clear(TransactionCtx ctx)
         {
             m_Verify();
-            var myLog = GetOrCreateMyLog();
+            var myLog = GetOrCreateMyLog(ctx);
             foreach (var e in m_Wrapped)
-                myLog.BeforeRemove(e);
+                myLog.BeforeRemove(e, ctx);
             m_Wrapped.Clear();
         }
 
@@ -159,13 +159,13 @@ namespace Edb
             m_Wrapped.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(T item)
+        public bool Remove(T item, TransactionCtx ctx)
         {
             m_Verify();
             if (!m_Wrapped.Remove(item)) 
                 return false;
             
-            GetOrCreateMyLog().AfterRemove(item);
+            GetOrCreateMyLog(ctx).AfterRemove(item, ctx);
             return true;
 
         }
@@ -184,10 +184,10 @@ namespace Edb
                 m_LogSet = logSet;
             }
 
-            public void Commit()
+            public void Commit(TransactionCtx ctx)
             {
                 if (IsSetChanged)
-                    LogNotify.Notify(m_LogSet.m_LogKey, this);
+                    LogNotify.Notify(m_LogSet.m_LogKey, this, ctx);
             }
 
             public void Rollback()
@@ -204,16 +204,16 @@ namespace Edb
                 Clear();
             }
 
-            public void BeforeRemove(TE item)
+            public void BeforeRemove(TE item, TransactionCtx ctx)
             {
-                Logs.Link(item, null, null!);
+                Logs.Link(item, null, null!, ctx);
                 LogRemove(item);
             }
 
-            public void AfterRemove(TE item)
+            public void AfterRemove(TE item, TransactionCtx ctx)
             {
                 LogRemove(item);
-                Logs.Link(item, null, null!);
+                Logs.Link(item, null, null!, ctx);
             }
 
             public void AfterAdd(TE item)

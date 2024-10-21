@@ -12,22 +12,22 @@ namespace Edb
                 m_Vars[varName] = listenable;
             }
             
-            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap)
+            internal override async Task LogNotify<TKey, TValue>(object key, object value, RecordState rs, ListenerMap listenerMap, TransactionCtx ctx)
             {
                 foreach (var l in m_Vars.Values)
-                    await l.LogNotify<TKey, TValue>(key, value, rs, listenerMap);
+                    await l.LogNotify<TKey, TValue>(key, value, rs, listenerMap, ctx);
 
                 switch (rs)
                 {
                     case RecordState.Added:
-                        await listenerMap.NotifyChanged("", key, value);
+                        await listenerMap.NotifyChanged("", key, value, ctx);
                         break;
                     case RecordState.Removed:
-                        await listenerMap.NotifyRemoved("", key, value);
+                        await listenerMap.NotifyRemoved("", key, value, ctx);
                         break;
                     case RecordState.Changed:
                         if (m_Changed)
-                            await listenerMap.NotifyChanged("", key, value, null); 
+                            await listenerMap.NotifyChanged("", key, value, null, ctx);
                         break;
                 }
 

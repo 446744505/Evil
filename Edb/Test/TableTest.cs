@@ -26,17 +26,17 @@ namespace Edb.Test
                 PlayerName = "Alice"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit( async ctx =>
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
+                await tp.Delete(player.PlayerId, ctx);
+                Assert.Null(await tp.Select(player.PlayerId, ctx));
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(async ctx =>
             {
-                var ok = await tp.Insert(player);
+                var ok = await tp.Insert(player, ctx);
                 Assert.True(ok);
-                var p = await tp.Select(player.PlayerId);
+                var p = await tp.Select(player.PlayerId, ctx);
                 Assert.NotNull(p);
                 Assert.Equal(player.PlayerId, p.PlayerId);
                 Assert.Equal(player.PlayerName, p.PlayerName);
@@ -57,20 +57,20 @@ namespace Edb.Test
                 PlayerName = "Alice"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit( async ctx =>
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
+                await tp.Delete(player.PlayerId, ctx);
+                Assert.Null(await tp.Select(player.PlayerId, ctx));
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(async ctx =>
             {
-                var ok = await tp.Insert(player);
+                var ok = await tp.Insert(player, ctx);
                 Assert.True(ok);
-                var up = await tp.Update(player.PlayerId);
+                var up = await tp.Update(player.PlayerId, ctx);
                 Assert.NotNull(up);
                 up.PlayerName = "Bob";
-                var p = await tp.Select(player.PlayerId);
+                var p = await tp.Select(player.PlayerId, ctx);
                 Assert.NotNull(p);
                 Assert.Equal(player.PlayerId, p.PlayerId);
                 Assert.Equal("Bob", p.PlayerName);
@@ -92,26 +92,26 @@ namespace Edb.Test
                 PlayerName = "Alice"
             };
             TPlayer tp = (TPlayer)table;
-            await Procedure.Submit( async () =>
+            await Procedure.Submit( async ctx =>
             {
-                await tp.Delete(player.PlayerId);
-                Assert.Null(await tp.Select(player.PlayerId));
+                await tp.Delete(player.PlayerId, ctx);
+                Assert.Null(await tp.Select(player.PlayerId, ctx));
                 return true;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(async ctx =>
             {
-                var ok = await tp.Insert(player);
+                var ok = await tp.Insert(player, ctx);
                 Assert.True(ok);
-                var p = await tp.Select(player.PlayerId);
+                var p = await tp.Select(player.PlayerId, ctx);
                 Assert.NotNull(p);
                 Assert.Equal(player.PlayerId, p.PlayerId);
                 Assert.Equal("Alice", p.PlayerName);
                 
                 return false;
             });
-            await Procedure.Submit(async () =>
+            await Procedure.Submit(async ctx =>
             {
-                var p = await tp.Select(player.PlayerId);
+                var p = await tp.Select(player.PlayerId, ctx);
                 Assert.Null(p);
                 return true;
             });
@@ -159,24 +159,24 @@ namespace Edb.Test
                 return BsonSerializer.Deserialize<Player>(value);
             }
             
-            public async Task<Player?> Select(long key)
+            public async Task<Player?> Select(long key, TransactionCtx ctx)
             {
-                return await GetAsync(key, false);
+                return await GetAsync(key, false, ctx);
             }
             
-            public async Task<bool> Insert(Player player)
+            public async Task<bool> Insert(Player player, TransactionCtx ctx)
             {
-                return await AddAsync(player.PlayerId, player);
+                return await AddAsync(player.PlayerId, player, ctx);
             }
             
-            public async Task<bool> Delete(long key)
+            public async Task<bool> Delete(long key, TransactionCtx ctx)
             {
-                return await RemoveAsync(key);
+                return await RemoveAsync(key, ctx);
             }
             
-            public async Task<Player?> Update(long key)
+            public async Task<Player?> Update(long key, TransactionCtx ctx)
             {
-                return await GetAsync(key, true);
+                return await GetAsync(key, true, ctx);
             }
         }
     }

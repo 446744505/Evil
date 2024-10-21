@@ -2,7 +2,7 @@
 {
     internal interface ILog
     {
-        internal void Commit();
+        internal void Commit(TransactionCtx ctx);
         internal void Rollback();
     }
 }
